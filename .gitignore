@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.vpp.bak_*
+.*.vpp.lck
+abc_shop/data/abc_shop.db
+abc_shop/data/uploads/
+tmp/
