@@ -1,0 +1,43 @@
+{
+  "categories": [
+    {"id": "shoes", "name": "Shoes"},
+    {"id": "bag", "name": "Bags"},
+    {"id": "shirt", "name": "Shirts"},
+    {"id": "cap", "name": "Caps"},
+    {"id": "watch", "name": "Watches"}
+  ],
+  "products": [
+    {"id": "P01", "name": "Nike Running Shoes",   "category": "shoes", "brand": "Nike",     "color": "black",  "price": 120, "stock": 10, "description": "lightweight road running shoes",             "image": "images/p01_nike_running_shoes.png"},
+    {"id": "P02", "name": "Adidas Running Shoes", "category": "shoes", "brand": "Adidas",   "color": "white",  "price": 100, "stock": 15, "description": "cushioned running shoes for daily training", "image": "images/p02_adidas_running_shoes.png"},
+    {"id": "P03", "name": "Black Leather Bag",    "category": "bag",   "brand": "Lumi",     "color": "black",  "price": 80,  "stock": 20, "description": "leather handbag with shoulder strap",        "image": "images/p03_black_leather_bag.png"},
+    {"id": "P04", "name": "Blue Sports Shoes",    "category": "shoes", "brand": "Puma",     "color": "blue",   "price": 75,  "stock": 12, "description": "sports shoes for gym and court",             "image": "images/p04_blue_sports_shoes.png"},
+    {"id": "P05", "name": "Nike Court Sneakers",  "category": "shoes", "brand": "Nike",     "color": "white",  "price": 85,  "stock": 0,  "description": "classic court sneakers",                     "image": "images/p05_nike_court_sneakers.png"},
+    {"id": "P06", "name": "Red Canvas Backpack",  "category": "bag",   "brand": "Herschel", "color": "red",    "price": 60,  "stock": 8,  "description": "canvas backpack for school and travel",      "image": "images/p06_red_canvas_backpack.png"},
+    {"id": "P07", "name": "Black Cotton T-Shirt", "category": "shirt", "brand": "Uniqlo",   "color": "black",  "price": 15,  "stock": 50, "description": "basic cotton t-shirt",                       "image": "images/p07_black_cotton_tshirt.png"},
+    {"id": "P08", "name": "White Polo Shirt",     "category": "shirt", "brand": "Lacoste",  "color": "white",  "price": 70,  "stock": 9,  "description": "polo shirt with collar",                     "image": "images/p08_white_polo_shirt.png"},
+    {"id": "P09", "name": "Blue Denim Cap",       "category": "cap",   "brand": "Levis",    "color": "blue",   "price": 25,  "stock": 30, "description": "denim baseball cap",                         "image": "images/p09_blue_denim_cap.png"},
+    {"id": "P10", "name": "Black Smart Watch",    "category": "watch", "brand": "Xiaomi",   "color": "black",  "price": 150, "stock": 6,  "description": "smart watch with heart rate sensor",         "image": "images/p10_black_smart_watch.png"},
+    {"id": "P11", "name": "Silver Analog Watch",  "category": "watch", "brand": "Casio",    "color": "silver", "price": 55,  "stock": 14, "description": "analog wrist watch with metal band",         "image": "images/p11_silver_analog_watch.png"},
+    {"id": "P12", "name": "Red Running Shoes",    "category": "shoes", "brand": "Asics",    "color": "red",    "price": 110, "stock": 7,  "description": "running shoes with gel cushioning",          "image": "images/p12_red_running_shoes.png"},
+    {"id": "P13", "name": "White Cotton T-Shirt", "category": "shirt", "brand": "Uniqlo",   "color": "white",  "price": 15,  "stock": 40, "description": "soft cotton t-shirt for everyday wear",      "image": "images/p13_white_cotton_tshirt.png"},
+    {"id": "P14", "name": "Red Baseball Cap",     "category": "cap",   "brand": "Nike",     "color": "red",    "price": 22,  "stock": 18, "description": "cotton baseball cap with curved brim",       "image": "images/p14_red_baseball_cap.png"},
+    {"id": "P15", "name": "Blue Smart Watch",     "category": "watch", "brand": "Samsung",  "color": "blue",   "price": 180, "stock": 4,  "description": "smart watch with gps and sleep tracking",    "image": "images/p15_blue_smart_watch.png"},
+    {"id": "P16", "name": "Blue Canvas Backpack", "category": "bag",   "brand": "Herschel", "color": "blue",   "price": 65,  "stock": 11, "description": "canvas backpack with laptop sleeve",         "image": "images/p16_blue_canvas_backpack.png"}
+  ],
+  "customers": [
+    {"id": "C001", "name": "Be Quoc Khanh",   "email": "khanh@example.com", "password": "khanh2026", "address": ["Be Quoc Khanh", "0912345678", "122 Hoang Quoc Viet", "Ha Noi"]},
+    {"id": "C002", "name": "Nguyen Thu Ha",   "email": "ha@example.com",    "password": "thuha2026", "address": ["Nguyen Thu Ha", "0987654321", "45 Tran Phu, Ha Dong", "Ha Noi"]},
+    {"id": "C003", "name": "Tran Minh Duc",   "email": "duc@example.com",   "password": "minhduc26", "address": ["Tran Minh Duc", "0909111222", "8 Le Loi, District 1", "Ho Chi Minh City"]},
+    {"id": "C004", "name": "Le Hoang Anh",    "email": "anh@example.com",   "password": "hoanganh26", "address": ["Le Hoang Anh", "0933555777", "17 Nguyen Van Linh", "Da Nang"]}
+  ],
+  "staff": [
+    {"id": "S01", "name": "Pham Lan",       "email": "sales@abc.vn",     "password": "sales2026",  "role": "sales"},
+    {"id": "W01", "name": "Do Tuan",    "email": "warehouse@abc.vn", "password": "stock2026",  "role": "warehouse"},
+    {"id": "A01", "name": "Vu Mai", "email": "admin@abc.vn",     "password": "admin2026",  "role": "admin"},
+    {"id": "M01", "name": "Hoang Nam",    "email": "manager@abc.vn",   "password": "report2026", "role": "manager"}
+  ],
+  "promotions": [
+    {"code": "WELCOME10", "percent": 10, "min_total": 50, "start": "2026-10-01", "end": "2026-12-31"},
+    {"code": "SUMMER20",  "percent": 20, "min_total": 0,  "start": "2026-06-01", "end": "2026-08-31"}
+  ]
+}
