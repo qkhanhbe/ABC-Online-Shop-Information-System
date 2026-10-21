@@ -21,7 +21,7 @@ See [abc_shop/README.md](abc_shop/README.md) for all commands, demo accounts and
 ## Project files
 
 - `tieuluan_V1_04_049_KHANHBQ.pdf` - essay report (5 chapters)
-- `TieuLuan_KHANHBQ.vpp` - Visual Paradigm project with all 24 diagrams
+- `TieuLuan_KHANHBQ.vpp` - Visual Paradigm project with all 27 diagrams
 - `diagrams/` - PNG export of the diagrams (context, use case, activity, DFD, sequence, class, state, ERD,
   component, package, deployment)
 - `abc_shop/` - Python source: model, dao, service, ai, controller, view, tests
@@ -31,7 +31,7 @@ See [abc_shop/README.md](abc_shop/README.md) for all commands, demo accounts and
 
 | Chapter | Content | Diagrams |
 |---|---|---|
-| 1. Requirement Determination | Business problems, stakeholders, needs, FR/NFR, 32 use cases, traceability | CTX01, UC00 |
+| 1. Requirement Determination | Business problems, stakeholders, needs, FR/NFR, 32 use cases, traceability | CTX01, UCD1-UCD4 |
 | 2. Analysis | Activity, DFD, sequence (BCE), analysis classes, order state machine, data model | AD01-03, DFD0-1, SD01-02, CL01, ST01, ERD01 |
 | 3. AI in E-commerce | Multimodal search, review insights, recommender; evaluation, risks, fallbacks | UC_AI, CMP01, SD03-04, AD04 |
 | 4. Design | Four steps: methods, use dependencies, DAO, MVC packages; checkout design; deployment | DCL01-03, PKG01, SD05, CMP02, DEP01 |
