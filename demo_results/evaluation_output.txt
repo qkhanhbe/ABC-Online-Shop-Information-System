@@ -1,0 +1,47 @@
+=== 1. Multimodal search ===
+  #  Mode       Query                                  Top-1 result              Score  Success
+  1  text       black shoes                            Nike Running Shoes        0.986  Yes
+  2  text       white polo shirt                       White Polo Shirt          0.988  Yes
+  3  text       find Nike shoes under 100 dollars      Nike Court Sneakers       0.900  Yes
+  4  text       red bag                                Red Canvas Backpack       0.987  Yes
+  5  text       cheap watch under 60                   Silver Analog Watch       0.542  Yes
+  6  text       leather handbag                        Black Leather Bag         0.997  Yes
+  7  voice      find running shoes                     Adidas Running Shoes      0.994  Yes
+  8  voice      show me a blue cap                     Blue Denim Cap            1.000  Yes
+  9  voice      i want a smart watch                   Black Smart Watch         0.985  Yes
+ 10  image      query_black_shoe.png                   Nike Running Shoes        0.892  Yes
+ 11  image      query_red_shoe.png                     Red Running Shoes         0.950  Yes
+ 12  image      query_white_shoe.png                   Adidas Running Shoes      0.785  Yes
+ 13  image      query_black_bag.png                    Black Leather Bag         0.959  Yes
+ 14  image      query_blue_cap.png                     Blue Denim Cap            0.955  Yes
+ 15  image      query_silver_watch.png                 Silver Analog Watch       0.967  Yes
+ 16  image      query_black_tshirt.png                 Black Cotton T-Shirt      0.961  Yes
+ 17  multimodal running shoes + query_red_shoe.png     Red Running Shoes         0.969  Yes
+ 18  multimodal nike + query_white_shoe.png            Nike Running Shoes        0.801  No (expected P05)
+ 19  text       find my order O001                     O001                          -  Yes
+ 20  voice      where is my latest order               O016                          -  Yes
+ 21  text       white sneakers                         Adidas Running Shoes      0.994  No (expected P05)
+ 22  voice      blue smartwatch                        Blue Smart Watch          0.983  Yes
+ 23  image      query_red_cap.png                      Red Baseball Cap          0.975  Yes
+ 24  image      query_blue_backpack.png                Blue Canvas Backpack      0.949  Yes
+ 25  multimodal cap + query_blue_cap.png               Blue Denim Cap            0.977  Yes
+ 26  text       find my order O002                     (nothing)                     -  Yes
+
+ Total queries: 26   Successful: 24   Success rate: 92.3%
+ Per mode: image 9/9, multimodal 2/3, order 3/3, text 6/7, voice 4/4
+
+=== 2. Review insights (aspect-based sentiment) ===
+ Reviews: 30   gold aspect labels: 39   predicted: 38
+ Aspect detection  precision 0.97  recall 0.95  F1 0.96
+ Polarity accuracy on detected aspects: 35/37 = 0.95
+ Errors:
+   - extra aspect  quality   "The price is too expensive for this quality."
+   - missed aspect delivery  "Good material but shipping took two weeks, very slow."
+   - polarity      quality   "Leather looks cheap but the price is fair."
+   - missed aspect quality   "Hang dep, giao hang nhanh, gia hop ly."
+   - polarity      price     "Expensive, but the quality makes it worth it."
+
+=== 3. Recommender ===
+ Same-category hit rate of top-3 similar products: 28/48 = 0.58
+ Catalogue coverage: 15/15 in-stock products appear in some top-3 list
+ Out-of-stock products recommended: 0

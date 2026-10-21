@@ -1,0 +1,94 @@
+=== ABC Online Shop - end-to-end demo ===
+
+--- 0. Seed: catalogue, accounts and October history (played through the services) ---
+  16 products, 16 orders, 14 reviews
+
+--- 1. Search (Chapter 3): text, voice, image, text + image ---
+  input (text): 'black shoes'
+  QueryService -> terms=['black', 'shoes'] filters={}
+  SearchService.retrieve -> 8 candidates
+  RankingService.rank -> top results (alpha, beta, gamma) = (0.9, 0, 0.1)
+    #  Product                Price Avail  keyword  cosine  S(x|q)
+    1  Nike Running Shoes       120     6        2  0.000   0.986
+    2  Black Cotton T-Shirt      15    43        1  0.000   0.550
+    3  Black Leather Bag         80    17        1  0.000   0.547
+    4  Adidas Running Shoes     100    14        1  0.000   0.544
+    5  Blue Sports Shoes         75    12        1  0.000   0.542
+
+  input (voice): <audio of 'find nike sneakers under 100 dollars'>
+  SpeechService.transcribe -> 'find nike sneakers under 100 dollars' (simulated STT)
+  QueryService -> terms=['nike', 'shoes'] filters={'max_price': 100.0}
+  SearchService.retrieve -> 4 candidates
+  RankingService.rank -> top results (alpha, beta, gamma) = (0.9, 0, 0.1)
+    #  Product                Price Avail  keyword  cosine  S(x|q)
+    1  Nike Court Sneakers       85     0        2  0.000   0.900
+    2  Red Baseball Cap          22    17        1  0.000   0.547
+    3  Adidas Running Shoes     100    14        1  0.000   0.544
+    4  Blue Sports Shoes         75    12        1  0.000   0.542
+
+  input (image): query_red_shoe.png
+  ImageService.encode -> 128-d embedding
+  SearchService.retrieve -> 5 candidates
+  RankingService.rank -> top results (alpha, beta, gamma) = (0, 0.9, 0.1)
+    #  Product                Price Avail  keyword  cosine  S(x|q)
+    1  Red Running Shoes        110     7        0  0.959   0.950
+    2  Red Canvas Backpack       60     7        0  0.808   0.814
+    3  Red Baseball Cap          22    17        0  0.790   0.808
+    4  Nike Running Shoes       120     6        0  0.504   0.540
+    5  Blue Sports Shoes         75    12        0  0.495   0.538
+
+  input (text + image): 'running shoes' + query_red_shoe.png
+  ImageService.encode -> 128-d embedding
+  QueryService -> terms=['running', 'shoes'] filters={}
+  SearchService.retrieve -> 7 candidates
+  RankingService.rank -> top results (alpha, beta, gamma) = (0.45, 0.45, 0.1)
+    #  Product                Price Avail  keyword  cosine  S(x|q)
+    1  Red Running Shoes        110     7        2  0.959   0.969
+    2  Nike Running Shoes       120     6        2  0.504   0.763
+    3  Adidas Running Shoes     100    14        2  0.000   0.544
+    4  Blue Sports Shoes         75    12        1  0.495   0.540
+    5  Red Baseball Cap          22    17        0  0.790   0.452
+
+--- 2. UC07 + UC08 checkout with promotion WELCOME10 ---
+  cart: [('P12', 1), ('P09', 2)]  subtotal 160  discount 16  shipping 0  total 144
+  CheckoutService.place_order -> O017 Paid/Confirmed (payment Succeeded)
+  P12 available 7 -> 6 (reserved for O017)
+  same submission again -> O017, duplicate=True (no second order/charge)
+
+--- 3. Payment declined: order fails, reservation released, cart kept ---
+  O018: Payment Failed; P10 available 5; cart still has ['P10']
+
+--- 4. UC19 -> UC21 -> UC22 -> UC23: fulfilment of O017 ---
+  processed by S01, packed SH011, carrier ref VNPF21E3D57B
+  milestone 1 PICKED_UP  -> accepted
+  milestone 2 IN_TRANSIT -> accepted
+  milestone 2 IN_TRANSIT -> ignored (duplicate/older)
+  milestone 1 PICKED_UP  -> ignored (duplicate/older)
+  milestone 3 DELIVERED  -> accepted
+  UC11 Track Order -> Delivered, 9 timeline entries
+
+--- 5. Order questions are limited to the customer's own orders ---
+  input (text): 'where is my latest order'
+  QueryService -> order query (order_id=None, latest=True, customer=C001)
+  Order: O018  Status: Payment Failed  Total: 150  Date: 2026-10-19
+  input (text): 'find my order O002'
+  QueryService -> order query (order_id=O002, latest=False, customer=C001)
+  no order of this customer matches
+
+--- 6. AI review insights for P01 Nike Running Shoes ---
+  4 reviews used, 0 skipped -> Mostly positive
+  quality   +4 -0  positive share 1.00
+  price     +1 -0  positive share 1.00
+  delivery  +2 -1  positive share 0.67
+  waiting for moderation: [('R012', 'Click www.free-money-now.biz f')]
+
+--- 7. Recommendations ---
+  similar to P01: P12 Red Running Shoes      score 0.378 (bought together 0x)
+  similar to P01: P03 Black Leather Bag      score 0.359 (bought together 1x)
+  similar to P01: P07 Black Cotton T-Shirt   score 0.355 (bought together 1x)
+  for C001:       P02 Adidas Running Shoes   score 0.981
+  for C001:       P14 Red Baseball Cap       score 0.667
+  for C001:       P13 White Cotton T-Shirt   score 0.665
+
+--- 8. UC25 management dashboard ---
+  orders 18  revenue 1537  average 118.23  exceptions 2  low stock ['P05', 'P15']

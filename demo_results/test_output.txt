@@ -1,0 +1,49 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.3.5, pluggy-1.6.0 -- C:\Users\bequo\AppData\Local\Programs\Python\Python311\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Phan tich thiet ke he thong\tieuluan_V1_04_049_KHANHBQ\abc_shop
+plugins: anyio-4.14.2
+collecting ... collected 40 items
+
+tests/test_ai.py::test_text_voice_and_price_filter PASSED
+tests/test_ai.py::test_synonyms_map_sneakers_to_shoes PASSED
+tests/test_ai.py::test_image_and_multimodal_search PASSED
+tests/test_ai.py::test_ranking_is_stock_aware PASSED
+tests/test_ai.py::test_order_questions_only_see_own_orders PASSED
+tests/test_ai.py::test_review_insights_handle_negation_and_noise PASSED
+tests/test_ai.py::test_recommender_never_suggests_out_of_stock_or_bought_items PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[model] PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[dao] PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[service] PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[ai] PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[controller] PASSED
+tests/test_architecture.py::test_dependencies_only_point_downwards[view] PASSED
+tests/test_architecture.py::test_services_never_import_a_storage_implementation PASSED
+tests/test_checkout.py::test_successful_checkout_reserves_stock_pays_and_clears_cart PASSED
+tests/test_checkout.py::test_promotion_and_shipping_are_part_of_the_authoritative_total PASSED
+tests/test_checkout.py::test_repeated_submission_returns_the_same_order PASSED
+tests/test_checkout.py::test_declined_payment_releases_reservation_and_keeps_cart PASSED
+tests/test_checkout.py::test_timeout_keeps_order_pending_and_reserved PASSED
+tests/test_checkout.py::test_insufficient_stock_stops_checkout_without_side_effects PASSED
+tests/test_checkout.py::test_changed_price_is_reported_before_payment PASSED
+tests/test_checkout.py::test_incomplete_address_is_rejected PASSED
+tests/test_checkout.py::test_payment_callbacks_are_verified_and_idempotent PASSED
+tests/test_model.py::test_cart_adds_to_an_existing_line_and_totals_the_lines PASSED
+tests/test_model.py::test_order_follows_only_the_allowed_transitions PASSED
+tests/test_model.py::test_stock_level_keeps_available_equal_physical_minus_reserved PASSED
+tests/test_model.py::test_promotion_checks_dates_and_minimum_total PASSED
+tests/test_model.py::test_shipment_ignores_duplicate_and_older_milestones PASSED
+tests/test_operations.py::test_customer_only_tracks_own_orders PASSED
+tests/test_operations.py::test_cancel_releases_the_reservation_and_notes_a_refund PASSED
+tests/test_operations.py::test_processing_needs_staff_role_and_a_paid_order PASSED
+tests/test_operations.py::test_full_fulfilment_path_and_milestones PASSED
+tests/test_operations.py::test_inventory_events_are_idempotent_and_never_negative PASSED
+tests/test_operations.py::test_low_stock_and_replenishment PASSED
+tests/test_operations.py::test_reviews_only_for_delivered_purchases_and_spam_waits_for_moderation PASSED
+tests/test_operations.py::test_reports_are_for_managers_and_match_the_orders PASSED
+tests/test_web.py::test_catalogue_and_product_page_with_ai_sections PASSED
+tests/test_web.py::test_search_shows_the_processing_steps PASSED
+tests/test_web.py::test_customer_buys_through_the_web PASSED
+tests/test_web.py::test_roles_are_enforced_on_screens PASSED
+
+============================= 40 passed in 13.46s =============================
