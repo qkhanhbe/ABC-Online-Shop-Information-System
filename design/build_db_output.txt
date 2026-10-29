@@ -1,0 +1,25 @@
+> python build_db.py
+
+[1] create_tables.sql (generated from ERD01 + ERD02) executed: 19 tables, 18 foreign keys
+    address, audit_log, cart, cart_item, category, customer_order
+    inventory_event, order_item, order_status_history, payment, product, promotion
+    replenishment_request, review, sequence, shipment, shipment_milestone, stock_level
+    users
+
+[2] Compared with abc_shop/dao/schema.sql: 17 of 19 tables identical (columns, NOT NULL, keys, foreign keys, UNIQUE, CHECK)
+    inventory_event: differs in UNIQUE (product_id, kind, reference)
+    review: differs in UNIQUE (customer_id, product_id, order_id)
+
+[3] The application seeded one month of history into the generated database:
+    users=8, product=16, customer_order=16, order_item=25,
+    payment=16, shipment=10, inventory_event=60, review=14
+    first order: O001 of Be Quoc Khanh, 2 line(s), total 145.00, payment Succeeded, shipment DELIVERED
+
+[4] Rules the database enforces by itself:
+  rejected: order line for a product that does not exist -> FOREIGN KEY constraint failed
+  rejected: second cart for the same customer            -> UNIQUE constraint failed: cart.customer_id
+  rejected: more reserved than physical stock            -> CHECK constraint failed: reserved >= 0 AND reserved <= physi
+  rejected: review rating 6                              -> CHECK constraint failed: rating BETWEEN 1 AND 5
+  rejected: repeated idempotency key (double submit)     -> UNIQUE constraint failed: customer_order.idempotency_key
+  rejected: user with an unknown role                    -> CHECK constraint failed: role IN ('customer','sales','wareho
+    6 of 6 rejected

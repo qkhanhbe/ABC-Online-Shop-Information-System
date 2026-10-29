@@ -8,3 +8,4 @@ venv/
 abc_shop/data/abc_shop.db
 abc_shop/data/uploads/
 tmp/
+design/abc_design.db

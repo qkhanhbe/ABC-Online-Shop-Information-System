@@ -1,0 +1,63 @@
+> python check_code.py
+
+[1] Packages and classes generated from the model (root abc_shop_design)
+  view.templates           templates (module)
+  controller.order_controller OrderController
+  service.cart_service     CartService
+  dao.interfaces           CartDAO, InventoryDAO, ProductDAO
+  model.cart               Cart, CartItem
+  model.customer           Address, User, Customer
+  model.inventory          InventoryEvent, StockLevel
+  model.order              Order, OrderItem, StatusChange
+  model.payment            Payment
+  model.product            Category, Product, Promotion
+  model.review             Review
+  model.shipment           Milestone, Shipment
+
+[2] py_compile and import of 12 modules (23 classes): no errors
+
+[3] Design model against the hand-written code in abc_shop/
+  class            module                        fields  methods  difference
+  OrderController  controller.order_controller    3/3     3/3     -
+  CartDAO          dao.interfaces                 0/0     2/2     -
+  InventoryDAO     dao.interfaces                 0/0     3/3     -
+  ProductDAO       dao.interfaces                 0/0     3/3     -
+  Cart             model.cart                     3/3     7/7     -
+  CartItem         model.cart                     4/4     1/1     -
+  Address          model.customer                 4/4     2/2     -
+  Customer         model.customer                 7/7     2/2     -
+  User             model.customer                 5/5     1/1     -
+  InventoryEvent   model.inventory                7/7     0/0     -
+  StockLevel       model.inventory                4/4     3/3     -
+  Order            model.order                   11/11    6/6     -
+  OrderItem        model.order                    4/4     1/1     -
+  StatusChange     model.order                    4/4     0/0     -
+  Payment          model.payment                  8/8     2/2     -
+  Category         model.product                  2/2     0/0     -
+  Product          model.product                  9/9     3/3     -
+  Promotion        model.product                  6/6     2/2     -
+  Review           model.review                   8/8     1/1     -
+  Milestone        model.shipment                 4/4     0/0     -
+  Shipment         model.shipment                 5/5     2/2     -
+  CartService      service.cart_service           3/3     6/6     -
+  templates        view.templates                 0/0     2/2     -
+  23 of 23 classes: every field and method of the model exists in the code
+
+[4] Members of the generated class model.order.Order
+  field  order_id: str
+  field  address: str
+  field  discount: float
+  field  shipping_fee: float
+  field  status: str
+  field  created_at: str
+  field  idempotency_key: str
+  field  items: list[OrderItem]
+  field  history: list[StatusChange]
+  field  customer_id: str
+  field  promo_code: str
+  method create_from_cart(self, order_id: 'str', cart: 'Cart', address: 'str', created_at: 'str', idempotency_key: 'str') -> 'Order'
+  method subtotal(self) -> 'float'
+  method calc_total(self) -> 'float'
+  method change_status(self, new_status: 'str', actor: 'str', at: 'str', note: 'str') -> 'Order'
+  method can_cancel(self) -> 'bool'
+  method last_update(self) -> 'str'

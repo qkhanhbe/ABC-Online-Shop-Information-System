@@ -1,0 +1,1539 @@
+{
+ "source": "TieuLuan_KHANHBQ.vpp",
+ "diagrams": [
+  "DCL01 Design Classes - Customers, Carts and Orders",
+  "DCL02 Design Classes - Payment, Shipment and Review",
+  "DCL03 Design Classes - Catalogue and Inventory",
+  "DCL04 Layer Slice - Add a Product to the Cart",
+  "PKG01 Layers, Packages and Classes"
+ ],
+ "classes": {
+  "Product": {
+   "name": "Product",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "product_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "name",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "brand",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "color",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "price",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "description",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "image",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "is_active",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "search_text",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "update_price",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "new_price: float"
+     ]
+    }
+   ]
+  },
+  "StatusChange": {
+   "name": "StatusChange",
+   "owner": "order",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "actor",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "at",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "note",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "OrderItem": {
+   "name": "OrderItem",
+   "owner": "order",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "name",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "unit_price",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "quantity",
+     "type": "int",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "sub_total",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "Order": {
+   "name": "Order",
+   "owner": "order",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "order_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "address",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "discount",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "shipping_fee",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "created_at",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "idempotency_key",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "create_from_cart",
+     "returnType": "Order",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "order_id: str",
+      "cart: Cart",
+      "address: str",
+      "created_at: str",
+      "idempotency_key: str"
+     ]
+    },
+    {
+     "name": "subtotal",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "calc_total",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "change_status",
+     "returnType": "Order",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "new_status: str",
+      "actor: str",
+      "at: str",
+      "note: str"
+     ]
+    },
+    {
+     "name": "can_cancel",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "last_update",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "CartItem": {
+   "name": "CartItem",
+   "owner": "cart",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "name",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "cart_price",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "quantity",
+     "type": "int",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "sub_total",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "Address": {
+   "name": "Address",
+   "owner": "customer",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "receiver",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "phone",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "street",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "city",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "is_complete",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "one_line",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "Customer": {
+   "name": "Customer",
+   "owner": "customer",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "created_at",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "update_profile",
+     "returnType": "Customer",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "name: str",
+      "address: Address"
+     ]
+    }
+   ]
+  },
+  "User": {
+   "name": "User",
+   "owner": "customer",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "user_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "name",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "email",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "password_hash",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "role",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "can",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "permission: str"
+     ]
+    }
+   ]
+  },
+  "Cart": {
+   "name": "Cart",
+   "owner": "cart",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "cart_id",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "find",
+     "returnType": "CartItem",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str"
+     ]
+    },
+    {
+     "name": "add_item",
+     "returnType": "CartItem",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product: Product",
+      "quantity: int"
+     ]
+    },
+    {
+     "name": "update_quantity",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str",
+      "quantity: int"
+     ]
+    },
+    {
+     "name": "remove_item",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str"
+     ]
+    },
+    {
+     "name": "calc_total",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "is_empty",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "clear",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "Review": {
+   "name": "Review",
+   "owner": "review",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "review_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "rating",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "text",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "created_at",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "validate",
+     "returnType": "Review",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "Milestone": {
+   "name": "Milestone",
+   "owner": "shipment",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "seq",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "code",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "at",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "location",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "Shipment": {
+   "name": "Shipment",
+   "owner": "shipment",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "shipment_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "carrier_ref",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "last_seq",
+     "returnType": "int",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "add_milestone",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "milestone: Milestone"
+     ]
+    }
+   ]
+  },
+  "Payment": {
+   "name": "Payment",
+   "owner": "payment",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "payment_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "attempt_ref",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "amount",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "currency",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "status",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "provider_ref",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "created_at",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "matches",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "attempt_ref: str",
+      "amount: float",
+      "currency: str"
+     ]
+    },
+    {
+     "name": "is_final",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
+  "InventoryEvent": {
+   "name": "InventoryEvent",
+   "owner": "inventory",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "event_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "kind",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "quantity",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "reference",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "reason",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "created_at",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "StockLevel": {
+   "name": "StockLevel",
+   "owner": "inventory",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "physical",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "reserved",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "threshold",
+     "type": "int",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "available",
+     "returnType": "int",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "is_low",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "apply",
+     "returnType": "StockLevel",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "event: InventoryEvent"
+     ]
+    }
+   ]
+  },
+  "Promotion": {
+   "name": "Promotion",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "code",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "percent",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "min_total",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "start",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "end",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "active",
+     "type": "bool",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "is_valid",
+     "returnType": "bool",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "subtotal: float",
+      "today: str"
+     ]
+    },
+    {
+     "name": "discount_for",
+     "returnType": "float",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "subtotal: float",
+      "today: str"
+     ]
+    }
+   ]
+  },
+  "Category": {
+   "name": "Category",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "category_id",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "name",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "InventoryDAO": {
+   "name": "InventoryDAO",
+   "owner": "dao",
+   "abstract": false,
+   "stereotypes": [
+    "interface"
+   ],
+   "attributes": [],
+   "operations": [
+    {
+     "name": "get_stock",
+     "returnType": "StockLevel",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str"
+     ]
+    },
+    {
+     "name": "save_stock",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "stock: StockLevel"
+     ]
+    },
+    {
+     "name": "add_event",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "event: InventoryEvent"
+     ]
+    }
+   ]
+  },
+  "ProductDAO": {
+   "name": "ProductDAO",
+   "owner": "dao",
+   "abstract": false,
+   "stereotypes": [
+    "interface"
+   ],
+   "attributes": [],
+   "operations": [
+    {
+     "name": "get_product",
+     "returnType": "Product",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str"
+     ]
+    },
+    {
+     "name": "list_products",
+     "returnType": "list",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "category_id: str",
+      "active_only: bool"
+     ]
+    },
+    {
+     "name": "save_product",
+     "returnType": "None",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product: Product"
+     ]
+    }
+   ]
+  },
+  "CartDAO": {
+   "name": "CartDAO",
+   "owner": "dao",
+   "abstract": false,
+   "stereotypes": [
+    "interface"
+   ],
+   "attributes": [],
+   "operations": [
+    {
+     "name": "get_cart",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "customer_id: str"
+     ]
+    },
+    {
+     "name": "update_cart",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "cart: Cart"
+     ]
+    }
+   ]
+  },
+  "CartService": {
+   "name": "CartService",
+   "owner": "service",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "carts",
+     "type": "CartDAO",
+     "visibility": "private"
+    },
+    {
+     "name": "products",
+     "type": "ProductDAO",
+     "visibility": "private"
+    },
+    {
+     "name": "inventory",
+     "type": "InventoryDAO",
+     "visibility": "private"
+    }
+   ],
+   "operations": [
+    {
+     "name": "view",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "customer_id: str"
+     ]
+    },
+    {
+     "name": "add_item",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "customer_id: str",
+      "product_id: str",
+      "quantity: int"
+     ]
+    },
+    {
+     "name": "update_quantity",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "customer_id: str",
+      "product_id: str",
+      "quantity: int"
+     ]
+    },
+    {
+     "name": "remove_item",
+     "returnType": "Cart",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "customer_id: str",
+      "product_id: str"
+     ]
+    },
+    {
+     "name": "check_availability",
+     "returnType": "int",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "product_id: str",
+      "quantity: int"
+     ]
+    },
+    {
+     "name": "validate_cart",
+     "returnType": "list",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "cart: Cart"
+     ]
+    }
+   ]
+  },
+  "OrderController": {
+   "name": "OrderController",
+   "owner": "controller",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "cart_service",
+     "type": "CartService",
+     "visibility": "private"
+    },
+    {
+     "name": "checkout_service",
+     "type": "CheckoutService",
+     "visibility": "private"
+    },
+    {
+     "name": "order_service",
+     "type": "OrderService",
+     "visibility": "private"
+    }
+   ],
+   "operations": [
+    {
+     "name": "cart",
+     "returnType": "Response",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "request: Request"
+     ]
+    },
+    {
+     "name": "add_to_cart",
+     "returnType": "Response",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "request: Request"
+     ]
+    },
+    {
+     "name": "update_cart",
+     "returnType": "Response",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "request: Request"
+     ]
+    }
+   ]
+  },
+  "templates": {
+   "name": "templates",
+   "owner": "view",
+   "abstract": false,
+   "stereotypes": [
+    "module"
+   ],
+   "attributes": [],
+   "operations": [
+    {
+     "name": "cart",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "request: Request",
+      "cart: Cart"
+     ]
+    },
+    {
+     "name": "product",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": [
+      "request: Request",
+      "card: dict",
+      "reviews: list",
+      "insight: dict",
+      "similar: list"
+     ]
+    }
+   ]
+  }
+ },
+ "relationships": [
+  {
+   "type": "Generalization",
+   "from": "User",
+   "to": "Customer",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Association",
+   "from": "Customer",
+   "to": "Address",
+   "name": "address",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": "address",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Cart",
+   "to": "CartItem",
+   "name": "items",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "composite",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "items",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Order",
+   "to": "OrderItem",
+   "name": "items",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "composite",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1..*",
+    "aggregation": "none",
+    "role": "items",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Order",
+   "to": "StatusChange",
+   "name": "history",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "composite",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1..*",
+    "aggregation": "none",
+    "role": "history",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Cart",
+   "to": "Customer",
+   "name": "customer_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "customer_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Order",
+   "to": "Customer",
+   "name": "customer_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "customer_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "CartItem",
+   "to": "Product",
+   "name": "product_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "product_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "OrderItem",
+   "to": "Product",
+   "name": "product_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "product_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Usage",
+   "from": "Cart",
+   "to": "Product",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "Order",
+   "to": "Cart",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Association",
+   "from": "Payment",
+   "to": "Order",
+   "name": "order_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "order_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Shipment",
+   "to": "Order",
+   "name": "order_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "order_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Shipment",
+   "to": "Milestone",
+   "name": "milestones",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "composite",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "milestones",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Review",
+   "to": "Product",
+   "name": "product_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "product_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Review",
+   "to": "Customer",
+   "name": "customer_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "customer_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Review",
+   "to": "Order",
+   "name": "order_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "order_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Product",
+   "to": "Category",
+   "name": "category_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": null,
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "category_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "StockLevel",
+   "to": "Product",
+   "name": "product_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": null,
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "product_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "InventoryEvent",
+   "to": "Product",
+   "name": "product_id",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": null,
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "none",
+    "role": "product_id",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Association",
+   "from": "Order",
+   "to": "Promotion",
+   "name": "promo_code",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "0..*",
+    "aggregation": "none",
+    "role": null,
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": "promo_code",
+    "navigable": "true"
+   }
+  },
+  {
+   "type": "Usage",
+   "from": "StockLevel",
+   "to": "InventoryEvent",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "OrderController",
+   "to": "templates",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "OrderController",
+   "to": "CartService",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "CartService",
+   "to": "CartDAO",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "CartService",
+   "to": "ProductDAO",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "CartService",
+   "to": "InventoryDAO",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "CartDAO",
+   "to": "Cart",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "ProductDAO",
+   "to": "Product",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Usage",
+   "from": "InventoryDAO",
+   "to": "StockLevel",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  }
+ ]
+}
