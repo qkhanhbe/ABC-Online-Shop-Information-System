@@ -3,7 +3,7 @@
 Analysis class diagram: Customer specialises User; Staff roles share Login (UC02) only.
 Methods of the class itself (design Step 1): update_profile, can.
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 ROLES = ("customer", "sales", "warehouse", "admin", "manager")
@@ -48,7 +48,6 @@ class User:
 class Customer(User):
     address: Optional[Address] = None
     created_at: str = ""
-    orders: list = field(default_factory=list, repr=False)
 
     def update_profile(self, name=None, address=None):
         if name:
