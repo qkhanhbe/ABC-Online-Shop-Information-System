@@ -20,7 +20,7 @@ See [abc_shop/README.md](abc_shop/README.md) for all commands, demo accounts and
 
 ## Project files
 
-- `tieuluan_V1_04_049_KHANHBQ.pdf` - essay report (5 chapters)
+- `design_04_10_KhanhBQ_049.pdf` - essay report (5 chapters)
 - `TieuLuan_KHANHBQ.vpp` - Visual Paradigm project with all 29 diagrams
 - `diagrams/` - PNG export of the diagrams from VP Community Edition (CTX01, DFD0, DFD1 are drawn from
   the stored project layout, as Community Edition cannot open data flow diagrams) (context, use case, activity, DFD, sequence, class, state, ERD,
