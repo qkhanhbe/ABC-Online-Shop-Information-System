@@ -43,7 +43,8 @@ def test_catalogue_and_product_page_with_ai_sections(client):
     code, _, page = client.request("GET", "/")
     assert code == 200 and "Nike Running Shoes" in page
     code, _, page = client.request("GET", "/product/P01")
-    assert "AI review insights" in page and "Customers also like" in page
+    assert "What buyers say" in page and "Customers also like" in page
+    assert "Sizes (EU)" in page and "footwear details" in page        # the detail of the product's category
 
 
 def test_search_shows_the_processing_steps(client):

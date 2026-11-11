@@ -24,9 +24,11 @@ CREATE TABLE IF NOT EXISTS address (
     city         TEXT NOT NULL
 );
 
+-- A category says which detail table holds the group-specific attributes of its products.
 CREATE TABLE IF NOT EXISTS category (
     category_id  TEXT PRIMARY KEY,
-    name         TEXT NOT NULL
+    name         TEXT NOT NULL,
+    detail_kind  TEXT NOT NULL CHECK (detail_kind IN ('footwear','apparel','bag','watch'))
 );
 
 CREATE TABLE IF NOT EXISTS product (
@@ -40,6 +42,58 @@ CREATE TABLE IF NOT EXISTS product (
     image        TEXT NOT NULL DEFAULT '',
     status       TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','unpublished'))
 );
+
+-- Product details: one table per product group, key = product key (one detail row per product).
+CREATE TABLE IF NOT EXISTS footwear_detail (
+    product_id      TEXT PRIMARY KEY REFERENCES product(product_id) ON DELETE CASCADE,
+    sizes           TEXT NOT NULL,
+    upper_material  TEXT NOT NULL,
+    sole            TEXT NOT NULL,
+    purpose         TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS apparel_detail (
+    product_id  TEXT PRIMARY KEY REFERENCES product(product_id) ON DELETE CASCADE,
+    sizes       TEXT NOT NULL,
+    material    TEXT NOT NULL,
+    fit         TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bag_detail (
+    product_id     TEXT PRIMARY KEY REFERENCES product(product_id) ON DELETE CASCADE,
+    capacity_l     REAL NOT NULL CHECK (capacity_l > 0),
+    material       TEXT NOT NULL,
+    laptop_sleeve  INTEGER NOT NULL DEFAULT 0 CHECK (laptop_sleeve IN (0, 1))
+);
+
+CREATE TABLE IF NOT EXISTS watch_detail (
+    product_id          TEXT PRIMARY KEY REFERENCES product(product_id) ON DELETE CASCADE,
+    movement            TEXT NOT NULL CHECK (movement IN ('smart','quartz','automatic')),
+    strap               TEXT NOT NULL,
+    water_resistance_m  INTEGER NOT NULL CHECK (water_resistance_m >= 0),
+    battery_days        INTEGER
+);
+
+-- A detail row must live in the table named by the product's category (BR-CAT-01).
+CREATE TRIGGER IF NOT EXISTS footwear_detail_kind BEFORE INSERT ON footwear_detail
+WHEN (SELECT c.detail_kind FROM product p JOIN category c ON c.category_id = p.category_id
+      WHERE p.product_id = NEW.product_id) IS NOT 'footwear'
+BEGIN SELECT RAISE(ABORT, 'product category does not use footwear details'); END;
+
+CREATE TRIGGER IF NOT EXISTS apparel_detail_kind BEFORE INSERT ON apparel_detail
+WHEN (SELECT c.detail_kind FROM product p JOIN category c ON c.category_id = p.category_id
+      WHERE p.product_id = NEW.product_id) IS NOT 'apparel'
+BEGIN SELECT RAISE(ABORT, 'product category does not use apparel details'); END;
+
+CREATE TRIGGER IF NOT EXISTS bag_detail_kind BEFORE INSERT ON bag_detail
+WHEN (SELECT c.detail_kind FROM product p JOIN category c ON c.category_id = p.category_id
+      WHERE p.product_id = NEW.product_id) IS NOT 'bag'
+BEGIN SELECT RAISE(ABORT, 'product category does not use bag details'); END;
+
+CREATE TRIGGER IF NOT EXISTS watch_detail_kind BEFORE INSERT ON watch_detail
+WHEN (SELECT c.detail_kind FROM product p JOIN category c ON c.category_id = p.category_id
+      WHERE p.product_id = NEW.product_id) IS NOT 'watch'
+BEGIN SELECT RAISE(ABORT, 'product category does not use watch details'); END;
 
 CREATE TABLE IF NOT EXISTS stock_level (
     product_id  TEXT PRIMARY KEY REFERENCES product(product_id),

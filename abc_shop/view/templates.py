@@ -29,40 +29,54 @@ def layout(request, title, body):
             links.append('<a href="/reports">Reports</a>')
         links.append(f'<span class="who">{e(user.name)} ({e(user.role)})</span> <a href="/logout">Log out</a>')
     note = f'<div class="flash">{e(flash)}</div>' if flash else ""
-    return f"""<!doctype html><html><head><meta charset="utf-8">
+    heading = "" if title == "Catalogue" else f"<h1>{e(title)}</h1>"
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css"></head>
-<body><header><a class="brand" href="/">ABC Online Shop</a><nav>{' '.join(links)}</nav></header>
-<main>{note}<h1>{e(title)}</h1>{body}</main>
-<footer>ABC Online Shop - course essay prototype (BeQuocKhanh, B23DCCE049)</footer></body></html>"""
+<body><header><a class="brand" href="/">ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
+<main>{note}{heading}{body}</main>
+<footer><span>ABC Online Shop &middot; course essay prototype</span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
+</body></html>"""
 
 
 def message(request, title, text):
     return layout(request, title, f'<p class="panel">{e(text)}</p><p><a href="/">Back to the catalogue</a></p>')
 
 
-def search_box(query=""):
+def search_box(query="", mode="text"):
+    modes = "".join(f'<label class="mode"><input type="radio" name="mode" value="{m}"{" checked" if m == mode else ""}>'
+                    f'{label}</label>' for m, label in (("text", "Text"), ("voice", "Voice transcript")))
     return f"""<form class="search" method="post" action="/search" enctype="multipart/form-data">
-<input name="q" value="{e(query)}" placeholder="black running shoes under 150, where is my latest order...">
-<select name="mode"><option value="text">Text</option><option value="voice">Voice (transcript)</option></select>
-<input type="file" name="image" accept="image/*" title="Search by image">
+<input name="q" value="{e(query)}" placeholder="black running shoes under 150 &middot; backpack with laptop sleeve &middot; where is my latest order">
+<span class="modes">{modes}</span>
+<span class="button ghost file">Photo<input type="file" name="image" accept="image/*" title="Search by a photo"></span>
 <button>Search</button></form>"""
+
+
+def stock_pill(available):
+    if available <= 0:
+        return '<span class="pill out">Out of stock</span>'
+    if available <= 3:
+        return f'<span class="pill low">Only {available} left</span>'
+    return '<span class="pill in">In stock</span>'
 
 
 def product_card(card):
     p = card["product"]
-    stock = "in" if card["available"] > 0 else "out"
-    return f"""<a class="card" href="/product/{e(p.product_id)}"><img src="/{e(p.image)}" alt="">
-<b>{e(p.name)}</b><span>{money(p.price)}</span><small class="{stock}">{e(card['status'])}</small></a>"""
+    return f"""<a class="card" href="/product/{e(p.product_id)}"><img src="/{e(p.image)}" alt="{e(p.name)}">
+<span class="brandline">{e(p.brand)}</span><b>{e(p.name)}</b>
+<span class="row"><span class="price">{money(p.price)}</span>{stock_pill(card['available'])}</span></a>"""
 
 
 def home(request, categories, cards, active):
     tabs = ['<a href="/"%s>All</a>' % (' class="on"' if not active else "")]
     tabs += [f'<a href="/?category={e(c.category_id)}"{" class=on" if c.category_id == active else ""}>'
              f'{e(c.name)}</a>' for c in categories]
-    grid = "".join(product_card(c) for c in cards)
-    return layout(request, "Catalogue", search_box() + f'<div class="tabs">{"".join(tabs)}</div>'
-                  f'<div class="grid">{grid}</div>')
+    grid = "".join(product_card(c) for c in cards) or '<p class="panel">No product in this category yet.</p>'
+    hero = ("<section class='hero'><div><h1>Shoes, bags, shirts, caps and watches.</h1>"
+            "<p>Search the way you would ask a shop assistant: in words, by a voice transcript or with a photo. "
+            "Prices and stock come straight from the shop's records.</p></div>" + search_box() + "</section>")
+    return layout(request, "Catalogue", hero + f'<div class="tabs">{"".join(tabs)}</div><div class="grid">{grid}</div>')
 
 
 def search_results(request, text, mode, results, trace):
@@ -75,7 +89,7 @@ def search_results(request, text, mode, results, trace):
              f"<th>Cosine</th><th>S(x|q)</th></tr>{rows}</table>") if results else \
         '<p class="panel">No product matches this search. Try fewer words or another photo.</p>'
     steps = "".join(f"<li>{e(t)}</li>" for t in trace)
-    return layout(request, f"Search results ({mode})", search_box(text or "") + table +
+    return layout(request, f"Search results ({mode})", search_box(text or "", "voice" if mode == "voice" else "text") + table +
                   f'<details open><summary>Processing steps</summary><ol class="trace">{steps}</ol></details>')
 
 
@@ -88,30 +102,35 @@ def order_search(request, text, orders, trace):
     return layout(request, "Order search", search_box(text) + body + f'<ol class="trace">{steps}</ol>')
 
 
-def product(request, card, reviews, insight, similar):
+def product(request, card, reviews, insight, similar, category=None):
     p = card["product"]
     aspects = "".join(
-        f"<tr><td>{e(a.title())}</td><td>{s['positive']}</td><td>{s['negative']}</td>"
-        f"<td><div class='bar'><i style='width:{int(s['share_positive'] * 100)}%'></i></div></td>"
-        f"<td><small>{e(s['evidence'][0][1])}</small></td></tr>"
+        f"<div class='aspect'><b>{e(a.title())}</b><div class='bar'><i style='width:{int(s['share_positive'] * 100)}%'></i></div>"
+        f"<span class='hint'>{s['positive']} + / {s['negative']} &minus;</span><q>{e(s['evidence'][0][1])}</q></div>"
         for a, s in insight["aspects"].items())
-    insight_html = (f"<p>Overall: <b>{e(insight['label'])}</b> ({insight['reviews_used']} reviews analysed, "
-                    f"{insight['reviews_skipped']} skipped as noise)</p>"
-                    f"<table><tr><th>Aspect</th><th>+</th><th>-</th><th>Positive share</th><th>Evidence</th></tr>"
-                    f"{aspects}</table>") if aspects else "<p>Not enough reviews yet.</p>"
-    review_list = "".join(f"<li><b>{'*' * r.rating}</b> {e(r.text)} <small>{e(r.created_at[:10])}</small></li>"
-                          for r in reviews) or "<li>No reviews yet.</li>"
-    recs = "".join(f'<a class="card small" href="/product/{e(q.product_id)}"><img src="/{e(q.image)}" alt="">'
-                   f'<b>{e(q.name)}</b><span>{money(q.price)}</span><small>score {s:.2f}</small></a>'
+    insight_html = (f"<div class='insight'><div class='verdict'>{e(insight['label'])}<small>{insight['reviews_used']} reviews "
+                    f"read by the review analyser, {insight['reviews_skipped']} set aside as noise. Green is the share of "
+                    f"positive mentions of each aspect.</small></div><div>{aspects}</div></div>") if aspects else \
+        "<p class='panel'>Not enough reviews yet for an AI summary (at least 2 are needed).</p>"
+    review_list = "".join(f"<li><span class='stars'>{'&#9733;' * r.rating}{'&#9734;' * (5 - r.rating)}</span>{e(r.text)} "
+                          f"<small class='hint'>{e(r.created_at[:10])}</small></li>" for r in reviews) or "<li>No reviews yet.</li>"
+    recs = "".join(f'<a class="card small" href="/product/{e(q.product_id)}"><img src="/{e(q.image)}" alt="{e(q.name)}">'
+                   f'<span class="brandline">{e(q.brand)}</span><b>{e(q.name)}</b>'
+                   f'<span class="row"><span class="price">{money(q.price)}</span><span class="hint">match {s:.2f}</span></span></a>'
                    for q, s, _ in similar)
-    buy = (f"""<form method="post" action="/cart/add"><input type="hidden" name="product_id" value="{e(p.product_id)}">
-<input type="number" name="qty" value="1" min="1" max="{card['available']}"> <button>Add to cart</button></form>"""
-           if card["available"] > 0 else '<p class="out">Out of stock</p>')
-    return layout(request, p.name, f"""<div class="detail"><img src="/{e(p.image)}" alt="">
-<div><p class="price">{money(p.price)}</p><p>{e(p.description)}</p>
-<p>Brand: {e(p.brand)} &middot; Colour: {e(p.color)} &middot; Category: {e(p.category_id)}</p>
-<p>Available: <b>{card['available']}</b></p>{buy}</div></div>
-<h2>AI review insights</h2>{insight_html}<h2>Customer reviews</h2><ul class="reviews">{review_list}</ul>
+    buy = (f"""<form class="buy" method="post" action="/cart/add"><input type="hidden" name="product_id" value="{e(p.product_id)}">
+<input type="number" name="qty" value="1" min="1" max="{card['available']}" aria-label="Quantity"><button>Add to cart</button></form>"""
+           if card["available"] > 0 else "")
+    rows = [("Brand", p.brand), ("Colour", p.color), ("Category", category.name if category else p.category_id)]
+    rows += p.detail.spec_rows() if p.detail else []
+    specs = "".join(f"<tr><th>{e(k)}</th><td>{e(v)}</td></tr>" for k, v in rows)
+    kind = f" &middot; {e(p.detail.KIND)} details" if p.detail else ""
+    return layout(request, p.name, f"""<div class="detail"><div class="photo"><img src="/{e(p.image)}" alt="{e(p.name)}"></div>
+<div><p class="price">{money(p.price)}</p><p class="lead">{e(p.description)}</p>{stock_pill(card['available'])}
+<span class="hint">&nbsp;{card['available']} available to order</span>{buy}
+<table class="specs"><caption>Specification{kind}</caption>{specs}</table></div></div>
+<h2>What buyers say</h2>{insight_html}
+<h2>Reviews</h2><ul class="reviews">{review_list}</ul>
 <h2>Customers also like</h2><div class="grid">{recs}</div>""")
 
 
@@ -133,15 +152,16 @@ def checkout(request, customer, quote, promo, key):
                     for l in quote["cart"].items)
     address = customer.address.one_line() if customer.address else "missing"
     return layout(request, "Checkout", f"""{f'<ul class="problems">{problems}</ul>' if problems else ''}
+<div class="summary"><div>
 <table>{lines}<tr><td>Subtotal</td><td>{money(quote['subtotal'])}</td></tr>
 <tr><td>Discount {e(quote['promo_note'])}</td><td>-{money(quote['discount'])}</td></tr>
-<tr><td>Shipping</td><td>{money(quote['shipping'])}</td></tr><tr><td><b>Total</b></td><td><b>{money(quote['total'])}</b></td></tr></table>
-<p>Deliver to: {e(address)}</p>
+<tr><td>Shipping</td><td>{money(quote['shipping'])}</td></tr><tr class="total"><td>Total</td><td>{money(quote['total'])}</td></tr></table>
+<p class="hint">Deliver to: {e(address)}</p></div><div class="panel">
 <form method="get" action="/checkout"><input name="promo" value="{e(promo)}" placeholder="Promotion code"><button>Apply</button></form>
 <form method="post" action="/checkout"><input type="hidden" name="promo" value="{e(promo)}"><input type="hidden" name="key" value="{e(key)}">
 <label>Payment (simulated provider) <select name="card"><option value="tok_visa">Card accepted</option>
 <option value="tok_declined">Card declined</option><option value="tok_timeout">Provider timeout</option></select></label>
-<button {'disabled' if problems else ''}>Place order and pay</button></form>""")
+<p><button {'disabled' if problems else ''}>Place order and pay</button></p></form></div></div>""")
 
 
 def order_history(request, orders, picks):
@@ -177,8 +197,9 @@ def login(request, error=""):
     err = f'<p class="problems">{e(error)}</p>' if error else ""
     return layout(request, "Log in", f"""{err}<form class="stack" method="post" action="/login">
 <input name="email" placeholder="Email" value="{e(request.get('email'))}"><input name="password" type="password" placeholder="Password">
-<button>Log in</button></form><p class="hint">Demo accounts: khanh@example.com / khanh2026, sales@abc.vn / sales2026,
-warehouse@abc.vn / stock2026, admin@abc.vn / admin2026, manager@abc.vn / report2026</p>""")
+<button>Log in</button></form><p class="demo">Demo accounts: <code>khanh@example.com / khanh2026</code>
+<code>sales@abc.vn / sales2026</code> <code>warehouse@abc.vn / stock2026</code> <code>admin@abc.vn / admin2026</code>
+<code>manager@abc.vn / report2026</code></p>""")
 
 
 def register(request, error=""):

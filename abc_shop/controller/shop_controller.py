@@ -60,4 +60,5 @@ class ShopController:
         reviews = self.reviews.published(product_id)
         insight = self.insights.analyse(reviews)
         similar = self.recommender.similar(product_id, 4)
-        return Response(templates.product(request, card, reviews, insight, similar))
+        category = self.catalog.category(card["product"].category_id)
+        return Response(templates.product(request, card, reviews, insight, similar, category))

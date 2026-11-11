@@ -25,7 +25,7 @@ Python 3.9+; only numpy and Pillow are needed at runtime, everything else is the
 | `python main.py demo` | End-to-end scenario printed step by step (in-memory database) |
 | `python main.py search --text "black shoes"` | One search; also `--voice "..."`, `--image FILE`, or `--text` with `--image` |
 | `python evaluate.py` | Evaluation of search, review insights and recommender |
-| `python -m pytest -q` | 40 tests |
+| `python -m pytest -q` | 45 tests |
 | `python tools/make_images.py` | Regenerate product and query images |
 
 ## Demo accounts

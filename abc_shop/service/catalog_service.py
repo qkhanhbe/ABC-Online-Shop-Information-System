@@ -21,6 +21,9 @@ class CatalogService:
     def categories(self):
         return self.products.list_categories()
 
+    def category(self, category_id):
+        return self.products.get_category(category_id)
+
     def product_detail(self, product_id):
         product = self.products.get_product(product_id)
         if product is None or not product.is_active():
@@ -36,6 +39,12 @@ class CatalogService:
         AuthService.require(admin, "catalogue")
         if not product.name.strip() or product.price <= 0:
             raise ValidationError("name and a positive price are required")
+        category = self.products.get_category(product.category_id)
+        if category is None:
+            raise ValidationError(f"unknown category {product.category_id}")
+        if product.detail is not None and product.detail.KIND != category.detail_kind:   # BR-CAT-01
+            raise ValidationError(f"{category.name} products need {category.detail_kind} details, "
+                                  f"not {product.detail.KIND} details")
         old = self.products.get_product(product.product_id)
         with self.db.transaction():
             self.products.save_product(product)

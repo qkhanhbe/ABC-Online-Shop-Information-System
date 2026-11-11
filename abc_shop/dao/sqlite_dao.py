@@ -2,12 +2,14 @@
 
 Each class maps rows to model objects and back; none of them contains a business rule.
 """
+import dataclasses
+
 from model.cart import Cart, CartItem
 from model.customer import Address, Customer, User
 from model.inventory import InventoryEvent, StockLevel
 from model.order import Order, OrderItem, StatusChange
 from model.payment import Payment
-from model.product import Category, Product, Promotion
+from model.product import DETAIL_TYPES, Category, Product, Promotion
 from model.review import Review
 from model.shipment import Milestone, Shipment
 
@@ -58,45 +60,76 @@ class SqliteCustomerDAO(interfaces.CustomerDAO):
 
 
 class SqliteProductDAO(interfaces.ProductDAO):
+    """Common columns in product; group columns in <kind>_detail, chosen by category.detail_kind."""
 
     def __init__(self, db):
         self.db = db
 
-    @staticmethod
-    def _to_product(row):
+    def _to_product(self, row):
         if row is None:
             return None
-        return Product(row["product_id"], row["name"], row["category_id"], row["brand"],
-                       row["color"], row["price"], row["description"], row["image"], row["status"])
+        product = Product(row["product_id"], row["name"], row["category_id"], row["brand"],
+                          row["color"], row["price"], row["description"], row["image"], row["status"])
+        product.detail = self._load_detail(row["detail_kind"], row["product_id"])
+        return product
+
+    def _load_detail(self, kind, product_id):
+        cls = DETAIL_TYPES.get(kind)
+        if cls is None:
+            return None
+        row = self.db.query_one(f"SELECT * FROM {kind}_detail WHERE product_id = ?", (product_id,))
+        if row is None:
+            return None
+        values = {f.name: row[f.name] for f in dataclasses.fields(cls)}
+        if kind == "bag":
+            values["laptop_sleeve"] = bool(values["laptop_sleeve"])
+        return cls(**values)
+
+    _SELECT = ("SELECT p.*, c.detail_kind FROM product p "
+               "JOIN category c ON c.category_id = p.category_id")
 
     def get_product(self, product_id):
-        return self._to_product(self.db.query_one(
-            "SELECT * FROM product WHERE product_id = ?", (product_id,)))
+        return self._to_product(self.db.query_one(self._SELECT + " WHERE p.product_id = ?", (product_id,)))
 
     def list_products(self, category_id=None, active_only=True):
-        sql, params = "SELECT * FROM product WHERE 1 = 1", []
+        sql, params = self._SELECT + " WHERE 1 = 1", []
         if category_id:
-            sql += " AND category_id = ?"
+            sql += " AND p.category_id = ?"
             params.append(category_id)
         if active_only:
-            sql += " AND status = 'active'"
-        return [self._to_product(r) for r in self.db.query(sql + " ORDER BY product_id", params)]
+            sql += " AND p.status = 'active'"
+        return [self._to_product(r) for r in self.db.query(sql + " ORDER BY p.product_id", params)]
 
     def save_product(self, p):
-        self.db.execute(
-            "INSERT OR REPLACE INTO product(product_id, name, category_id, brand, color, price, "
-            "description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (p.product_id, p.name, p.category_id, p.brand, p.color, p.price, p.description,
-             p.image, p.status))
+        with self.db.transaction():
+            self.db.execute(
+                "INSERT INTO product(product_id, name, category_id, brand, color, price, description, image, "
+                "status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(product_id) DO UPDATE SET "
+                "name = excluded.name, category_id = excluded.category_id, brand = excluded.brand, "
+                "color = excluded.color, price = excluded.price, description = excluded.description, "
+                "image = excluded.image, status = excluded.status",
+                (p.product_id, p.name, p.category_id, p.brand, p.color, p.price, p.description,
+                 p.image, p.status))
+            if p.detail is not None:
+                d = p.detail
+                cols = [f.name for f in dataclasses.fields(d)]
+                self.db.execute(
+                    f"INSERT OR REPLACE INTO {d.KIND}_detail({', '.join(cols)}) "
+                    f"VALUES ({', '.join('?' for _ in cols)})",
+                    tuple(int(v) if isinstance(v, bool) else v for v in (getattr(d, c) for c in cols)))
         return p
 
+    def get_category(self, category_id):
+        r = self.db.query_one("SELECT * FROM category WHERE category_id = ?", (category_id,))
+        return Category(r["category_id"], r["name"], r["detail_kind"]) if r else None
+
     def list_categories(self):
-        return [Category(r["category_id"], r["name"])
+        return [Category(r["category_id"], r["name"], r["detail_kind"])
                 for r in self.db.query("SELECT * FROM category ORDER BY name")]
 
     def save_category(self, c):
-        self.db.execute("INSERT OR REPLACE INTO category(category_id, name) VALUES (?, ?)",
-                        (c.category_id, c.name))
+        self.db.execute("INSERT OR REPLACE INTO category(category_id, name, detail_kind) VALUES (?, ?, ?)",
+                        (c.category_id, c.name, c.detail_kind))
         return c
 
 
