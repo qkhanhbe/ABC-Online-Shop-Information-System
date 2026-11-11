@@ -98,10 +98,10 @@ CH1 = after(CH1, "h2", "1.5. ", [
     skip=2)
 i = find(CH1, "h2", "1.8. ")
 CH1 = CH1[:i] + [
-    ("p", "The problem tree arranges the problems by cause and effect. At the top are the effects the business feels: "
-          "customers lose trust, sales are lost or cancelled, and management decides late. They all come from one core "
-          "problem: order, stock and payment information is fragmented and late. Below it are the six observable problems "
-          "of Assignment 01 (BP01-BP06), and at the bottom their root causes. The root causes, not the symptoms, are what "
+    ("p", "The problem tree is read from top to bottom, from causes to effects. The top row holds the root causes, the "
+          "second row the six observable problems of Assignment 01 (BP01-BP06) that they produce. All six lead to one core "
+          "problem: order, stock and payment information is fragmented and late. At the bottom are the effects the business "
+          "feels: customers lose trust, sales are lost or cancelled, and management decides late. The root causes, not the symptoms, are what "
           "the requirements of Chapter 2 address: a single product source, stock as typed events, verified payment "
           "results, defined order states, carrier milestones with references and reports computed from records."),
     fig("PT01", "Problem tree: root causes, the six business problems, the core problem and its effects", 165)] + CH1[i:]
