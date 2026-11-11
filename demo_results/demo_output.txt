@@ -83,12 +83,12 @@
   waiting for moderation: [('R012', 'Click www.free-money-now.biz f')]
 
 --- 7. Recommendations ---
-  similar to P01: P12 Red Running Shoes      score 0.378 (bought together 0x)
-  similar to P01: P03 Black Leather Bag      score 0.359 (bought together 1x)
-  similar to P01: P07 Black Cotton T-Shirt   score 0.355 (bought together 1x)
-  for C001:       P02 Adidas Running Shoes   score 0.981
-  for C001:       P14 Red Baseball Cap       score 0.667
-  for C001:       P13 White Cotton T-Shirt   score 0.665
+  similar to P01: P12 Red Running Shoes      score 0.367 (bought together 0x)
+  similar to P01: P03 Black Leather Bag      score 0.338 (bought together 1x)
+  similar to P01: P07 Black Cotton T-Shirt   score 0.335 (bought together 1x)
+  for C001:       P02 Adidas Running Shoes   score 0.809
+  for C001:       P13 White Cotton T-Shirt   score 0.692
+  for C001:       P14 Red Baseball Cap       score 0.605
 
 --- 8. UC25 management dashboard ---
   orders 18  revenue 1537  average 118.23  exceptions 2  low stock ['P05', 'P15']

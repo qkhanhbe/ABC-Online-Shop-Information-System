@@ -42,6 +42,6 @@
    - polarity      price     "Expensive, but the quality makes it worth it."
 
 === 3. Recommender ===
- Same-category hit rate of top-3 similar products: 28/48 = 0.58
+ Same-category hit rate of top-3 similar products: 27/48 = 0.56
  Catalogue coverage: 15/15 in-stock products appear in some top-3 list
  Out-of-stock products recommended: 0

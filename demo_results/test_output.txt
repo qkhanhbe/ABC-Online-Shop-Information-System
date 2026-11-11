@@ -3,47 +3,52 @@ platform win32 -- Python 3.11.9, pytest-8.3.5, pluggy-1.6.0 -- C:\Users\bequo\Ap
 cachedir: .pytest_cache
 rootdir: D:\Phan tich thiet ke he thong\tieuluan_V1_04_049_KHANHBQ\abc_shop
 plugins: anyio-4.14.2
-collecting ... collected 40 items
+collecting ... collected 45 items
 
-tests/test_ai.py::test_text_voice_and_price_filter PASSED
-tests/test_ai.py::test_synonyms_map_sneakers_to_shoes PASSED
-tests/test_ai.py::test_image_and_multimodal_search PASSED
-tests/test_ai.py::test_ranking_is_stock_aware PASSED
-tests/test_ai.py::test_order_questions_only_see_own_orders PASSED
-tests/test_ai.py::test_review_insights_handle_negation_and_noise PASSED
-tests/test_ai.py::test_recommender_never_suggests_out_of_stock_or_bought_items PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[model] PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[dao] PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[service] PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[ai] PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[controller] PASSED
-tests/test_architecture.py::test_dependencies_only_point_downwards[view] PASSED
-tests/test_architecture.py::test_services_never_import_a_storage_implementation PASSED
-tests/test_checkout.py::test_successful_checkout_reserves_stock_pays_and_clears_cart PASSED
-tests/test_checkout.py::test_promotion_and_shipping_are_part_of_the_authoritative_total PASSED
-tests/test_checkout.py::test_repeated_submission_returns_the_same_order PASSED
-tests/test_checkout.py::test_declined_payment_releases_reservation_and_keeps_cart PASSED
-tests/test_checkout.py::test_timeout_keeps_order_pending_and_reserved PASSED
-tests/test_checkout.py::test_insufficient_stock_stops_checkout_without_side_effects PASSED
-tests/test_checkout.py::test_changed_price_is_reported_before_payment PASSED
-tests/test_checkout.py::test_incomplete_address_is_rejected PASSED
-tests/test_checkout.py::test_payment_callbacks_are_verified_and_idempotent PASSED
-tests/test_model.py::test_cart_adds_to_an_existing_line_and_totals_the_lines PASSED
-tests/test_model.py::test_order_follows_only_the_allowed_transitions PASSED
-tests/test_model.py::test_stock_level_keeps_available_equal_physical_minus_reserved PASSED
-tests/test_model.py::test_promotion_checks_dates_and_minimum_total PASSED
-tests/test_model.py::test_shipment_ignores_duplicate_and_older_milestones PASSED
-tests/test_operations.py::test_customer_only_tracks_own_orders PASSED
-tests/test_operations.py::test_cancel_releases_the_reservation_and_notes_a_refund PASSED
-tests/test_operations.py::test_processing_needs_staff_role_and_a_paid_order PASSED
-tests/test_operations.py::test_full_fulfilment_path_and_milestones PASSED
-tests/test_operations.py::test_inventory_events_are_idempotent_and_never_negative PASSED
-tests/test_operations.py::test_low_stock_and_replenishment PASSED
-tests/test_operations.py::test_reviews_only_for_delivered_purchases_and_spam_waits_for_moderation PASSED
-tests/test_operations.py::test_reports_are_for_managers_and_match_the_orders PASSED
-tests/test_web.py::test_catalogue_and_product_page_with_ai_sections PASSED
-tests/test_web.py::test_search_shows_the_processing_steps PASSED
-tests/test_web.py::test_customer_buys_through_the_web PASSED
-tests/test_web.py::test_roles_are_enforced_on_screens PASSED
+tests/test_ai.py::test_text_voice_and_price_filter PASSED                [  2%]
+tests/test_ai.py::test_synonyms_map_sneakers_to_shoes PASSED             [  4%]
+tests/test_ai.py::test_image_and_multimodal_search PASSED                [  6%]
+tests/test_ai.py::test_ranking_is_stock_aware PASSED                     [  8%]
+tests/test_ai.py::test_order_questions_only_see_own_orders PASSED        [ 11%]
+tests/test_ai.py::test_review_insights_handle_negation_and_noise PASSED  [ 13%]
+tests/test_ai.py::test_recommender_never_suggests_out_of_stock_or_bought_items PASSED [ 15%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[model] PASSED [ 17%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[dao] PASSED [ 20%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[service] PASSED [ 22%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[ai] PASSED [ 24%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[controller] PASSED [ 26%]
+tests/test_architecture.py::test_dependencies_only_point_downwards[view] PASSED [ 28%]
+tests/test_architecture.py::test_services_never_import_a_storage_implementation PASSED [ 31%]
+tests/test_catalogue.py::test_each_product_loads_the_detail_kind_of_its_category PASSED [ 33%]
+tests/test_catalogue.py::test_product_page_shows_the_group_specific_attributes PASSED [ 35%]
+tests/test_catalogue.py::test_service_rejects_a_detail_of_the_wrong_group PASSED [ 37%]
+tests/test_catalogue.py::test_database_trigger_rejects_a_detail_of_the_wrong_group PASSED [ 40%]
+tests/test_catalogue.py::test_search_uses_the_detail_attributes PASSED   [ 42%]
+tests/test_checkout.py::test_successful_checkout_reserves_stock_pays_and_clears_cart PASSED [ 44%]
+tests/test_checkout.py::test_promotion_and_shipping_are_part_of_the_authoritative_total PASSED [ 46%]
+tests/test_checkout.py::test_repeated_submission_returns_the_same_order PASSED [ 48%]
+tests/test_checkout.py::test_declined_payment_releases_reservation_and_keeps_cart PASSED [ 51%]
+tests/test_checkout.py::test_timeout_keeps_order_pending_and_reserved PASSED [ 53%]
+tests/test_checkout.py::test_insufficient_stock_stops_checkout_without_side_effects PASSED [ 55%]
+tests/test_checkout.py::test_changed_price_is_reported_before_payment PASSED [ 57%]
+tests/test_checkout.py::test_incomplete_address_is_rejected PASSED       [ 60%]
+tests/test_checkout.py::test_payment_callbacks_are_verified_and_idempotent PASSED [ 62%]
+tests/test_model.py::test_cart_adds_to_an_existing_line_and_totals_the_lines PASSED [ 64%]
+tests/test_model.py::test_order_follows_only_the_allowed_transitions PASSED [ 66%]
+tests/test_model.py::test_stock_level_keeps_available_equal_physical_minus_reserved PASSED [ 68%]
+tests/test_model.py::test_promotion_checks_dates_and_minimum_total PASSED [ 71%]
+tests/test_model.py::test_shipment_ignores_duplicate_and_older_milestones PASSED [ 73%]
+tests/test_operations.py::test_customer_only_tracks_own_orders PASSED    [ 75%]
+tests/test_operations.py::test_cancel_releases_the_reservation_and_notes_a_refund PASSED [ 77%]
+tests/test_operations.py::test_processing_needs_staff_role_and_a_paid_order PASSED [ 80%]
+tests/test_operations.py::test_full_fulfilment_path_and_milestones PASSED [ 82%]
+tests/test_operations.py::test_inventory_events_are_idempotent_and_never_negative PASSED [ 84%]
+tests/test_operations.py::test_low_stock_and_replenishment PASSED        [ 86%]
+tests/test_operations.py::test_reviews_only_for_delivered_purchases_and_spam_waits_for_moderation PASSED [ 88%]
+tests/test_operations.py::test_reports_are_for_managers_and_match_the_orders PASSED [ 91%]
+tests/test_web.py::test_catalogue_and_product_page_with_ai_sections PASSED [ 93%]
+tests/test_web.py::test_search_shows_the_processing_steps PASSED         [ 95%]
+tests/test_web.py::test_customer_buys_through_the_web PASSED             [ 97%]
+tests/test_web.py::test_roles_are_enforced_on_screens PASSED             [100%]
 
-============================= 40 passed in 13.46s =============================
+============================= 45 passed in 6.85s ==============================
