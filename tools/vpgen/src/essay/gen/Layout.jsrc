@@ -1,0 +1,174 @@
+package essay.gen;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import com.brunnen.vp.mcp.util.ActivityLayoutProfile;
+import com.brunnen.vp.mcp.util.ClassLayoutProfile;
+import com.brunnen.vp.mcp.util.ComponentLayoutProfile;
+import com.brunnen.vp.mcp.util.DeploymentLayoutProfile;
+import com.brunnen.vp.mcp.util.DfdLayoutProfile;
+import com.brunnen.vp.mcp.util.ErdLayoutProfile;
+import com.brunnen.vp.mcp.util.LayoutProfile;
+import com.brunnen.vp.mcp.util.PackageLayoutProfile;
+import com.brunnen.vp.mcp.util.StateLayoutProfile;
+import com.brunnen.vp.mcp.util.UseCaseLayoutProfile;
+import com.brunnen.vp.mcp.util.VpGraphLayout;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.diagram.shape.IActivityPartitionHeaderUIModel;
+import com.vp.plugin.diagram.shape.IActivitySwimlane2CompartmentUIModel;
+import com.vp.plugin.diagram.shape.IActivitySwimlane2NewUIModel;
+
+/**
+ * Layered layout with orthogonal routing for every diagram except sequence diagrams.
+ * Uses the layout engine of vp-mcp (github.com/thanhtrnnn/vp-mcp, Apache License 2.0), which runs the
+ * Eclipse Layout Kernel bundled with Visual Paradigm and routes right-angle connectors around shapes.
+ */
+public final class Layout {
+
+    private Layout() { }
+
+    /** Positions of the Step 1 design classes, reused by Step 2 so the two diagrams compare. */
+    static final java.util.Map<String, int[]> STEP1 = new HashMap<String, int[]>();
+
+    static String apply(IDiagramUIModel d) {
+        LayoutProfile profile = profile(d);
+        if (profile == null || d.getName().startsWith("CTX") || d.getName().startsWith("DEP")) {
+            return "skipped";
+        }
+        String n = d.getName();
+        if (n.startsWith("DCL02") || n.startsWith("DCL03") || n.startsWith("PKG01")) {
+            if (n.startsWith("DCL02")) {
+                for (IDiagramElement e : d.toDiagramElementArray()) {
+                    int[] p = e instanceof IShapeUIModel && e.getModelElement() != null ? STEP1.get(e.getModelElement().getName()) : null;
+                    if (p != null) {
+                        IShapeUIModel s = (IShapeUIModel) e;
+                        s.setBounds(p[0], p[1], s.getWidth(), s.getHeight());
+                    }
+                }
+            }
+            int moved = 0;
+            if (n.startsWith("DCL02")) {
+                for (IDiagramElement e : d.toDiagramElementArray()) {
+                    if (e instanceof IShapeUIModel && e.getModelElement() != null && STEP1.containsKey(e.getModelElement().getName())) moved++;
+                }
+            }
+            try {
+                VpGraphLayout.route(d, profile);
+                return "route only (step1 " + STEP1.size() + ", matched " + moved + ")";
+            } catch (RuntimeException e) {
+                return "route failed (" + e + ")";
+            }
+        }
+        try {
+            VpGraphLayout.layout(d, profile);
+            if (n.startsWith("DCL01")) {
+                for (IDiagramElement e : d.toDiagramElementArray()) {
+                    if (e instanceof IShapeUIModel && e.getModelElement() != null) {
+                        STEP1.put(e.getModelElement().getName(), new int[] {e.getX(), e.getY()});
+                    }
+                }
+            }
+            return "layout";
+        } catch (RuntimeException e) {
+            try {
+                VpGraphLayout.route(d, profile);
+                return "route only (" + e + ")";
+            } catch (RuntimeException e2) {
+                return "failed (" + e2 + ")";
+            }
+        }
+    }
+
+    static LayoutProfile profile(IDiagramUIModel d) {
+        String t = d.getType();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM.equals(t)) return new ClassLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_USE_CASE_DIAGRAM.equals(t)) return new UseCaseLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_ER_DIAGRAM.equals(t)) return new ErdLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_STATE_DIAGRAM.equals(t)) return new StateLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_COMPONENT_DIAGRAM.equals(t)) return new ComponentLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_PACKAGE_DIAGRAM.equals(t)) return new PackageLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_DEPLOYMENT_DIAGRAM.equals(t)) return new DeploymentLayoutProfile(new HashMap<String, int[]>());
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(t)) return new DfdLayoutProfile();
+        if (IDiagramTypeConstants.DIAGRAM_TYPE_ACTIVITY_DIAGRAM.equals(t)) {
+            IActivitySwimlane2NewUIModel lane = null;
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                if (e instanceof IActivitySwimlane2NewUIModel) {
+                    lane = (IActivitySwimlane2NewUIModel) e;
+                }
+            }
+            return new ActivityLayoutProfile(lane == null ? null : new Lanes(d, lane),
+                                             new LinkedHashMap<String, java.util.Set<String>>());
+        }
+        return null;
+    }
+
+    /** Vertical swimlanes of a diagram: headers and compartments sorted from left to right. */
+    static final class Lanes implements ActivityLayoutProfile.Lanes {
+        final IActivitySwimlane2NewUIModel frame;
+        final List<IShapeUIModel> headers = new ArrayList<IShapeUIModel>();
+        final List<IShapeUIModel> cells = new ArrayList<IShapeUIModel>();
+
+        Lanes(IDiagramUIModel d, IActivitySwimlane2NewUIModel frame) {
+            this.frame = frame;
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                if (e instanceof IActivityPartitionHeaderUIModel) headers.add((IShapeUIModel) e);
+                if (e instanceof IActivitySwimlane2CompartmentUIModel) cells.add((IShapeUIModel) e);
+            }
+            Comparator<IShapeUIModel> byX = new Comparator<IShapeUIModel>() {
+                public int compare(IShapeUIModel a, IShapeUIModel b) { return a.getX() - b.getX(); }
+            };
+            headers.sort(byX);
+            cells.sort(byX);
+        }
+
+        public int size() { return headers.size(); }
+
+        public int laneOf(IShapeUIModel node) {
+            IDiagramElement parent = node.getParent();
+            for (int i = 0; parent != null && i < cells.size(); i++) {
+                if (cells.get(i).getId().equals(parent.getId())) return i;
+            }
+            return -1;
+        }
+
+        public int left() { return frame.getX(); }
+
+        public int top() { return frame.getY(); }
+
+        public int headerHeight() { return headers.isEmpty() ? 34 : headers.get(0).getHeight(); }
+
+        public int minWidth(int lane) { return 220; }
+
+        public int minBodyHeight() { return 0; }
+
+        public void apply(int[] xs, int[] widths, int bodyHeight) {
+            int top = frame.getY(), hh = headerHeight(), right = xs.length == 0 ? frame.getX() : xs[0];
+            for (int i = 0; i < headers.size(); i++) {
+                headers.get(i).setBounds(xs[i], top, widths[i], hh);
+                cells.get(i).setBounds(xs[i], top + hh, widths[i], bodyHeight);
+                right = xs[i] + widths[i];
+            }
+            int left = xs.length == 0 ? frame.getX() : xs[0];
+            frame.setBounds(left, top, right - left, hh + bodyHeight);
+        }
+
+        public int[] xs() {
+            int[] r = new int[headers.size()];
+            for (int i = 0; i < r.length; i++) r[i] = headers.get(i).getX();
+            return r;
+        }
+
+        public int[] widths() {
+            int[] r = new int[headers.size()];
+            for (int i = 0; i < r.length; i++) r[i] = headers.get(i).getWidth();
+            return r;
+        }
+    }
+}

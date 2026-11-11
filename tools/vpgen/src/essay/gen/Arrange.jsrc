@@ -1,0 +1,69 @@
+package essay.gen;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.diagram.shape.IClassUIModel;
+import com.vp.plugin.model.IProject;
+
+/**
+ * Place shapes at exact bounds read from a spec (DIAGRAM-PREFIX|name|x|y|w|h, applied in file order, no
+ * container moves its children) and hide the members of class views (DIAGRAM-PREFIX|@namesonly|Class).
+ * The connectors are redrawn afterwards in the GUI with the MCP plugin's rerouteConnectors.
+ */
+public class Arrange {
+
+    public void run(IProject project, String spec) throws Exception {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(spec), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (line.trim().isEmpty() || line.startsWith("#")) continue;
+                String[] f = line.split("[|]");
+                for (IDiagramUIModel d : project.toDiagramArray()) {
+                    if (!d.getName().startsWith(f[0] + " ")) continue;
+                    if ("@delete".equals(f[1])) {             // remove a scratch diagram (views only)
+                        System.out.println("ARRANGE deleted diagram " + d.getName());
+                        d.delete();
+                        continue;
+                    }
+                    int hits = 0;
+                    for (IDiagramElement e : d.toDiagramElementArray()) {
+                        if (!(e instanceof IShapeUIModel) || e.getModelElement() == null) continue;
+                        IShapeUIModel s = (IShapeUIModel) e;
+                        if ("@stereo".equals(f[1])) {
+                            if (f[2].equals(e.getModelElement().getName()) && e.getModelElement() instanceof com.vp.plugin.model.IClass) {
+                                com.vp.plugin.model.IClass c = (com.vp.plugin.model.IClass) e.getModelElement();
+                                if (!java.util.Arrays.asList(c.toStereotypeArray()).contains(f[3])) c.addStereotype(f[3]);
+                                hits++;
+                            }
+                            continue;
+                        }
+                        if ("@namesonly".equals(f[1])) {
+                            if (f[2].equals(e.getModelElement().getName()) && s instanceof IClassUIModel) {
+                                ((IClassUIModel) s).setShowAttributeType(IClassUIModel.ATTR_SHOW_TYPE_NONE);
+                                ((IClassUIModel) s).setShowOperationType(IClassUIModel.OP_SHOW_TYPE_NONE);
+                                s.setSize(Math.max(80, 9 * f[2].length() + 20), 30);
+                                s.resetCaption();
+                                hits++;
+                            }
+                            continue;
+                        }
+                        if (!f[1].equals(e.getModelElement().getName())) continue;
+                        int x = Integer.parseInt(f[2]), y = Integer.parseInt(f[3]);
+                        int w = Integer.parseInt(f[4]), h = Integer.parseInt(f[5]);
+                        s.setBounds(x, y, w > 0 ? w : s.getWidth(), h > 0 ? h : s.getHeight());
+                        s.resetCaption();
+                        hits++;
+                    }
+                    if (hits == 0) System.out.println("ARRANGE NOT FOUND " + line);
+                }
+            }
+        }
+        System.out.println("ARRANGE done");
+    }
+}

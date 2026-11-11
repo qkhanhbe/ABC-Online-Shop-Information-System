@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="essay.gen" name="Essay Diagram Generator" description="Generates the diagrams of the course essay" provider="KhanhBQ" class="essay.gen.EssayPlugin">
+  <runtime>
+    <library path="classes" relativePath="true"/>
+  </runtime>
+</plugin>

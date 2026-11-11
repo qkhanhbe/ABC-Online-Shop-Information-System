@@ -1,0 +1,216 @@
+package essay.gen;
+
+import java.awt.Rectangle;
+import java.io.File;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.ExportDiagramAsImageOption;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.connector.IAssociationUIModel;
+import com.vp.plugin.diagram.connector.IHasRoleConnectorUIModel;
+import com.vp.plugin.model.IAssociation;
+import com.vp.plugin.model.IAssociationEnd;
+import com.vp.plugin.model.IDependency;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * Finishing touches the MCP plugin cannot make on diagrams it drew in the GUI:
+ * multiplicity and role labels get a box tall enough for the diagram font (CE clips them at 14 px),
+ * and named dependencies get their keyword ("Cart -> Order" becomes <<create>> checkout).
+ */
+public class Polish {
+    static final int H = 20;
+
+    public void run(IProject project, String[] prefixes, String png) {
+        File dir = png == null ? null : new File(png);
+        if (dir != null) dir.mkdirs();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            boolean hit = false;
+            for (String p : prefixes) if (d.getName().startsWith(p)) hit = true;
+            if (!hit) continue;
+            if (d.getType().contains("BusinessProcess")) {         // CE can open BPMN but not change it
+                if (dir != null) export(d, dir);
+                continue;
+            }
+            int n = 0;
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                if (e instanceof IHasRoleConnectorUIModel && e.getModelElement() instanceof IAssociation) {
+                    IHasRoleConnectorUIModel c = (IHasRoleConnectorUIModel) e;
+                    IAssociation a = (IAssociation) e.getModelElement();
+                    IAssociationEnd from = (IAssociationEnd) a.getFromEnd(), to = (IAssociationEnd) a.getToEnd();
+                    c.setMultiplicityARectangle(grow(c.getMultiplicityARectangle(), from.getMultiplicity()));
+                    c.setMultiplicityBRectangle(grow(c.getMultiplicityBRectangle(), to.getMultiplicity()));
+                    java.awt.Point[] pts = ((com.vp.plugin.diagram.IConnectorUIModel) e).getPoints();
+                    if (pts != null && pts.length >= 2) {
+                        Rectangle ra = role(pts[0], pts[1], c.getMultiplicityARectangle(), from.getName());
+                        Rectangle rb = role(pts[pts.length - 1], pts[pts.length - 2], c.getMultiplicityBRectangle(), to.getName());
+                        if (ra != null) c.setRoleARectangle(ra);
+                        if (rb != null) c.setRoleBRectangle(rb);
+                    }
+                    if (e instanceof IAssociationUIModel) {
+                        IAssociationUIModel u = (IAssociationUIModel) e;
+                        // the role (field name) is shown as the association name, so the end labels stay hidden
+                        u.setShowToRoleName(false);
+                        u.setShowFromRoleName(false);
+                        u.setFromMultiplicityInternalHeight(H);
+                        u.setToMultiplicityInternalHeight(H);
+                        u.setFromRoleInternalHeight(H);
+                        u.setToRoleInternalHeight(H);
+                    }
+                    n++;
+                }
+                IModelElement m = e.getModelElement();
+                if (m instanceof IDependency && "Cart".equals(((IDependency) m).getFrom().getName())
+                        && "Order".equals(((IDependency) m).getTo().getName())
+                        && d.getName().startsWith("CL01")) {
+                    m.setName("checkout");
+                    ((IDependency) m).addStereotype("create");
+                    com.vp.plugin.diagram.IConnectorUIModel cu = (com.vp.plugin.diagram.IConnectorUIModel) e;
+                    cu.setShowConnectorName(0);
+                    java.awt.Point[] pts = cu.getPoints();
+                    if (pts != null && pts.length >= 2) {
+                        java.awt.Point a = pts[0], b = pts[pts.length - 1];
+                        cu.getCaptionUIModel().setBounds(Math.max(a.x, b.x) + 6, (a.y + b.y) / 2 - 18, 140, 36);
+                    }
+                }
+            }
+            boolean erd = d.getName().startsWith("ERD");
+            if (erd) {
+                for (IDiagramElement e : d.toDiagramElementArray()) {
+                    if (e instanceof com.vp.plugin.diagram.IConnectorUIModel) {
+                        ((com.vp.plugin.diagram.IConnectorUIModel) e).setShowConnectorName(1);
+                    }
+                }
+            }
+            boolean data = erd || d.getName().startsWith("LDM") || d.getName().startsWith("CDM");
+            if (data) {
+                for (IDiagramElement e : d.toDiagramElementArray()) {
+                    if (e instanceof com.vp.plugin.diagram.IConnectorUIModel) {
+                        ((com.vp.plugin.diagram.IConnectorUIModel) e).setShowConnectorName(1);
+                    }
+                }
+            }
+            growCaptions(d);
+            fitFrames(d);
+            int moved = data ? 0 : freeCaptions(d);
+            System.out.println("POLISH " + d.getName() + " associations=" + n + " captionsMoved=" + moved);
+            if (dir != null) export(d, dir);
+        }
+    }
+
+    /** Frames (system boundary, packages, pools) keep their title readable in CE: re-fit the title caption. */
+    static void fitFrames(IDiagramUIModel d) {
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof com.vp.plugin.diagram.IShapeUIModel) || e.getModelElement() == null) continue;
+            String t = e.getModelElement().getModelType();
+            if ("System".equals(t)) {
+                com.vp.plugin.diagram.IShapeUIModel s = (com.vp.plugin.diagram.IShapeUIModel) e;
+                int need = 9 * e.getModelElement().getName().length() + 40;
+                if (s.getWidth() < need) s.setSize(need, s.getHeight());
+                s.resetCaption();
+            }
+        }
+    }
+
+    /** Community Edition draws captions with a wider font than Enterprise: give every connector name room. */
+    static void growCaptions(IDiagramUIModel d) {
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel)) continue;
+            IModelElement m = e.getModelElement();
+            String text = m == null ? null : m.getName();
+            if (m != null) {
+                try {                                         // control flows show their guard, not their name
+                    Object g = m.getClass().getMethod("getGuard").invoke(m);
+                    if (g instanceof String && !((String) g).isEmpty()) text = "[" + g + "]";
+                } catch (Exception ignored) {
+                }
+            }
+            com.vp.plugin.diagram.ICaptionUIModel cap = ((com.vp.plugin.diagram.IConnectorUIModel) e).getCaptionUIModel();
+            if (cap == null || cap.getWidth() <= 0) continue;
+            int need = text == null || text.isEmpty() ? cap.getWidth() * 13 / 10 : 9 * text.length() + 20;
+            int w = Math.max(cap.getWidth(), need), h = Math.max(cap.getHeight(), 24);
+            cap.setBounds(cap.getX() - (w - cap.getWidth()) / 2, cap.getY() - (h - cap.getHeight()) / 2, w, h);
+        }
+    }
+
+    /** Move a connector name that sits on top of a class/table box to the middle of the longest segment. */
+    static int freeCaptions(IDiagramUIModel d) {
+        java.util.List<Rectangle> boxes = new java.util.ArrayList<>();
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof com.vp.plugin.diagram.IShapeUIModel)) continue;
+            String t = e.getModelElement() == null ? "" : e.getModelElement().getModelType();
+            if ("Package".equals(t) || "System".equals(t) || "Model".equals(t) || t.contains("Pool")
+                    || t.contains("Lane") || t.contains("Swimlane") || t.contains("Frame")) continue;
+            com.vp.plugin.diagram.IShapeUIModel s = (com.vp.plugin.diagram.IShapeUIModel) e;
+            boxes.add(new Rectangle(s.getX(), s.getY(), s.getWidth(), s.getHeight()));
+        }
+        int moved = 0;
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel)) continue;
+            IModelElement m = e.getModelElement();
+            if (m == null || m.getName() == null || m.getName().isEmpty()) continue;
+            com.vp.plugin.diagram.ICaptionUIModel cap = ((com.vp.plugin.diagram.IConnectorUIModel) e).getCaptionUIModel();
+            if (cap == null) continue;
+            Rectangle r = new Rectangle(cap.getX(), cap.getY(), cap.getWidth(), cap.getHeight());
+            boolean hit = false;
+            for (Rectangle b : boxes) if (b.intersects(r)) hit = true;
+            if (!hit) continue;
+            java.awt.Point[] pts = ((com.vp.plugin.diagram.IConnectorUIModel) e).getPoints();
+            if (pts == null || pts.length < 2) continue;
+            int best = -1; java.awt.Point a = pts[0], b = pts[1];
+            for (int i = 0; i + 1 < pts.length; i++) {
+                int len = Math.abs(pts[i + 1].x - pts[i].x) + Math.abs(pts[i + 1].y - pts[i].y);
+                if (len > best) { best = len; a = pts[i]; b = pts[i + 1]; }
+            }
+            if (Math.abs(a.x - b.x) < Math.abs(a.y - b.y)) {
+                cap.setBounds(a.x + 6, (a.y + b.y) / 2 - r.height / 2, r.width, r.height);
+            } else {
+                cap.setBounds((a.x + b.x) / 2 - r.width / 2, a.y - r.height - 2, r.width, r.height);
+            }
+            System.out.println("POLISH caption moved: " + m.getName());
+            moved++;
+        }
+        return moved;
+    }
+
+    /** Role label beside the end point of a line, on the other side of the line than the multiplicity. */
+    static Rectangle role(java.awt.Point end, java.awt.Point next, Rectangle mult, String text) {
+        if (text == null || text.isEmpty()) return null;
+        int w = 8 * text.length() + 8, h = H;
+        boolean vertical = Math.abs(end.x - next.x) < Math.abs(end.y - next.y);
+        int dir = vertical ? Integer.signum(next.y - end.y) : Integer.signum(next.x - end.x);
+        if (vertical) {
+            boolean multRight = mult != null && mult.x + mult.width / 2 > end.x;
+            int x = multRight ? end.x - w - 3 : end.x + 3;
+            int y = dir > 0 ? end.y + 2 : end.y - h - 2;
+            return new Rectangle(x, y, w, h);
+        }
+        boolean multBelow = mult != null && mult.y + mult.height / 2 > end.y;
+        int y = multBelow ? end.y - h - 1 : end.y + 1;
+        int x = dir > 0 ? end.x + 3 : end.x - w - 3;
+        return new Rectangle(x, y, w, h);
+    }
+
+    static Rectangle grow(Rectangle r, String text) {
+        if (r == null || text == null || text.isEmpty()) return r;
+        int w = Math.max(r.width, 8 * text.length() + 8);
+        int h = Math.max(r.height, H);
+        return new Rectangle(r.x - (w - r.width) / 2, r.y - (h - r.height) / 2, w, h);
+    }
+
+    static void export(IDiagramUIModel d, File dir) {
+        ExportDiagramAsImageOption opt = new ExportDiagramAsImageOption(ExportDiagramAsImageOption.IMAGE_TYPE_PNG);
+        opt.setTextAntiAliasing(true);
+        try {
+            File target = new File(dir, d.getName() + ".png");
+            for (int pass = 0; pass < 3; pass++) {
+                ApplicationManager.instance().getModelConvertionManager().exportDiagramAsImage(d, target, opt);
+                Thread.sleep(700);
+            }
+        } catch (Throwable t) {
+            System.out.println("EXPORT FAILED " + d.getName() + ": " + t);
+        }
+    }
+}

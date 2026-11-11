@@ -1,0 +1,229 @@
+package essay.gen;
+
+import java.awt.Color;
+
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.*;
+
+/** Chapter 1 - Requirement Determination: context diagram and complete use case model. */
+public class Ch1 extends Base {
+
+
+    // ------------------------------------------------------------------ DFD helpers
+    IShapeUIModel entity(IDiagramUIModel d, String name, String key, int x, int y) {
+        IDFExternalEntity e = (IDFExternalEntity) named.get("ee:" + name);
+        if (e == null) {
+            e = f.createDFExternalEntity();
+            e.setName(name);
+            named.put("ee:" + name, e);
+        }
+        return put(d, e, key, x, y, Math.max(120, name.length() * 8 + 20), 56, YELLOW);
+    }
+
+    IShapeUIModel process(IDiagramUIModel d, String id, String name, String key, int x, int y, int w, int h) {
+        IDFProcess p = f.createDFProcess();
+        p.setName(name);
+        p.setDfId(id);
+        return put(d, p, key, x, y, w, h, LIGHT);
+    }
+
+    IShapeUIModel store(IDiagramUIModel d, String id, String name, String key, int x, int y) {
+        IDFDataStore s = (IDFDataStore) named.get("ds:" + name);
+        if (s == null) {
+            s = f.createDFDataStore();
+            s.setName(name);
+            s.setDfId(id);
+            named.put("ds:" + name, s);
+        }
+        return put(d, s, key, x, y, Math.max(150, name.length() * 8 + 50), 36, GREEN);
+    }
+
+    void flow(IDiagramUIModel d, String from, String to, String label) {
+        IDFDataFlow fl = f.createDFDataFlow();
+        fl.setName(label);
+        fl.setFrom(shapes.get(from).getModelElement());
+        fl.setTo(shapes.get(to).getModelElement());
+        IShapeUIModel a = shapes.get(from), b = shapes.get(to);
+        // endpoints on both borders, shifted sideways by direction, so A->B and B->A run in parallel
+        boolean canonical = from.compareTo(to) < 0;
+        IShapeUIModel p = canonical ? a : b, q = canonical ? b : a;
+        double px = p.getX() + p.getWidth() / 2.0, py = p.getY() + p.getHeight() / 2.0;
+        double qx = q.getX() + q.getWidth() / 2.0, qy = q.getY() + q.getHeight() / 2.0;
+        double dx = qx - px, dy = qy - py, len = Math.max(1, Math.hypot(dx, dy));
+        double side = canonical ? 12 : -12;
+        double ox = -dy / len * side, oy = dx / len * side;
+        java.awt.Point onA = border(a, b, ox, oy), onB = border(b, a, ox, oy);
+        java.awt.Point[] pts = new java.awt.Point[] {onA, onB};
+        com.vp.plugin.diagram.IConnectorUIModel c = d.getName().startsWith("CTX") ? link(d, fl, a, b, pts) : link(d, fl, a, b);
+        if (c != null) {
+            c.setShowConnectorName(0);
+            c.resetCaption();
+        }
+    }
+
+    /** Point where the line from the centre of s towards the centre of t leaves s, shifted by (ox, oy). */
+    java.awt.Point border(IShapeUIModel s, IShapeUIModel t, double ox, double oy) {
+        double cx = s.getX() + s.getWidth() / 2.0 + ox, cy = s.getY() + s.getHeight() / 2.0 + oy;
+        double tx = t.getX() + t.getWidth() / 2.0 + ox, ty = t.getY() + t.getHeight() / 2.0 + oy;
+        double dx = tx - cx, dy = ty - cy;
+        double k = Math.min(dx == 0 ? 1e9 : (s.getWidth() / 2.0 - 1) / Math.abs(dx),
+                            dy == 0 ? 1e9 : (s.getHeight() / 2.0 - 1) / Math.abs(dy));
+        return new java.awt.Point((int) Math.round(cx + dx * k), (int) Math.round(cy + dy * k));
+    }
+
+    // ------------------------------------------------------------------ use case helpers
+    IShapeUIModel actor(IDiagramUIModel d, String name, String key, int x, int y) {
+        IActor a = (IActor) named.get("actor:" + name);
+        if (a == null) {
+            a = f.createActor();
+            a.setName(name);
+            named.put("actor:" + name, a);
+        }
+        return put(d, a, key, x, y, 40, 70, BLUE);
+    }
+
+    IShapeUIModel usecase(IDiagramUIModel d, ISystem sys, IShapeUIModel box, String name, String key,
+                          int x, int y, int w) {
+        IUseCase u = (IUseCase) named.get("uc:" + name);
+        if (u == null) {
+            u = f.createUseCase();
+            u.setName(name);
+            named.put("uc:" + name, u);
+            if (sys != null) {
+                sys.addUseCase(u);
+            }
+        }
+        IShapeUIModel s = put(d, u, key, x, y, w, 46, BLUE);
+        if (s instanceof com.vp.plugin.diagram.shape.IUseCaseUIModel) {
+            ((com.vp.plugin.diagram.shape.IUseCaseUIModel) s).setShowExtensionPoint(false);
+        }
+        if (box != null) {
+            box.addChild(s);
+        }
+        return s;
+    }
+
+    void assocUC(IDiagramUIModel d, String actorKey, String ucKey) {
+        IAssociation as = f.createAssociation();
+        as.setFrom(shapes.get(actorKey).getModelElement());
+        as.setTo(shapes.get(ucKey).getModelElement());
+        link(d, as, shapes.get(actorKey), shapes.get(ucKey));
+    }
+
+    void include(IDiagramUIModel d, String base, String inc) {
+        IInclude i = f.createInclude();
+        i.setFrom(shapes.get(base).getModelElement());
+        i.setTo(shapes.get(inc).getModelElement());
+        link(d, i, shapes.get(base), shapes.get(inc));
+    }
+
+    /** VP's IExtend runs from the extended (base) use case to the extension; the arrowhead is drawn at "from". */
+    void extend(IDiagramUIModel d, String ext, String base) {
+        IExtend e = f.createExtend();
+        e.setFrom(shapes.get(base).getModelElement());
+        e.setTo(shapes.get(ext).getModelElement());
+        link(d, e, shapes.get(base), shapes.get(ext));
+        IShapeUIModel b = shapes.get(base);
+        if (b instanceof com.vp.plugin.diagram.shape.IUseCaseUIModel) {
+            ((com.vp.plugin.diagram.shape.IUseCaseUIModel) b).setShowExtensionPoint(false);
+            b.resetCaption();
+        }
+    }
+
+    void genShapes(IDiagramUIModel d, String child, String parent) {
+        link(d, gen(shapes.get(child).getModelElement(), shapes.get(parent).getModelElement()),
+             shapes.get(parent), shapes.get(child));
+    }
+
+    // ------------------------------------------------------------------ diagrams
+    void contextDiagram() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM, "CTX01 System Context Diagram");
+        process(d, "0", "ABC Online Shop E-Commerce Information System", "sys", 470, 300, 260, 170);
+        entity(d, "Customer / Visitor", "cus", 60, 120);
+        entity(d, "Administrator", "adm", 60, 330);
+        entity(d, "Sales Staff", "sal", 60, 540);
+        entity(d, "Warehouse Staff", "war", 250, 640);
+        entity(d, "Manager", "man", 270, 20);
+        entity(d, "Payment Provider", "pay", 940, 120);
+        entity(d, "Shipping Provider", "shi", 940, 360);
+        entity(d, "Supplier", "sup", 950, 580);
+        flow(d, "cus", "sys", "account, search, cart, order, review");
+        flow(d, "sys", "cus", "products, availability, order status");
+        flow(d, "adm", "sys", "catalogue, promotion, moderation");
+        flow(d, "sys", "adm", "review queue, audit trail");
+        flow(d, "sal", "sys", "order decisions");
+        flow(d, "sys", "sal", "processing queue, exceptions");
+        flow(d, "war", "sys", "stock events, packing");
+        flow(d, "sys", "war", "pick list, low-stock alerts");
+        flow(d, "man", "sys", "report request");
+        flow(d, "sys", "man", "dashboard, reports");
+        flow(d, "sys", "pay", "payment request (ref, amount)");
+        flow(d, "pay", "sys", "signed payment result");
+        flow(d, "sys", "shi", "delivery request");
+        flow(d, "shi", "sys", "shipment milestones");
+        flow(d, "sys", "sup", "replenishment request");
+        flow(d, "sup", "sys", "supply confirmation");
+    }
+
+    /** One use case diagram per package of the Assignment 02 catalogue (32 use cases in total). */
+    void completeUseCaseDiagram() {
+        ucPackage("UCD1 Account and Catalogue",
+            new String[][] {{"UC01", "UC01 Register Account"}, {"UC02", "UC02 Login"}, {"UC03", "UC03 Manage Profile"},
+                            {"UC04", "UC04 Browse Products"}, {"UC05", "UC05 Search Products"}, {"UC06", "UC06 View Product Details"}},
+            new String[][] {{"vis", "Visitor"}, {"cus", "Customer"}, {"staff", "Staff"}},
+            new String[][] {{"gen", "cus", "vis"}, {"as", "vis", "UC01"}, {"as", "vis", "UC04"}, {"as", "vis", "UC05"},
+                            {"as", "vis", "UC06"}, {"as", "cus", "UC02"}, {"as", "cus", "UC03"}, {"as", "staff", "UC02"}});
+        ucPackage("UCD2 Cart, Order and Payment",
+            new String[][] {{"UC07", "UC07 Manage Shopping Cart"}, {"UC08", "UC08 Place Order / Checkout"}, {"UC09", "UC09 Make Payment"},
+                            {"UC10", "UC10 View Order History"}, {"UC11", "UC11 Track Order"}, {"UC12", "UC12 Cancel Order"},
+                            {"UC13", "UC13 Submit Review"}, {"UC29", "UC29 Validate Cart"}, {"UC30", "UC30 Check Product Availability"},
+                            {"UC31", "UC31 Calculate Order Total"}, {"UC32", "UC32 Apply Promotion"}},
+            new String[][] {{"cus", "Customer"}, {"pay", "Payment Provider"}, {"sal", "Sales Staff"}},
+            new String[][] {{"as", "cus", "UC07"}, {"as", "cus", "UC08"}, {"as", "cus", "UC10"}, {"as", "cus", "UC11"},
+                            {"as", "pay", "UC09"}, {"as", "sal", "UC12"}, {"inc", "UC08", "UC29"}, {"inc", "UC08", "UC30"},
+                            {"inc", "UC08", "UC31"}, {"inc", "UC08", "UC09"}, {"inc", "UC07", "UC30"}, {"ext", "UC32", "UC08"},
+                            {"ext", "UC12", "UC10"}, {"ext", "UC13", "UC10"}});
+        ucPackage("UCD3 Administration",
+            new String[][] {{"UC14", "UC14 Manage Products"}, {"UC15", "UC15 Manage Categories"}, {"UC16", "UC16 Manage Promotions"},
+                            {"UC17", "UC17 Manage Customers"}, {"UC18", "UC18 Manage Reviews"}},
+            new String[][] {{"adm", "Administrator"}, {"sal", "Sales Staff"}},
+            new String[][] {{"as", "adm", "UC14"}, {"as", "adm", "UC15"}, {"as", "adm", "UC16"}, {"as", "adm", "UC17"},
+                            {"as", "adm", "UC18"}, {"as", "sal", "UC17"}});
+        ucPackage("UCD4 Operations and Reporting",
+            new String[][] {{"UC19", "UC19 Process Orders"}, {"UC20", "UC20 Manage Inventory"}, {"UC21", "UC21 Prepare Shipment"},
+                            {"UC22", "UC22 Arrange Delivery"}, {"UC23", "UC23 Update Shipment Status"},
+                            {"UC24", "UC24 Manage Replenishment"}, {"UC25", "UC25 View Management Dashboard"},
+                            {"UC26", "UC26 Generate Sales Report"}, {"UC27", "UC27 Generate Inventory Report"},
+                            {"UC28", "UC28 Generate Order and Exception Report"}},
+            new String[][] {{"sal", "Sales Staff"}, {"war", "Warehouse Staff"}, {"shi", "Shipping Provider"},
+                            {"sup", "Supplier"}, {"man", "Manager"}},
+            new String[][] {{"as", "sal", "UC19"}, {"as", "war", "UC20"}, {"as", "war", "UC21"}, {"as", "war", "UC22"},
+                            {"as", "war", "UC24"}, {"as", "shi", "UC22"}, {"as", "shi", "UC23"}, {"as", "sup", "UC24"},
+                            {"as", "man", "UC25"}, {"as", "man", "UC26"}, {"as", "man", "UC27"}, {"as", "man", "UC28"},
+                            {"ext", "UC24", "UC20"}});
+    }
+
+    void ucPackage(String name, String[][] ucs, String[][] actors, String[][] rels) {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_USE_CASE_DIAGRAM, name);
+        ISystem sys = f.createSystem();
+        sys.setName("ABC Online Shop - " + name.substring(5));
+        IShapeUIModel box = put(d, sys, "box", 250, 20, 500, 80 + ucs.length * 80, new Color(236, 246, 253));
+        for (int i = 0; i < ucs.length; i++) {
+            usecase(d, sys, box, ucs[i][1], ucs[i][0], 290, 60 + i * 80, Math.max(200, ucs[i][1].length() * 8));
+        }
+        for (int i = 0; i < actors.length; i++) {
+            actor(d, actors[i][1], actors[i][0], 60, 40 + i * 120);
+        }
+        for (String[] r : rels) {
+            if ("gen".equals(r[0])) genShapes(d, r[1], r[2]);
+            else if ("as".equals(r[0])) assocUC(d, r[1], r[2]);
+            else if ("inc".equals(r[0])) include(d, r[1], r[2]);
+            else extend(d, r[1], r[2]);
+        }
+        if (shapes.containsKey("staff")) {
+            ((IActor) shapes.get("staff").getModelElement()).setAbstract(true);
+        }
+    }
+}

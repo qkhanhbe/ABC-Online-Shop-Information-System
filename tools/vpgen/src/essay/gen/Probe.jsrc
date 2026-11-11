@@ -1,0 +1,154 @@
+package essay.gen;
+
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.*;
+
+/** Small diagrams of each type, to check how the API renders before the real project. */
+public class Probe extends Base {
+
+    void run() {
+        init();
+        classes();
+        useCases();
+        sequence();
+        erd();
+        dfd();
+        state();
+        component();
+    }
+
+    void classes() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "P_CLASS");
+        IClass cart = cls("Cart", null, new String[] {"cartId : String", "customerId : String"},
+                          new String[] {"addItem(product : Product, qty : int) : CartItem", "calcTotal() : float"});
+        IClass item = cls("CartItem", null, new String[] {"quantity : int", "cartPrice : float"}, new String[] {"subTotal() : float"});
+        IClass user = cls("User", null, new String[] {"userId : String"}, null);
+        IClass cust = cls("Customer", null, new String[] {"address : Address"}, null);
+        IClass dao = cls("CartDAO", "interface", null, new String[] {"getCart(customerId : String) : Cart"});
+        put(d, cart, "cart", 60, 60, 260, 90, LIGHT);
+        put(d, item, "item", 420, 60, 200, 80, LIGHT);
+        put(d, user, "user", 60, 260, 160, 60, LIGHT);
+        put(d, cust, "cust", 60, 400, 160, 60, LIGHT);
+        put(d, dao, "dao", 420, 260, 260, 70, GREEN);
+        link(d, assoc(cart, item, "1", "0..*", null, "composition"), shapes.get("cart"), shapes.get("item"));
+        link(d, gen(cust, user), shapes.get("user"), shapes.get("cust"));
+        link(d, use(dao, cart), shapes.get("dao"), shapes.get("cart"));
+        for (String k : shapes.keySet()) fit(shapes.get(k));
+    }
+
+    void useCases() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_USE_CASE_DIAGRAM, "P_UC");
+        ISystem sys = f.createSystem();
+        sys.setName("ABC Online Shop");
+        IShapeUIModel box = put(d, sys, "sys", 200, 30, 420, 320, LIGHT);
+        IActor a = f.createActor();
+        a.setName("Customer");
+        put(d, a, "a", 60, 150, 40, 70, BLUE);
+        IUseCase place = f.createUseCase(); place.setName("Place Order");
+        IUseCase pay = f.createUseCase(); pay.setName("Make Payment");
+        IUseCase promo = f.createUseCase(); promo.setName("Apply Promotion");
+        sys.addUseCase(place); sys.addUseCase(pay); sys.addUseCase(promo);
+        box.addChild(put(d, place, "place", 240, 140, 140, 50, BLUE));
+        box.addChild(put(d, pay, "pay", 450, 70, 140, 50, BLUE));
+        box.addChild(put(d, promo, "promo", 450, 230, 140, 50, BLUE));
+        IAssociation as = f.createAssociation(); as.setFrom(a); as.setTo(place);
+        link(d, as, shapes.get("a"), shapes.get("place"));
+        IInclude inc = f.createInclude(); inc.setFrom(place); inc.setTo(pay);
+        link(d, inc, shapes.get("place"), shapes.get("pay"));
+        IExtend ext = f.createExtend(); ext.setFrom(promo); ext.setTo(place);
+        link(d, ext, shapes.get("promo"), shapes.get("place"));
+    }
+
+    void sequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "P_SEQ");
+        lifeline(d, "Customer", null, 30, 90, 330);
+        lifeline(d, "CheckoutForm", "boundary", 190, 110, 330);
+        lifeline(d, "CheckoutController", "control", 370, 130, 330);
+        lifeline(d, "Order", "entity", 570, 90, 330);
+        msg(d, "Customer", "CheckoutForm", "1", "placeOrder()", 120, false);
+        msg(d, "CheckoutForm", "CheckoutController", "2", "checkout(cart)", 150, false);
+        msg(d, "CheckoutController", "CheckoutController", "3", "validateCart()", 180, false);
+        msg(d, "CheckoutController", "Order", "4", "createFromCart(cart)", 230, false);
+        msg(d, "Order", "CheckoutController", "5", "order", 260, true);
+        msg(d, "CheckoutController", "CheckoutForm", "6", "confirmation", 290, true);
+    }
+
+    void erd() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_ER_DIAGRAM, "P_ERD");
+        IDBTable cust = f.createDBTable(); cust.setName("users");
+        col(cust, "user_id", "varchar", 10, true, false);
+        col(cust, "email", "varchar", 100, false, false);
+        IDBTable ord = f.createDBTable(); ord.setName("customer_order");
+        col(ord, "order_id", "varchar", 12, true, false);
+        col(ord, "total", "double", 0, false, false);
+        IShapeUIModel s1 = put(d, cust, "users", 60, 60, 200, 80, null);
+        IShapeUIModel s2 = put(d, ord, "ord", 380, 60, 200, 80, null);
+        IDBForeignKey fk = f.createDBForeignKey();
+        fk.setFrom(cust); fk.setTo(ord);
+        fk.setFromMultiplicity(IDBForeignKey.FROM_MULTIPLICITY_ONE);
+        fk.setToMultiplicity(IDBForeignKey.TO_MULTIPLICITY_ZERO_TO_MANY);
+        java.util.Iterator<?> it = fk.foreignKeyColumnsIterator();
+        if (it.hasNext()) { ((IDBColumn) it.next()).setName("customer_id"); }
+        link(d, fk, s1, s2);
+        fit(s1); fit(s2);
+    }
+
+    IDBColumn col(IDBTable t, String name, String type, int len, boolean pk, boolean nullable) {
+        IDBColumn c = f.createDBColumn();
+        c.setName(name);
+        c.setType(type, len, 0);
+        c.setPrimaryKey(pk);
+        c.setNullable(nullable);
+        t.addDBColumn(c);
+        return c;
+    }
+
+    void dfd() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM, "P_DFD");
+        IDFExternalEntity cus = f.createDFExternalEntity(); cus.setName("Customer");
+        IDFProcess p = f.createDFProcess(); p.setName("Place Order"); p.setDfId("4.0");
+        IDFDataStore s = f.createDFDataStore(); s.setName("Orders"); s.setDfId("D3");
+        IShapeUIModel a = put(d, cus, "c", 40, 100, 120, 60, null);
+        IShapeUIModel b = put(d, p, "p", 280, 80, 120, 100, null);
+        IShapeUIModel c = put(d, s, "s", 520, 110, 160, 40, null);
+        IDFDataFlow f1 = f.createDFDataFlow(); f1.setName("order details"); f1.setFrom(cus); f1.setTo(p);
+        link(d, f1, a, b);
+        IDFDataFlow f2 = f.createDFDataFlow(); f2.setName("new order"); f2.setFrom(p); f2.setTo(s);
+        link(d, f2, b, c);
+    }
+
+    void state() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_STATE_DIAGRAM, "P_STATE");
+        IInitialPseudoState i = f.createInitialPseudoState();
+        IState2 a = f.createState2(); a.setName("Payment Pending");
+        IState2 b = f.createState2(); b.setName("Paid/Confirmed");
+        IFinalState2 z = f.createFinalState2();
+        IShapeUIModel si = put(d, i, "i", 100, 30, 20, 20, null);
+        IShapeUIModel sa = put(d, a, "a", 50, 100, 140, 50, BLUE);
+        IShapeUIModel sb = put(d, b, "b", 50, 220, 140, 50, BLUE);
+        IShapeUIModel sz = put(d, z, "z", 100, 330, 24, 24, null);
+        ITransition2 t0 = f.createTransition2(); t0.setFrom(i); t0.setTo(a); t0.setName("place order"); link(d, t0, si, sa);
+        ITransition2 t1 = f.createTransition2(); t1.setFrom(a); t1.setTo(b); t1.setName("payment succeeded [amount matches]"); link(d, t1, sa, sb);
+        ITransition2 t2 = f.createTransition2(); t2.setFrom(b); t2.setTo(z); link(d, t2, sb, sz);
+    }
+
+    void component() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_COMPONENT_DIAGRAM, "P_COMP");
+        IPackage pkg = f.createPackage(); pkg.setName("Application Layer");
+        IShapeUIModel ps = put(d, pkg, "pkg", 40, 40, 520, 160, LIGHT);
+        IComponent c1 = f.createComponent(); c1.setName("SearchService");
+        IComponent c2 = f.createComponent(); c2.setName("RankingService");
+        pkg.addChild(c1); pkg.addChild(c2);
+        IShapeUIModel s1 = put(d, c1, "c1", 70, 90, 160, 60, BLUE);
+        IShapeUIModel s2 = put(d, c2, "c2", 340, 90, 160, 60, BLUE);
+        ps.addChild(s1); ps.addChild(s2);
+        link(d, use(c1, c2), s1, s2);
+        INode n = f.createNode(); n.setName("Web Server");
+        IShapeUIModel ns = put(d, n, "n", 40, 260, 220, 120, GREY);
+        IArtifact art = f.createArtifact(); art.setName("abc_shop.py");
+        n.addChild(art);
+        ns.addChild(put(d, art, "art", 60, 300, 150, 50, YELLOW));
+    }
+}

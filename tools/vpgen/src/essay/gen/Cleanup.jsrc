@@ -1,0 +1,73 @@
+package essay.gen;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.IInteractionLifeLine;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/** Remove the old design diagrams (DCL01-03, PKG01, ERD01) and the model elements only they show. */
+public class Cleanup {
+    static final String[] DIAGRAMS = {"DCL01", "DCL02", "DCL03", "PKG01", "ERD01"};
+    static final String[] PACKAGES = {"Design Step 1", "Design Step 2", "Design Model", "Data Access Objects",
+                                      "view", "controller", "service", "ai", "dao", "model"};
+
+    final Set<String> used = new HashSet<>();
+
+    public void run(IProject project) {
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            for (String prefix : DIAGRAMS) {
+                if (d.getName().startsWith(prefix + " ")) {
+                    System.out.println("CLEANUP diagram " + d.getName());
+                    d.delete();
+                }
+            }
+        }
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                IModelElement m = e.getModelElement();
+                if (m == null) continue;
+                used.add(m.getId());
+                if (m instanceof IInteractionLifeLine) {
+                    Object base = ((IInteractionLifeLine) m).getBaseClassifier();
+                    if (base instanceof IModelElement) used.add(((IModelElement) base).getId());
+                }
+            }
+        }
+        for (IModelElement t : project.toModelElementArray("DBTable")) {
+            System.out.println("CLEANUP table " + t.getName());
+            t.delete();
+        }
+        for (IModelElement p : project.toModelElementArray("Package")) {
+            if (p.getParent() != null && !(p.getParent() instanceof IProject)) continue;
+            for (String name : PACKAGES) {
+                if (name.equals(p.getName())) prune(p);
+            }
+        }
+        for (IModelElement m : project.toModelElementArray()) {
+            if (m.getParent() == null || m.getParent() instanceof IProject) {
+                System.out.println("ROOT " + m.getModelType() + " " + m.getName() + " children=" + m.childCount());
+            }
+        }
+    }
+
+    /** Delete the unused descendants of an element; return true when the element itself was deleted. */
+    boolean prune(IModelElement m) {
+        boolean keep = used.contains(m.getId());
+        if ("Package".equals(m.getModelType())) {
+            for (IModelElement c : m.toChildArray()) {
+                if (!prune(c)) keep = true;
+            }
+        }
+        if (keep) {
+            System.out.println("CLEANUP keep " + m.getModelType() + " " + m.getName());
+            return false;
+        }
+        System.out.println("CLEANUP delete " + m.getModelType() + " " + m.getName());
+        m.delete();
+        return true;
+    }
+}

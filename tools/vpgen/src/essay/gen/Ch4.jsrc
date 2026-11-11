@@ -1,0 +1,325 @@
+package essay.gen;
+
+import java.awt.Color;
+
+import com.vp.plugin.diagram.IConnectorUIModel;
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.*;
+
+/** Chapter 4 - Design: four transformation steps, design sequence, components, deployment. */
+public class Ch4 extends Ch3 {
+
+    String[][] modelSpecs() {
+        return new String[][] {
+            {"User", "userId : String;name : String;email : String;passwordHash : String;role : String", "can(permission : String) : boolean"},
+            {"Customer", "address : Address;createdAt : String", "updateProfile(name : String, address : Address) : Customer"},
+            {"Address", "receiver : String;phone : String;street : String;city : String", "isComplete() : boolean;oneLine() : String"},
+            {"Product", "productId : String;name : String;categoryId : String;brand : String;color : String;price : float;status : String", "isActive() : boolean;searchText() : String;updatePrice(newPrice : float)"},
+            {"Promotion", "code : String;percent : float;minTotal : float;start : String;end : String", "isValid(subtotal : float, today : String) : boolean;discountFor(subtotal : float, today : String) : float"},
+            {"Cart", "cartId : String;customerId : String", "addItem(product : Product, qty : int) : CartItem;updateQuantity(productId : String, qty : int);removeItem(productId : String);calcTotal() : float;clear()"},
+            {"CartItem", "productId : String;name : String;cartPrice : float;quantity : int", "subTotal() : float"},
+            {"Order", "orderId : String;customerId : String;address : String;status : String;discount : float;shippingFee : float;idempotencyKey : String", "createFromCart(id : String, cart : Cart, address : String) : Order;subtotal() : float;calcTotal() : float;changeStatus(status : String, actor : String, at : String);canCancel() : boolean"},
+            {"OrderItem", "productId : String;name : String;unitPrice : float;quantity : int", "subTotal() : float"},
+            {"StatusChange", "status : String;actor : String;at : String;note : String", ""},
+            {"Payment", "paymentId : String;orderId : String;attemptRef : String;amount : float;currency : String;status : String;providerRef : String", "matches(ref : String, amount : float, currency : String) : boolean;isFinal() : boolean"},
+            {"StockLevel", "productId : String;physical : int;reserved : int;threshold : int", "available() : int;isLow() : boolean;apply(event : InventoryEvent) : StockLevel"},
+            {"InventoryEvent", "eventId : String;productId : String;kind : String;quantity : int;reference : String;reason : String", ""},
+            {"Shipment", "shipmentId : String;orderId : String;carrierRef : String;status : String", "lastSeq() : int;addMilestone(m : Milestone) : boolean"},
+            {"Milestone", "seq : int;code : String;at : String;location : String", ""},
+            {"Review", "reviewId : String;productId : String;customerId : String;orderId : String;rating : int;text : String;status : String", "validate() : Review"},
+        };
+    }
+
+    void modelClasses(String prefix) {
+        for (String[] s : modelSpecs()) {
+            klass(prefix + s[0], s[0], null, s[1].isEmpty() ? null : s[1].split(";"), s[2].isEmpty() ? null : s[2].split(";"));
+        }
+    }
+
+    void placeModel(IDiagramUIModel d, String prefix) {
+        columns(d, prefix, new String[][] {
+            {"User", "Customer", "Address", "StatusChange"},
+            {"Cart", "CartItem", "Order", "OrderItem"},
+            {"Promotion", "Product", "Payment"},
+            {"StockLevel", "InventoryEvent", "Review"},
+            {"Shipment", "Milestone"}}, 30, 30, LIGHT);
+    }
+
+    void designStep1() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "DCL01 Design Step 1 - Methods Added");
+        ownerPackage("Design Step 1");
+        modelClasses("s1:");
+        placeModel(d, "s1:");
+        inherit(d, "Customer", "User");
+        associate(d, "Customer", "Address", "1", "0..1", null, "aggregation");
+        associate(d, "Cart", "CartItem", "1", "0..*", null, "composition");
+        associate(d, "Cart", "Customer", "0..1", "1", null, null);
+        associate(d, "CartItem", "Product", "0..*", "1", null, null);
+        associate(d, "Cart", "Order", "1", "0..*", "checkout", null);
+        associate(d, "Order", "OrderItem", "1", "1..*", null, "composition");
+        associate(d, "Order", "StatusChange", "1", "1..*", null, "composition");
+        associate(d, "OrderItem", "Product", "0..*", "1", null, null);
+        associate(d, "Order", "Payment", "1", "0..*", null, null);
+        associate(d, "Order", "Promotion", "0..*", "0..1", null, null);
+        associate(d, "Order", "Shipment", "1", "0..1", null, null);
+        associate(d, "Shipment", "Milestone", "1", "0..*", null, "composition");
+        associate(d, "Product", "StockLevel", "1", "1", null, null);
+        associate(d, "StockLevel", "InventoryEvent", "1", "0..*", null, null);
+        associate(d, "Review", "Product", "0..*", "1", null, null);
+        associate(d, "Review", "Order", "0..*", "1", null, null);
+    }
+
+    void designStep2() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "DCL02 Design Step 2 - Use Dependencies");
+        ownerPackage("Design Model");
+        modelClasses("s2:");
+        placeModel(d, "s2:");
+        inherit(d, "Customer", "User");
+        associate(d, "Customer", "Address", "1", "0..1", null, "aggregation");
+        associate(d, "Cart", "CartItem", "1", "0..*", null, "composition");
+        associate(d, "Order", "OrderItem", "1", "1..*", null, "composition");
+        associate(d, "Order", "StatusChange", "1", "1..*", null, "composition");
+        associate(d, "Shipment", "Milestone", "1", "0..*", null, "composition");
+        uses(d, "Cart", "Product");
+        uses(d, "Order", "Cart");
+        uses(d, "StockLevel", "InventoryEvent");
+        uses(d, "Customer", "Address");
+        uses(d, "Shipment", "Milestone");
+
+    }
+
+    void designStep3Dao() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "DCL03 Design Step 3 - Data Access Objects");
+        ownerPackage("Data Access Objects");
+        String[][] daos = {
+            {"CustomerDAO", "getUser(id : String) : User;findByEmail(email : String) : User;saveUser(user : User);listCustomers() : List", "User"},
+            {"ProductDAO", "getProduct(id : String) : Product;listProducts(category : String) : List;saveProduct(p : Product);listCategories() : List", "Product"},
+            {"InventoryDAO", "getStock(productId : String) : StockLevel;saveStock(s : StockLevel);findEvent(productId : String, kind : String, ref : String) : InventoryEvent;addEvent(e : InventoryEvent)", "StockLevel"},
+            {"CartDAO", "getCart(customerId : String) : Cart;updateCart(cart : Cart)", "Cart"},
+            {"OrderDAO", "getOrder(id : String) : Order;findByIdempotencyKey(key : String) : Order;findByCustomer(id : String) : List;findByStatus(status : String) : List;saveOrder(o : Order)", "Order"},
+            {"PaymentDAO", "getByAttempt(ref : String) : Payment;forOrder(orderId : String) : List;savePayment(p : Payment)", "Payment"},
+            {"ShipmentDAO", "getByOrder(orderId : String) : Shipment;getByCarrierRef(ref : String) : Shipment;saveShipment(s : Shipment)", "Shipment"},
+            {"ReviewDAO", "forProduct(productId : String) : List;exists(c : String, p : String, o : String) : boolean;saveReview(r : Review)", "Review"},
+        };
+        int gy = 30;
+        for (int row = 0; row < 4; row++) {
+            int gx = 30, rowH = 0;
+            for (int col = 0; col < 2; col++) {
+                int i = row * 2 + col;
+                String n = daos[i][0];
+                IClass iface = klass("dao:" + n, n, "interface", null, daos[i][1].split(";"));
+                IClass impl = klass("impl:" + n, "Sqlite" + n, null, new String[] {"-db : Database"}, null);
+                IClass model = (IClass) named.get("s2:" + daos[i][2]);
+                IShapeUIModel si = box(d, iface, n, gx, gy, GREEN);
+                IShapeUIModel sm = box(d, impl, "impl" + n, gx + 20, gy + si.getHeight() + 40, LIGHT);
+                IShapeUIModel so = box(d, model, "m" + n, gx + si.getWidth() + 70, gy, LIGHT);
+                rel(d, realize(impl, iface), n, "impl" + n);
+                uses(d, n, "m" + n);
+                rowH = Math.max(rowH, Math.max(si.getHeight() + 40 + sm.getHeight(), so.getHeight()));
+                gx += si.getWidth() + 70 + so.getWidth() + 90;
+            }
+            gy += rowH + 60;
+        }
+        IClass db = klass("dbclass", "Database", null, new String[] {"-conn : Connection"},
+                          new String[] {"transaction() : ContextManager", "nextId(name : String, prefix : String) : String", "now() : String"});
+        box(d, db, "db", 700, gy, GREEN);
+        note(d, "Every Sqlite*DAO holds the shared Database (one SQLite connection).\n"
+             + "Services depend only on the interfaces; a missing record returns None / [].", 30, gy, 520, 50);
+    }
+
+    IShapeUIModel pkgFrame(IDiagramUIModel d, String name, String key, int x, int y, int w, int h, Color c, String[] classes) {
+        IPackage p = f.createPackage();
+        p.setName(name);
+        named.put("pkg:" + name, p);
+        IShapeUIModel frame = put(d, p, key, x, y, w, h, c);
+        int cx = x + 15, cy = y + 40;
+        for (String n : classes) {
+            IClass k = f.createClass();
+            k.setName(n);
+            p.addChild(k);
+            int w2 = Math.max(110, (int) (n.length() * 7.8) + 26);
+            if (cx + w2 > x + w - 10) {
+                cx = x + 15;
+                cy += 48;
+            }
+            IShapeUIModel s = put(d, k, null, cx, cy, w2, 36, Color.WHITE);
+            frame.addChild(s);
+            cx += w2 + 12;
+        }
+        return frame;
+    }
+
+    void designStep4Packages() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_PACKAGE_DIAGRAM, "PKG01 Design Step 4 - MVC Packages");
+        pkgFrame(d, "view", "view", 30, 30, 460, 120, PRES, new String[] {"templates", "style.css"});
+        pkgFrame(d, "controller", "ctl", 540, 30, 620, 170, PRES, new String[] {"WebApp (router)", "Request", "Response",
+                 "AccountController", "ShopController", "OrderController", "StaffController", "ReportController"});
+        pkgFrame(d, "service", "svc", 30, 260, 670, 240, APP, new String[] {"AuthService", "CatalogService", "CartService",
+                 "CheckoutService", "PaymentService", "OrderService", "InventoryService", "ShipmentService", "ReviewService",
+                 "ReportService", "PaymentGateway", "ShippingGateway"});
+        pkgFrame(d, "ai", "ai", 730, 260, 480, 240, APP, new String[] {"QueryService", "SpeechService", "ImageService",
+                 "SearchService", "RankingService", "ReviewInsightService", "RecommenderService"});
+        pkgFrame(d, "dao", "dao", 30, 540, 1150, 200, DATA, new String[] {"Database", "CustomerDAO", "ProductDAO", "InventoryDAO",
+                 "CartDAO", "PromotionDAO", "OrderDAO", "PaymentDAO", "ShipmentDAO", "ReviewDAO", "AuditDAO",
+                 "Sqlite*DAO (10)", "VectorIndex", "ImageStorage"});
+        pkgFrame(d, "model", "model", 30, 800, 1180, 150, LILAC, new String[] {"User", "Customer", "Address", "Product",
+                 "Category", "Promotion", "Cart", "CartItem", "Order", "OrderItem", "StatusChange", "Payment", "StockLevel",
+                 "InventoryEvent", "Shipment", "Milestone", "Review"});
+        String[][] deps = {{"controller", "view"}, {"controller", "service"}, {"controller", "ai"}, {"service", "dao"},
+                           {"ai", "dao"}, {"service", "model"}, {"ai", "model"}, {"dao", "model"}, {"controller", "model"}};
+        String[] keys = {"view", "ctl", "svc", "ai", "dao", "model"};
+        String[] names = {"view", "controller", "service", "ai", "dao", "model"};
+        for (String[] dp : deps) {
+            String a = keys[java.util.Arrays.asList(names).indexOf(dp[0])];
+            String b = keys[java.util.Arrays.asList(names).indexOf(dp[1])];
+            rel(d, dep(named.get("pkg:" + dp[0]), named.get("pkg:" + dp[1]), "use"), a, b);
+        }
+        IPackage shop = f.createPackage();
+        shop.setName("shop.py (composition root)");
+        put(d, shop, "root", 1220, 300, 200, 90, YELLOW);
+        rel(d, dep(shop, named.get("pkg:controller"), "create"), "root", "ctl");
+        rel(d, dep(shop, named.get("pkg:service"), "create"), "root", "svc");
+        rel(d, dep(shop, named.get("pkg:dao"), "create"), "root", "dao");
+    }
+
+    void checkoutDesignSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD05 Checkout Through the Layers (Design)");
+        int h = 840;
+        lifeline(d, "Customer", null, 10, 80, h);
+        lifeline(d, "OrderController", "boundary", 120, 120, h);
+        lifeline(d, "CheckoutService", "control", 280, 120, h);
+        lifeline(d, "CartService", "control", 440, 100, h);
+        lifeline(d, "OrderDAO", "entity", 580, 90, h);
+        lifeline(d, "Order", "entity", 710, 70, h);
+        lifeline(d, "InventoryService", "control", 820, 120, h);
+        lifeline(d, "PaymentService", "control", 980, 120, h);
+        lifeline(d, "PaymentGateway", "boundary", 1140, 120, h);
+        String[][] m = {
+            {"Customer", "OrderController", "1", "POST /checkout (promo, card, key)", "0"},
+            {"OrderController", "CheckoutService", "2", "place_order(customer, promo, card, key)", "0"},
+            {"CheckoutService", "OrderDAO", "3", "find_by_idempotency_key(key)", "0"},
+            {"OrderDAO", "CheckoutService", "4", "None", "1"},
+            {"CheckoutService", "CartService", "5", "validate_cart(cart)", "0"},
+            {"CartService", "CheckoutService", "6", "[] (no problems)", "1"},
+            {"CheckoutService", "CheckoutService", "7", "apply_promotion(), calc_shipping()", "0"},
+            {"CheckoutService", "Order", "8", "create_from_cart(id, cart, address)", "0"},
+            {"CheckoutService", "OrderDAO", "9", "save_order(order)", "0"},
+            {"CheckoutService", "InventoryService", "10", "reserve_order(order)", "0"},
+            {"CheckoutService", "PaymentService", "11", "request_payment(order, card)", "0"},
+            {"PaymentService", "PaymentGateway", "12", "authorize(ref, amount, USD, card)", "0"},
+            {"PaymentGateway", "PaymentService", "13", "signed result", "1"},
+            {"PaymentService", "Order", "14", "change_status(Paid/Confirmed)", "0"},
+            {"PaymentService", "OrderDAO", "15", "save_order(order)", "0"},
+            {"PaymentService", "CheckoutService", "16", "Succeeded", "1"},
+            {"CheckoutService", "OrderController", "17", "{order, payment}", "1"},
+            {"OrderController", "Customer", "18", "302 /orders/O017", "1"}};
+        int y = 120;
+        for (String[] r : m) {
+            msg(d, r[0], r[1], r[2], r[3], y, "1".equals(r[4]));
+            y += r[0].equals(r[1]) ? 55 : 38;
+        }
+        activate(d, "Customer", 120, y - 38);
+        activate(d, "OrderController", 120, y - 38);
+        activate(d, "CheckoutService", 158, y - 76);
+        activate(d, "CartService", 272, 310);
+        activate(d, "InventoryService", 471, 490);
+        activate(d, "PaymentService", 509, 680);
+        activate(d, "PaymentGateway", 547, 585);
+        note(d, "Steps 8-10 run inside one Database.transaction(): either the order and all\n"
+             + "RESERVE events are stored, or none (UC08 E1).", 300, y + 20, 460, 46);
+    }
+
+    void systemComponents() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_COMPONENT_DIAGRAM, "CMP02 System Component Diagram");
+        IPackage app = layer(d, "ABC Online Shop application (Python WSGI)", "app", 200, 20, 820, 560, new Color(245, 248, 252));
+        IShapeUIModel fa = shapes.get("app");
+        component(d, app, fa, "Web UI (view)", "ui", 240, 70, 170);
+        component(d, app, fa, "Controllers", "ctl", 480, 70, 170);
+        component(d, app, fa, "Business Services", "svc", 300, 230, 190);
+        component(d, app, fa, "AI Services", "ai", 640, 230, 170);
+        component(d, app, fa, "Gateways", "gw", 240, 400, 150);
+        component(d, app, fa, "Data Access (DAO)", "dao", 520, 400, 190);
+        IComponent db = f.createComponent();
+        db.setName("SQLite database abc_shop.db");
+        put(d, db, "db", 500, 640, 280, 62, GREEN);
+        IComponent psp = f.createComponent();
+        psp.setName("Payment Provider");
+        put(d, psp, "psp", 10, 400, 175, 62, YELLOW);
+        IComponent car = f.createComponent();
+        car.setName("Shipping Provider");
+        put(d, car, "car", 10, 520, 175, 62, YELLOW);
+        IComponent br = f.createComponent();
+        br.setName("Web browser");
+        put(d, br, "br", 30, 70, 140, 56, YELLOW);
+        uses(d, "br", "ctl");
+        uses(d, "ctl", "ui");
+        uses(d, "ctl", "svc");
+        uses(d, "ctl", "ai");
+        uses(d, "svc", "dao");
+        uses(d, "ai", "dao");
+        uses(d, "svc", "gw");
+        uses(d, "gw", "psp");
+        uses(d, "gw", "car");
+        uses(d, "dao", "db");
+    }
+
+    void deployment() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_DEPLOYMENT_DIAGRAM, "DEP01 Deployment Diagram");
+        INode client = f.createNode();
+        client.setName("Customer / Staff device");
+        IShapeUIModel cs = put(d, client, "client", 30, 120, 220, 150, GREY);
+        IArtifact browser = f.createArtifact();
+        browser.setName("Web browser (HTML, CSS)");
+        client.addChild(browser);
+        cs.addChild(put(d, browser, "browser", 45, 175, 190, 75, YELLOW));
+
+        INode server = f.createNode();
+        server.setName("Application server");
+        IShapeUIModel ss = put(d, server, "server", 380, 40, 430, 360, GREY);
+        INode py = f.createNode();
+        py.setName("Python 3.11 runtime");
+        server.addChild(py);
+        IShapeUIModel ps = put(d, py, "py", 400, 90, 390, 180, LIGHT);
+        ss.addChild(ps);
+        IArtifact app = f.createArtifact();
+        app.setName("abc_shop (main.py serve)");
+        py.addChild(app);
+        ps.addChild(put(d, app, "app", 415, 135, 220, 75, YELLOW));
+        IArtifact libs = f.createArtifact();
+        libs.setName("numpy, Pillow");
+        py.addChild(libs);
+        ps.addChild(put(d, libs, "libs", 650, 135, 125, 75, YELLOW));
+        IArtifact db = f.createArtifact();
+        db.setName("abc_shop.db (SQLite)");
+        server.addChild(db);
+        ss.addChild(put(d, db, "db", 415, 290, 190, 75, GREEN));
+        IArtifact img = f.createArtifact();
+        img.setName("data/images");
+        server.addChild(img);
+        ss.addChild(put(d, img, "img", 625, 290, 160, 75, GREEN));
+
+        INode pay = f.createNode();
+        pay.setName("Payment Provider (external)");
+        put(d, pay, "pay", 940, 60, 220, 100, new Color(253, 235, 220));
+        INode ship = f.createNode();
+        ship.setName("Shipping Provider (external)");
+        put(d, ship, "ship", 940, 260, 220, 100, new Color(253, 235, 220));
+        path(d, "client", "server", "HTTP(S)");
+        path(d, "server", "pay", "HTTPS, signed callback");
+        path(d, "server", "ship", "HTTPS, milestones");
+    }
+
+    void path(IDiagramUIModel d, String a, String b, String label) {
+        IAssociation as = f.createAssociation();
+        as.setFrom(shapes.get(a).getModelElement());
+        as.setTo(shapes.get(b).getModelElement());
+        as.setName(label);
+        IConnectorUIModel c = link(d, as, shapes.get(a), shapes.get(b));
+        if (c != null) {
+            c.setShowConnectorName(0);
+            c.resetCaption();
+        }
+    }
+}

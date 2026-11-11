@@ -1,0 +1,676 @@
+package essay.gen;
+
+import java.awt.Color;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.vp.plugin.diagram.IConnectorUIModel;
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeTypeConstants;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.diagram.shape.IActivityPartitionHeaderUIModel;
+import com.vp.plugin.diagram.shape.IActivitySwimlane2CompartmentUIModel;
+import com.vp.plugin.diagram.shape.IActivitySwimlane2NewUIModel;
+import com.vp.plugin.model.*;
+
+/** Chapter 2 - Analysis: activity, DFD, sequence, class, state and data models. */
+public class Ch2 extends Ch1 {
+
+    // ------------------------------------------------------------------ class boxes
+    /** Class shape sized from its text, so it renders the same with or without fitSize. */
+    IShapeUIModel box(IDiagramUIModel d, IClass c, String key, int x, int y, Color bg) {
+        int longest = c.getName().length() + 4;
+        int lines = 0;
+        for (IAttribute a : c.toAttributeArray()) {
+            longest = Math.max(longest, a.getName().length() + String.valueOf(a.getTypeAsString()).length() + 6);
+            lines++;
+        }
+        int ops = 0;
+        for (IOperation o : c.toOperationArray()) {
+            int len = o.getName().length() + 6 + (o.getReturnTypeAsString() == null ? 0 : o.getReturnTypeAsString().length());
+            for (IParameter p : o.toParameterArray()) {
+                len += p.getName().length() + String.valueOf(p.getTypeAsString()).length() + 5;
+            }
+            longest = Math.max(longest, len);
+            ops++;
+        }
+        int st = c.toStereotypeArray() != null && c.toStereotypeArray().length > 0 ? 15 : 0;
+        int w = Math.max(110, (int) (longest * 6.7) + 26);
+        int h = 30 + st + Math.max(1, lines) * 17 + 8 + Math.max(1, ops) * 17 + 8;
+        return put(d, c, key, x, y, w, h, bg);
+    }
+
+    /** Columns of classes, each stacked top-down; column x follows the widest box of the previous one. */
+    void columns(IDiagramUIModel d, String prefix, String[][] cols, int x0, int y0, Color bg) {
+        int x = x0;
+        for (String[] col : cols) {
+            int y = y0, widest = 0;
+            for (String n : col) {
+                IShapeUIModel sh = box(d, (IClass) named.get(prefix + n), n, x, y, bg);
+                y += sh.getHeight() + 45;
+                widest = Math.max(widest, sh.getWidth());
+            }
+            x += widest + 70;
+        }
+    }
+
+    IClass klass(String key, String name, String st, String[] attrs, String[] ops) {
+        IClass c = cls(name, st, attrs, ops);
+        named.put(key, c);
+        return c;
+    }
+
+    IConnectorUIModel rel(IDiagramUIModel d, IModelElement r, String a, String b) {
+        IConnectorUIModel c = link(d, r, shapes.get(a), shapes.get(b));
+        if (c != null && r.getName() != null && !r.getName().isEmpty()) {
+            c.setShowConnectorName(0);
+        }
+        return c;
+    }
+
+    void associate(IDiagramUIModel d, String a, String b, String ma, String mb, String name, String kind) {
+        rel(d, assoc(shapes.get(a).getModelElement(), shapes.get(b).getModelElement(), ma, mb, name, kind), a, b);
+    }
+
+    void inherit(IDiagramUIModel d, String child, String parent) {
+        rel(d, gen(shapes.get(child).getModelElement(), shapes.get(parent).getModelElement()), parent, child);
+    }
+
+    void uses(IDiagramUIModel d, String client, String supplier) {
+        rel(d, use(shapes.get(client).getModelElement(), shapes.get(supplier).getModelElement()), client, supplier);
+    }
+
+    // ------------------------------------------------------------------ activity helpers
+    static final Color ACTION = new Color(126, 205, 238);
+
+    final class Node {
+        final IModelElement model;
+        final IShapeUIModel shape;
+        Node(IModelElement m, IShapeUIModel s) { model = m; shape = s; }
+    }
+
+    void cflow(IDiagramUIModel d, IModelElement owner, Node a, Node b, String guard) {
+        IControlFlow c = f.createControlFlow();
+        c.setFrom(a.model);
+        c.setTo(b.model);
+        if (guard != null) {
+            c.setGuard(guard);
+        }
+        if (owner != null) {
+            owner.addChild(c);
+        }
+        IConnectorUIModel ui = link(d, c, a.shape, b.shape);
+        if (guard != null && ui != null) {
+            ui.setShowConnectorName(0);
+            ui.setRequestResetCaption(true);
+        }
+    }
+
+    Node act(IDiagramUIModel d, String name, int x, int y, int w) {
+        IActivityAction a = f.createActivityAction();
+        a.setName(name);
+        return new Node(a, put(d, a, null, x, y, w, 50, ACTION));
+    }
+
+    Node decision(IDiagramUIModel d, String name, int x, int y) {
+        IDecisionNode n = f.createDecisionNode();
+        n.setName(name);
+        return new Node(n, put(d, n, null, x, y, 110, 70, YELLOW));
+    }
+
+    Node merge(IDiagramUIModel d, int x, int y) {
+        IMergeNode n = f.createMergeNode();
+        n.setName("");
+        return new Node(n, put(d, n, null, x, y, 50, 40, YELLOW));
+    }
+
+    Node start(IDiagramUIModel d, int x, int y) {
+        IInitialNode n = f.createInitialNode();
+        return new Node(n, put(d, n, null, x, y, 26, 26, Color.BLACK));
+    }
+
+    Node end(IDiagramUIModel d, int x, int y) {
+        IActivityFinalNode n = f.createActivityFinalNode();
+        return new Node(n, put(d, n, null, x, y, 28, 28, Color.WHITE));
+    }
+
+    /** Vertical swimlanes; node x positions are relative to their lane. */
+    final class Lanes {
+        final IDiagramUIModel d;
+        final IActivitySwimlane2 model;
+        final IActivitySwimlane2NewUIModel shape;
+        final Map<String, IActivityPartition> parts = new LinkedHashMap<String, IActivityPartition>();
+        final Map<String, IActivitySwimlane2CompartmentUIModel> cells = new LinkedHashMap<String, IActivitySwimlane2CompartmentUIModel>();
+        final Map<String, Integer> index = new LinkedHashMap<String, Integer>();
+        final int width, ox = 40, oy = 40;
+
+        Lanes(String name, String[] names, int width, int height) {
+            d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_ACTIVITY_DIAGRAM, name);
+            d.setConnectorStyle(1);
+            this.width = width;
+            model = f.createActivitySwimlane2();
+            shape = (IActivitySwimlane2NewUIModel) dm.createDiagramElement(d, model);
+            shape.setBounds(ox, oy, width * names.length, height);
+            shape.setForeground(LINE);
+            String[] headers = new String[names.length], cellIds = new String[names.length];
+            for (int i = 0; i < names.length; i++) {
+                IActivityPartition p = f.createActivityPartition();
+                p.setName(names[i]);
+                model.addVerticalPartition(p);
+                model.addChild(p);
+                parts.put(names[i], p);
+                index.put(names[i], i);
+                IActivityPartitionHeaderUIModel h = (IActivityPartitionHeaderUIModel) dm.createDiagramElement(d, p);
+                h.setHorizontal(false);
+                h.setSwimlane(shape);
+                h.setBounds(ox + i * width, oy, width, 34);
+                fill(h, new Color(91, 170, 214));
+                h.setRequestResetCaption(true);
+                shape.addChild(h);
+                headers[i] = h.getId();
+                IActivitySwimlane2CompartmentUIModel c = (IActivitySwimlane2CompartmentUIModel)
+                    dm.createDiagramElement(d, IShapeTypeConstants.SHAPE_TYPE_ACTIVITY_SWIMLANE2_COMPARTMENT);
+                c.setVerticalPartitionId(h.getId());
+                c.setBounds(ox + i * width, oy + 34, width, height - 34);
+                fill(c, i % 2 == 0 ? new Color(245, 250, 253) : Color.WHITE);
+                shape.addChild(c);
+                cells.put(names[i], c);
+                cellIds[i] = c.getId();
+            }
+            shape.setVerticalPartitionIds(headers);
+            shape.setCompartmentIds(cellIds);
+        }
+
+        Node place(String lane, IModelElement m, int x, int y, int w, int h, Color bg) {
+            model.addChild(m);
+            parts.get(lane).addContainedElement(m);
+            IShapeUIModel s = put(d, m, null, ox + index.get(lane) * width + x, oy + y, w, h, bg);
+            cells.get(lane).addChild(s);
+            return new Node(m, s);
+        }
+
+        Node action(String lane, String name, int y) {
+            IActivityAction a = f.createActivityAction();
+            a.setName(name);
+            return place(lane, a, 20, y, width - 40, 50, ACTION);
+        }
+
+        Node decision(String lane, String name, int y) {
+            IDecisionNode n = f.createDecisionNode();
+            n.setName(name);
+            return place(lane, n, width / 2 - 55, y, 110, 70, YELLOW);
+        }
+
+        Node start(String lane, int y) {
+            return place(lane, f.createInitialNode(), width / 2 - 13, y, 26, 26, Color.BLACK);
+        }
+
+        Node end(String lane, int x, int y) {
+            return place(lane, f.createActivityFinalNode(), x, y, 28, 28, Color.WHITE);
+        }
+
+        void flow(Node a, Node b) { cflow(d, model, a, b, null); }
+
+        void flow(Node a, Node b, String guard) { cflow(d, model, a, b, guard); }
+    }
+
+    // ------------------------------------------------------------------ diagrams
+    void placeOrderActivity() {
+        Lanes l = new Lanes("AD01 Place Order (Swimlane)", new String[] {"Customer", "System", "Payment Provider"}, 300, 1300);
+        Node s = l.start("Customer", 50);
+        Node a1 = l.action("Customer", "Select Checkout from cart", 100);
+        Node a2 = l.action("System", "Validate cart lines and prices (UC29)", 180);
+        Node a3 = l.action("System", "Check availability (UC30)", 260);
+        Node d1 = l.decision("System", "Cart valid?", 340);
+        Node e1 = l.action("Customer", "[No] Correct quantities in cart", 355);
+        Node x1 = l.end("Customer", 136, 430);
+        Node a4 = l.action("Customer", "Confirm address, enter promotion code", 470);
+        Node a5 = l.action("System", "Apply promotion (UC32), calculate total (UC31)", 550);
+        Node a6 = l.action("Customer", "Confirm purchase", 630);
+        Node a7 = l.action("System", "Reserve stock and create Payment Pending order", 710);
+        Node a8 = l.action("System", "Send referenced payment request (UC09)", 790);
+        Node a9 = l.action("Payment Provider", "Authorise payment", 790);
+        Node a10 = l.action("Payment Provider", "Return signed result", 870);
+        Node d2 = l.decision("System", "Verified success?", 950);
+        Node a11 = l.action("System", "[Yes] Mark Paid/Confirmed, clear cart", 1060);
+        Node a12 = l.action("Customer", "[No] See failure, cart kept", 1060);
+        Node r1 = l.action("System", "[No] Release reservation, Payment Failed", 1140);
+        Node a13 = l.action("Customer", "View order confirmation", 1160);
+        Node x2 = l.end("Customer", 136, 1240);
+        Node x3 = l.end("Payment Provider", 136, 1160);
+        l.flow(s, a1); l.flow(a1, a2); l.flow(a2, a3); l.flow(a3, d1);
+        l.flow(d1, e1, "No"); l.flow(e1, x1); l.flow(d1, a4, "Yes");
+        l.flow(a4, a5); l.flow(a5, a6); l.flow(a6, a7); l.flow(a7, a8); l.flow(a8, a9); l.flow(a9, a10);
+        l.flow(a10, d2); l.flow(d2, a11, "Yes"); l.flow(d2, r1, "No"); l.flow(r1, a12); l.flow(a12, x3);
+        l.flow(a11, a13); l.flow(a13, x2);
+    }
+
+    void fulfilmentActivity() {
+        Lanes l = new Lanes("AD02 Process and Ship Order (Swimlane)",
+                            new String[] {"Sales Staff", "System", "Warehouse Staff", "Shipping Provider"}, 250, 1100);
+        Node s = l.start("Sales Staff", 50);
+        Node a1 = l.action("Sales Staff", "Open processing queue", 100);
+        Node a2 = l.action("System", "List Paid/Confirmed and On Hold orders", 180);
+        Node a3 = l.action("Sales Staff", "Select order, confirm processing", 260);
+        Node a4 = l.action("System", "Verify payment and reservations", 340);
+        Node d1 = l.decision("System", "Eligible?", 420);
+        Node h = l.action("Sales Staff", "[No] Order On Hold, exception recorded", 520);
+        Node xh = l.end("Sales Staff", 111, 600);
+        Node a5 = l.action("System", "[Yes] Set Processing, add to pick list", 520);
+        Node a6 = l.action("Warehouse Staff", "Pick and pack items", 600);
+        Node a7 = l.action("System", "Issue stock, create shipment, Ready for Shipment", 680);
+        Node a8 = l.action("Warehouse Staff", "Hand parcel to carrier", 760);
+        Node a9 = l.action("Shipping Provider", "Create delivery, return carrier reference", 760);
+        Node a10 = l.action("Shipping Provider", "Send milestones (picked up ... delivered)", 860);
+        Node a11 = l.action("System", "Accept new milestones, update order status", 940);
+        Node x = l.end("System", 111, 1030);
+        l.flow(s, a1); l.flow(a1, a2); l.flow(a2, a3); l.flow(a3, a4); l.flow(a4, d1);
+        l.flow(d1, h, "No"); l.flow(h, xh); l.flow(d1, a5, "Yes"); l.flow(a5, a6); l.flow(a6, a7);
+        l.flow(a7, a8); l.flow(a8, a9); l.flow(a9, a10); l.flow(a10, a11); l.flow(a11, x);
+    }
+
+    void inventoryActivity() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_ACTIVITY_DIAGRAM, "AD03 Manage Inventory");
+        d.setConnectorStyle(1);
+        Node s = start(d, 287, 20);
+        Node a1 = act(d, "Warehouse Staff: select product and event type", 160, 70, 280);
+        Node a2 = act(d, "System: show physical, reserved, available, recent events", 160, 150, 280);
+        Node a3 = act(d, "Warehouse Staff: enter quantity, reference, reason", 160, 230, 280);
+        Node dup = decision(d, "Reference already recorded?", 245, 310);
+        Node r0 = act(d, "[Yes] Return earlier event, no change", 470, 320, 230);
+        Node x0 = end(d, 571, 400);
+        Node d1 = decision(d, "Resulting balance valid?", 245, 420);
+        Node r1 = act(d, "[No] Reject event and explain", 470, 430, 230);
+        Node x1 = end(d, 571, 510);
+        Node a4 = act(d, "System: record event, recalculate stock atomically", 160, 530, 280);
+        Node d2 = decision(d, "Available <= threshold?", 245, 610);
+        Node a5 = act(d, "[Yes] Flag low stock, offer UC24 replenishment", 470, 620, 260);
+        Node m = merge(d, 275, 720);
+        Node a6 = act(d, "System: display new balance and event id", 160, 790, 280);
+        Node x2 = end(d, 286, 870);
+        cflow(d, null, s, a1, null); cflow(d, null, a1, a2, null); cflow(d, null, a2, a3, null);
+        cflow(d, null, a3, dup, null); cflow(d, null, dup, r0, "Yes"); cflow(d, null, r0, x0, null);
+        cflow(d, null, dup, d1, "No"); cflow(d, null, d1, r1, "No"); cflow(d, null, r1, x1, null);
+        cflow(d, null, d1, a4, "Yes"); cflow(d, null, a4, d2, null); cflow(d, null, d2, a5, "Yes");
+        cflow(d, null, a5, m, null); cflow(d, null, d2, m, "No"); cflow(d, null, m, a6, null);
+        cflow(d, null, a6, x2, null);
+    }
+
+    void dfdLevel0() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM, "DFD0 Level 0 Diagram");
+        entity(d, "Customer", "cus", 40, 330);
+        entity(d, "Administrator", "adm", 40, 70);
+        entity(d, "Payment Provider", "pay", 1180, 330);
+        entity(d, "Shipping Provider", "shi", 1180, 560);
+        entity(d, "Warehouse Staff", "war", 1180, 780);
+        entity(d, "Manager", "man", 40, 820);
+        process(d, "1.0", "Manage Catalogue", "p1", 330, 50, 150, 90);
+        process(d, "2.0", "Search and Browse", "p2", 330, 230, 150, 90);
+        process(d, "3.0", "Manage Cart", "p3", 330, 420, 150, 90);
+        process(d, "4.0", "Place Order and Pay", "p4", 640, 320, 160, 100);
+        process(d, "5.0", "Fulfil and Ship", "p5", 900, 560, 150, 90);
+        process(d, "6.0", "Manage Inventory", "p6", 900, 760, 150, 90);
+        process(d, "7.0", "Manage Reviews", "p7", 330, 620, 150, 90);
+        process(d, "8.0", "Produce Reports", "p8", 330, 820, 150, 90);
+        store(d, "1", "Products", "d1", 620, 70);
+        store(d, "2", "Customers", "d2", 640, 200);
+        store(d, "3", "Orders", "d3", 650, 520);
+        store(d, "4", "Inventory", "d4", 650, 840);
+        store(d, "5", "Payments", "d5", 950, 230);
+        store(d, "6", "Reviews", "d6", 620, 660);
+        flow(d, "adm", "p1", "product data");
+        flow(d, "p1", "d1", "product record");
+        flow(d, "cus", "p2", "query");
+        flow(d, "d1", "p2", "products");
+        flow(d, "p2", "cus", "results");
+        flow(d, "cus", "p3", "cart change");
+        flow(d, "p3", "p4", "cart");
+        flow(d, "d2", "p4", "address");
+        flow(d, "p4", "d3", "order");
+        flow(d, "p4", "pay", "payment request");
+        flow(d, "pay", "p4", "payment result");
+        flow(d, "p4", "d5", "payment");
+        flow(d, "p4", "d4", "reservation");
+        flow(d, "d3", "p5", "paid order");
+        flow(d, "p5", "shi", "delivery request");
+        flow(d, "shi", "p5", "milestones");
+        flow(d, "war", "p6", "stock event");
+        flow(d, "p6", "d4", "balance");
+        flow(d, "cus", "p7", "review");
+        flow(d, "p7", "d6", "review");
+        flow(d, "d3", "p8", "orders");
+        flow(d, "p8", "man", "reports");
+    }
+
+    void dfdLevel1() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM, "DFD1 Level 1 - 4.0 Place Order and Pay");
+        entity(d, "Customer", "cus", 40, 250);
+        entity(d, "Payment Provider", "pay", 1040, 250);
+        process(d, "4.1", "Validate Cart", "p1", 300, 60, 150, 90);
+        process(d, "4.2", "Calculate Total", "p2", 300, 250, 150, 90);
+        process(d, "4.3", "Reserve Stock and Create Order", "p3", 560, 250, 170, 100);
+        process(d, "4.4", "Request Payment", "p4", 820, 120, 150, 90);
+        process(d, "4.5", "Record Payment Result", "p5", 820, 400, 160, 90);
+        store(d, "1", "Products", "d1", 520, 30);
+        store(d, "7", "Carts", "d7", 40, 450);
+        store(d, "8", "Promotions", "d8", 300, 450);
+        store(d, "3", "Orders", "d3", 560, 520);
+        store(d, "4", "Inventory", "d4", 520, 140);
+        store(d, "5", "Payments", "d5", 1040, 520);
+        flow(d, "cus", "p1", "checkout request");
+        flow(d, "d7", "p1", "cart lines");
+        flow(d, "d1", "p1", "price, status");
+        flow(d, "p1", "p2", "valid cart");
+        flow(d, "d8", "p2", "promotion rule");
+        flow(d, "p2", "cus", "quote");
+        flow(d, "p2", "p3", "confirmed total");
+        flow(d, "d4", "p3", "available qty");
+        flow(d, "p3", "d4", "RESERVE events");
+        flow(d, "p3", "d3", "Payment Pending order");
+        flow(d, "p3", "p4", "order ref, amount");
+        flow(d, "p4", "pay", "payment request");
+        flow(d, "pay", "p5", "signed result");
+        flow(d, "p5", "d5", "payment status");
+        flow(d, "p5", "d3", "order status");
+        flow(d, "p5", "cus", "confirmation");
+    }
+
+    void placeOrderSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD01 Place Order (Analysis)");
+        int h = 720;
+        lifeline(d, "Customer", null, 20, 90, h);
+        lifeline(d, "CheckoutForm", "boundary", 150, 110, h);
+        lifeline(d, "CheckoutController", "control", 320, 130, h);
+        lifeline(d, "Cart", "entity", 510, 80, h);
+        lifeline(d, "StockLevel", "entity", 640, 90, h);
+        lifeline(d, "Order", "entity", 790, 80, h);
+        lifeline(d, "PaymentGateway", "boundary", 930, 120, h);
+        lifeline(d, "Payment Provider", null, 1110, 120, h);
+        msg(d, "Customer", "CheckoutForm", "1", "checkout(promoCode)", 130, false);
+        msg(d, "CheckoutForm", "CheckoutController", "2", "placeOrder(customer, promoCode)", 160, false);
+        msg(d, "CheckoutController", "Cart", "3", "validate()", 195, false);
+        msg(d, "Cart", "CheckoutController", "4", "problems", 225, true);
+        msg(d, "CheckoutController", "StockLevel", "5", "checkAvailable(qty)", 260, false);
+        msg(d, "CheckoutController", "CheckoutController", "6", "applyPromotion(), calcTotal()", 295, false);
+        msg(d, "CheckoutController", "Order", "7", "createFromCart(cart)", 350, false);
+        msg(d, "CheckoutController", "StockLevel", "8", "reserve(order)", 385, false);
+        msg(d, "CheckoutController", "PaymentGateway", "9", "authorize(ref, amount)", 425, false);
+        msg(d, "PaymentGateway", "Payment Provider", "10", "payment request", 455, false);
+        msg(d, "Payment Provider", "PaymentGateway", "11", "signed result", 490, true);
+        msg(d, "PaymentGateway", "CheckoutController", "12", "Succeeded", 520, true);
+        msg(d, "CheckoutController", "Order", "13", "changeStatus(Paid/Confirmed)", 555, false);
+        msg(d, "CheckoutController", "Cart", "14", "clear()", 590, false);
+        msg(d, "CheckoutController", "CheckoutForm", "15", "order confirmation", 630, true);
+        msg(d, "CheckoutForm", "Customer", "16", "show order O017", 665, true);
+        activate(d, "Customer", 130, 665);
+        activate(d, "CheckoutForm", 130, 665);
+        activate(d, "CheckoutController", 160, 630);
+        activate(d, "Cart", 195, 225);
+        activate(d, "StockLevel", 260, 270);
+        activate(d, "Order", 350, 360);
+        activate(d, "StockLevel", 385, 395);
+        activate(d, "PaymentGateway", 425, 520);
+        activate(d, "Payment Provider", 455, 490);
+        activate(d, "Order", 555, 565);
+        activate(d, "Cart", 590, 600);
+    }
+
+    void trackOrderSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD02 Track Order (Analysis)");
+        int h = 480;
+        lifeline(d, "Customer", null, 20, 90, h);
+        lifeline(d, "OrderPage", "boundary", 160, 100, h);
+        lifeline(d, "OrderController", "control", 320, 120, h);
+        lifeline(d, "Order", "entity", 500, 80, h);
+        lifeline(d, "Shipment", "entity", 640, 90, h);
+        msg(d, "Customer", "OrderPage", "1", "open order O011", 130, false);
+        msg(d, "OrderPage", "OrderController", "2", "track(customerId, orderId)", 165, false);
+        msg(d, "OrderController", "Order", "3", "find(orderId)", 200, false);
+        msg(d, "Order", "OrderController", "4", "order", 230, true);
+        msg(d, "OrderController", "OrderController", "5", "checkOwner(customerId)", 265, false);
+        msg(d, "OrderController", "Shipment", "6", "milestones()", 320, false);
+        msg(d, "Shipment", "OrderController", "7", "accepted milestones", 350, true);
+        msg(d, "OrderController", "OrderPage", "8", "status, timeline, last update", 390, true);
+        msg(d, "OrderPage", "Customer", "9", "show timeline", 425, true);
+        activate(d, "Customer", 130, 425);
+        activate(d, "OrderPage", 130, 425);
+        activate(d, "OrderController", 165, 390);
+        activate(d, "Order", 200, 230);
+        activate(d, "Shipment", 320, 350);
+    }
+
+    void analysisClasses() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "CL01 Analysis Class Diagram");
+        ownerPackage("Analysis Model");
+        klass("user", "User", null, new String[] {"userId : String", "name : String", "email : String", "role : String"}, null);
+        klass("cus", "Customer", null, new String[] {"createdAt : DateTime"}, null);
+        klass("addr", "Address", null, new String[] {"receiver : String", "phone : String", "street : String", "city : String"}, null);
+        klass("cat", "Category", null, new String[] {"categoryId : String", "name : String"}, null);
+        klass("prod", "Product", null, new String[] {"productId : String", "name : String", "brand : String", "color : String", "price : float", "status : String"}, null);
+        klass("stock", "StockLevel", null, new String[] {"physical : int", "reserved : int", "threshold : int", "/available : int"}, null);
+        klass("ev", "InventoryEvent", null, new String[] {"eventId : String", "kind : EventKind", "quantity : int", "reference : String", "reason : String"}, null);
+        klass("cart", "Cart", null, new String[] {"cartId : String"}, null);
+        klass("ci", "CartItem", null, new String[] {"quantity : int", "cartPrice : float"}, null);
+        klass("promo", "Promotion", null, new String[] {"code : String", "percent : float", "minTotal : float", "start : Date", "end : Date"}, null);
+        klass("ord", "Order", null, new String[] {"orderId : String", "status : OrderStatus", "discount : float", "shippingFee : float", "createdAt : DateTime", "idempotencyKey : String"}, null);
+        klass("oi", "OrderItem", null, new String[] {"quantity : int", "unitPrice : float"}, null);
+        klass("hist", "StatusChange", null, new String[] {"status : OrderStatus", "actor : String", "at : DateTime", "note : String"}, null);
+        klass("pay", "Payment", null, new String[] {"attemptRef : String", "amount : float", "currency : String", "status : String", "providerRef : String"}, null);
+        klass("ship", "Shipment", null, new String[] {"shipmentId : String", "carrierRef : String", "status : String"}, null);
+        klass("ms", "Milestone", null, new String[] {"seq : int", "code : String", "at : DateTime"}, null);
+        klass("rev", "Review", null, new String[] {"rating : int", "text : String", "status : String"}, null);
+        IDiagramUIModel dd = d;
+        box(dd, (IClass) named.get("user"), "user", 40, 30, LIGHT);
+        box(dd, (IClass) named.get("cus"), "cus", 40, 200, LIGHT);
+        box(dd, (IClass) named.get("addr"), "addr", 40, 330, LIGHT);
+        box(dd, (IClass) named.get("cart"), "cart", 330, 200, LIGHT);
+        box(dd, (IClass) named.get("ci"), "ci", 330, 330, LIGHT);
+        box(dd, (IClass) named.get("ord"), "ord", 330, 480, LIGHT);
+        box(dd, (IClass) named.get("oi"), "oi", 330, 700, LIGHT);
+        box(dd, (IClass) named.get("hist"), "hist", 40, 520, LIGHT);
+        box(dd, (IClass) named.get("pay"), "pay", 40, 700, LIGHT);
+        box(dd, (IClass) named.get("promo"), "promo", 330, 30, LIGHT);
+        box(dd, (IClass) named.get("prod"), "prod", 660, 330, LIGHT);
+        box(dd, (IClass) named.get("cat"), "cat", 660, 160, LIGHT);
+        box(dd, (IClass) named.get("stock"), "stock", 930, 330, LIGHT);
+        box(dd, (IClass) named.get("ev"), "ev", 930, 500, LIGHT);
+        box(dd, (IClass) named.get("ship"), "ship", 660, 700, LIGHT);
+        box(dd, (IClass) named.get("ms"), "ms", 930, 700, LIGHT);
+        box(dd, (IClass) named.get("rev"), "rev", 660, 520, LIGHT);
+        inherit(dd, "cus", "user");
+        associate(dd, "cus", "addr", "1", "0..1", "delivers to", "aggregation");
+        associate(dd, "cus", "cart", "1", "1", "owns", null);
+        associate(dd, "cart", "ci", "1", "0..*", null, "composition");
+        associate(dd, "ci", "prod", "0..*", "1", "refers to", null);
+        associate(dd, "cus", "ord", "1", "0..*", "places", null);
+        associate(dd, "ord", "oi", "1", "1..*", null, "composition");
+        associate(dd, "oi", "prod", "0..*", "1", null, null);
+        associate(dd, "ord", "hist", "1", "1..*", "history", "composition");
+        associate(dd, "ord", "pay", "1", "0..*", "paid by", null);
+        associate(dd, "ord", "promo", "0..*", "0..1", "uses", null);
+        associate(dd, "ord", "ship", "1", "0..1", "shipped as", null);
+        associate(dd, "ship", "ms", "1", "0..*", null, "composition");
+        associate(dd, "prod", "cat", "0..*", "1", "belongs to", null);
+        associate(dd, "prod", "stock", "1", "1", null, null);
+        associate(dd, "stock", "ev", "1", "0..*", "explained by", null);
+        associate(dd, "rev", "prod", "0..*", "1", "about", null);
+        associate(dd, "rev", "ord", "0..*", "1", "verified by", null);
+    }
+
+    void orderStateMachine() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_STATE_DIAGRAM, "ST01 Order State Machine");
+        String[][] st = {
+            {"pp", "Payment Pending", "430", "110"}, {"pf", "Payment Failed", "40", "110"},
+            {"paid", "Paid/Confirmed", "430", "270"}, {"hold", "On Hold", "820", "270"},
+            {"proc", "Processing", "430", "430"}, {"ready", "Ready for Shipment", "430", "590"},
+            {"ship", "Shipped", "430", "740"}, {"df", "Delivery Failed", "820", "740"},
+            {"del", "Delivered", "430", "900"}, {"can", "Cancelled", "40", "590"}};
+        for (String[] s : st) {
+            IState2 m = f.createState2();
+            m.setName(s[1]);
+            put(d, m, s[0], Integer.parseInt(s[2]), Integer.parseInt(s[3]), 170, 50, BLUE);
+        }
+        put(d, f.createInitialPseudoState(), "init", 503, 20, 24, 24, null);
+        put(d, f.createFinalState2(), "fin1", 502, 1010, 26, 26, null);
+        put(d, f.createFinalState2(), "fin2", 112, 720, 26, 26, null);
+        put(d, f.createFinalState2(), "fin3", 112, 20, 26, 26, null);
+        String[][] tr = {
+            {"init", "pp", "place order [cart valid] / reserve stock"},
+            {"pp", "paid", "payment succeeded"},
+            {"pp", "pf", "payment declined"},
+            {"pf", "fin3", ""},
+            {"pp", "can", "cancel"},
+            {"paid", "proc", "confirm [paid, reserved]"},
+            {"paid", "hold", "manual check"},
+            {"hold", "proc", "resolved"},
+            {"paid", "can", "cancel"},
+            {"proc", "can", "cancel"},
+            {"proc", "ready", "packed / issue stock"},
+            {"ready", "ship", "PICKED_UP"},
+            {"ship", "df", "FAILED_ATTEMPT"},
+            {"df", "del", "DELIVERED (retry)"},
+            {"ship", "del", "DELIVERED"},
+            {"del", "fin1", ""},
+            {"can", "fin2", ""}};
+        for (String[] t : tr) {
+            ITransition2 x = f.createTransition2();
+            x.setFrom(shapes.get(t[0]).getModelElement());
+            x.setTo(shapes.get(t[1]).getModelElement());
+            if (!t[2].isEmpty()) {
+                x.setName(t[2]);
+            }
+            IShapeUIModel a = shapes.get(t[0]), b = shapes.get(t[1]);
+            boolean canonical = t[0].compareTo(t[1]) < 0;
+            IShapeUIModel p = canonical ? a : b, q = canonical ? b : a;
+            double dx = q.getX() + q.getWidth() / 2.0 - p.getX() - p.getWidth() / 2.0;
+            double dy = q.getY() + q.getHeight() / 2.0 - p.getY() - p.getHeight() / 2.0;
+            double len = Math.max(1, Math.hypot(dx, dy)), side = canonical ? 10 : -10;
+            boolean twoWay = (t[0] + t[1]).equals("shipdf") || (t[0] + t[1]).equals("dfship")
+                || (t[0] + t[1]).equals("paidhold") || (t[0] + t[1]).equals("holdpaid");
+            java.awt.Point[] pts = twoWay ? new java.awt.Point[] {border(a, b, -dy / len * side, dx / len * side),
+                                                               border(b, a, -dy / len * side, dx / len * side)} : null;
+            IConnectorUIModel c = link(d, x, a, b);
+            if (c != null && !t[2].isEmpty()) {
+                c.setShowConnectorName(0);
+                c.resetCaption();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ ERD
+    IDBTable table(String name, String[][] cols) {
+        IDBTable t = f.createDBTable();
+        t.setName(name);
+        for (String[] c : cols) {
+            IDBColumn col = f.createDBColumn();
+            col.setName(c[0]);
+            String type = c[1];
+            int len = 0;
+            if (type.contains("(")) {
+                len = Integer.parseInt(type.substring(type.indexOf('(') + 1, type.indexOf(')')));
+                type = type.substring(0, type.indexOf('('));
+            }
+            col.setType(type, len, 0);
+            col.setPrimaryKey(c.length > 2 && c[2].contains("PK"));
+            col.setNullable(c.length > 2 && c[2].contains("N"));
+            col.setUnique(c.length > 2 && c[2].contains("U"));
+            t.addDBColumn(col);
+        }
+        named.put("table:" + name, t);
+        return t;
+    }
+
+    IShapeUIModel tableShape(IDiagramUIModel d, String name, int x, int y) {
+        IDBTable t = (IDBTable) named.get("table:" + name);
+        int rows = t.toDBColumnArray().length;
+        int longest = name.length();
+        for (IDBColumn c : t.toDBColumnArray()) {
+            longest = Math.max(longest, c.getName().length() + c.getTypeInText().length() + 4);
+        }
+        return put(d, t, name, x, y, Math.max(170, (int) (longest * 7.2) + 56), 30 + rows * 17 + 6, null);
+    }
+
+    /** FK from parent (referenced) to child; the generated column is renamed, optionally part of PK. */
+    void fk(IDiagramUIModel d, String parent, String child, String column, boolean pk, boolean optional) {
+        IDBTable p = (IDBTable) named.get("table:" + parent), c = (IDBTable) named.get("table:" + child);
+        IDBForeignKey k = f.createDBForeignKey();
+        k.setFrom(p);
+        k.setTo(c);
+        k.setFromMultiplicity(IDBForeignKey.FROM_MULTIPLICITY_ONE);
+        k.setToMultiplicity(IDBForeignKey.TO_MULTIPLICITY_ZERO_TO_MANY);
+        java.util.Iterator<?> it = k.foreignKeyColumnsIterator();
+        if (it.hasNext()) {
+            IDBColumn col = (IDBColumn) it.next();
+            col.setName(column);
+            col.setPrimaryKey(pk);
+            col.setNullable(optional);
+        }
+        link(d, k, shapes.get(parent), shapes.get(child));
+    }
+
+    void physicalErd() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_ER_DIAGRAM, "ERD01 Physical Data Model");
+        table("users", new String[][] {{"user_id", "varchar(10)", "PK"}, {"name", "varchar(100)"}, {"email", "varchar(100)", "U"}, {"password_hash", "varchar(128)"}, {"role", "varchar(12)"}, {"created_at", "timestamp"}});
+        table("address", new String[][] {{"receiver", "varchar(100)"}, {"phone", "varchar(20)"}, {"street", "varchar(150)"}, {"city", "varchar(60)"}});
+        table("category", new String[][] {{"category_id", "varchar(20)", "PK"}, {"name", "varchar(60)"}});
+        table("product", new String[][] {{"product_id", "varchar(10)", "PK"}, {"name", "varchar(120)"}, {"brand", "varchar(60)"}, {"color", "varchar(20)"}, {"price", "decimal(10)"}, {"description", "varchar(255)", "N"}, {"image", "varchar(255)", "N"}, {"status", "varchar(12)"}});
+        table("stock_level", new String[][] {{"physical", "integer"}, {"reserved", "integer"}, {"threshold", "integer"}});
+        table("inventory_event", new String[][] {{"event_id", "varchar(10)", "PK"}, {"kind", "varchar(10)"}, {"quantity", "integer"}, {"reference", "varchar(40)"}, {"reason", "varchar(100)", "N"}, {"created_at", "timestamp"}});
+        table("replenishment_request", new String[][] {{"request_id", "varchar(10)", "PK"}, {"quantity", "integer"}, {"status", "varchar(20)"}, {"created_at", "timestamp"}});
+        table("cart", new String[][] {{"cart_id", "varchar(20)", "PK"}});
+        table("cart_item", new String[][] {{"name", "varchar(120)"}, {"cart_price", "decimal(10)"}, {"quantity", "integer"}});
+        table("promotion", new String[][] {{"code", "varchar(20)", "PK"}, {"percent", "decimal(5)"}, {"min_total", "decimal(10)"}, {"start_date", "date"}, {"end_date", "date"}, {"active", "boolean"}});
+        table("customer_order", new String[][] {{"order_id", "varchar(12)", "PK"}, {"address", "varchar(255)"}, {"discount", "decimal(10)"}, {"shipping_fee", "decimal(10)"}, {"total", "decimal(12)"}, {"status", "varchar(24)"}, {"created_at", "timestamp"}, {"promo_code", "varchar(20)", "N"}, {"idempotency_key", "varchar(64)", "U"}});
+        table("order_item", new String[][] {{"name", "varchar(120)"}, {"unit_price", "decimal(10)"}, {"quantity", "integer"}});
+        table("order_status_history", new String[][] {{"id", "integer", "PK"}, {"status", "varchar(24)"}, {"actor", "varchar(20)"}, {"at", "timestamp"}, {"note", "varchar(255)", "N"}});
+        table("payment", new String[][] {{"payment_id", "varchar(12)", "PK"}, {"attempt_ref", "varchar(20)", "U"}, {"amount", "decimal(12)"}, {"currency", "varchar(3)"}, {"status", "varchar(12)"}, {"provider_ref", "varchar(40)", "N"}, {"created_at", "timestamp"}});
+        table("shipment", new String[][] {{"shipment_id", "varchar(10)", "PK"}, {"carrier_ref", "varchar(20)", "N"}, {"status", "varchar(20)"}});
+        table("shipment_milestone", new String[][] {{"seq", "integer", "PK"}, {"code", "varchar(20)"}, {"at", "timestamp"}, {"location", "varchar(100)", "N"}});
+        table("review", new String[][] {{"review_id", "varchar(10)", "PK"}, {"rating", "integer"}, {"text", "varchar(1000)"}, {"status", "varchar(12)"}, {"created_at", "timestamp"}});
+        table("audit_log", new String[][] {{"id", "integer", "PK"}, {"actor", "varchar(20)"}, {"action", "varchar(40)"}, {"entity", "varchar(20)"}, {"entity_id", "varchar(20)"}, {"detail", "varchar(255)", "N"}, {"at", "timestamp"}});
+        tableShape(d, "users", 40, 40);
+        tableShape(d, "address", 40, 270);
+        tableShape(d, "cart", 330, 40);
+        tableShape(d, "cart_item", 330, 170);
+        tableShape(d, "customer_order", 330, 360);
+        tableShape(d, "order_status_history", 40, 470);
+        tableShape(d, "payment", 40, 660);
+        tableShape(d, "order_item", 330, 640);
+        tableShape(d, "shipment", 330, 800);
+        tableShape(d, "shipment_milestone", 330, 950);
+        tableShape(d, "category", 680, 40);
+        tableShape(d, "product", 680, 170);
+        tableShape(d, "review", 680, 470);
+        tableShape(d, "promotion", 680, 680);
+        tableShape(d, "stock_level", 980, 170);
+        tableShape(d, "inventory_event", 980, 330);
+        tableShape(d, "replenishment_request", 980, 560);
+        tableShape(d, "audit_log", 980, 760);
+        fk(d, "users", "address", "customer_id", true, false);
+        fk(d, "users", "cart", "customer_id", false, false);
+        fk(d, "cart", "cart_item", "cart_id", true, false);
+        fk(d, "product", "cart_item", "product_id", true, false);
+        fk(d, "users", "customer_order", "customer_id", false, false);
+        fk(d, "customer_order", "order_item", "order_id", true, false);
+        fk(d, "product", "order_item", "product_id", true, false);
+        fk(d, "customer_order", "order_status_history", "order_id", false, false);
+        fk(d, "customer_order", "payment", "order_id", false, false);
+        fk(d, "customer_order", "shipment", "order_id", false, false);
+        fk(d, "shipment", "shipment_milestone", "shipment_id", true, false);
+        fk(d, "category", "product", "category_id", false, false);
+        fk(d, "product", "stock_level", "product_id", true, false);
+        fk(d, "product", "inventory_event", "product_id", false, false);
+        fk(d, "product", "replenishment_request", "product_id", false, false);
+        fk(d, "product", "review", "product_id", false, false);
+        fk(d, "users", "review", "customer_id", false, false);
+        fk(d, "customer_order", "review", "order_id", false, false);
+        for (String t : new String[] {"address", "cart", "cart_item", "customer_order", "order_item", "order_status_history",
+                                      "payment", "shipment", "shipment_milestone", "product", "stock_level",
+                                      "inventory_event", "replenishment_request", "review"}) {
+            IShapeUIModel s = shapes.get(t);
+            int rows = ((IDBTable) named.get("table:" + t)).toDBColumnArray().length;
+            s.setSize(s.getWidth() + 20, 30 + rows * 17 + 6);
+        }
+    }
+}

@@ -1,0 +1,35 @@
+users|role|role IN ('customer','sales','warehouse','admin','manager')|
+category|detail_kind|detail_kind IN ('footwear','apparel','bag','watch')|
+product|price|price > 0|
+product|description||''
+product|image||''
+product|status|status IN ('active','unpublished')|'active'
+bag_detail|capacity_l|capacity_l > 0|
+bag_detail|laptop_sleeve|laptop_sleeve IN (0, 1)|0
+watch_detail|movement|movement IN ('smart','quartz','automatic')|
+watch_detail|water_resistance_m|water_resistance_m >= 0|
+stock_level|physical|physical >= 0|
+stock_level|reserved|reserved >= 0 AND reserved <= physical|
+stock_level|threshold||3
+inventory_event|kind|kind IN ('RECEIPT','RESERVE','RELEASE','ISSUE','ADJUST')|
+inventory_event|reason||''
+replenishment_request|quantity|quantity > 0|
+replenishment_request|status||'Requested'
+cart_item|quantity|quantity > 0|
+promotion|percent|percent > 0 AND percent <= 50|
+promotion|min_total||0
+promotion|active||1
+customer_order|discount||0
+customer_order|shipping_fee||0
+customer_order|total|total > 0|
+customer_order|promo_code||''
+order_item|quantity|quantity > 0|
+order_status_history|note||''
+payment|amount|amount > 0|
+payment|currency||'USD'
+payment|provider_ref||''
+shipment|carrier_ref||''
+shipment_milestone|location||''
+review|rating|rating BETWEEN 1 AND 5|
+review|status||'published'
+audit_log|detail||''

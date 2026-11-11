@@ -1,0 +1,37 @@
+package essay.gen;
+
+/** All diagrams of the essay, in chapter order. */
+public class Essay extends Ch4 {
+
+    void run() {
+        init();
+        // Chapter 1 - Requirement Determination
+        contextDiagram();
+        completeUseCaseDiagram();
+        // Chapter 2 - Analysis
+        placeOrderActivity();
+        fulfilmentActivity();
+        inventoryActivity();
+        dfdLevel0();
+        dfdLevel1();
+        placeOrderSequence();
+        trackOrderSequence();
+        analysisClasses();
+        orderStateMachine();
+        physicalErd();
+        // Chapter 3 - AI in e-commerce
+        aiUseCases();
+        searchComponents();
+        voiceSearchSequence();
+        imageSearchSequence();
+        reviewPipelineActivity();
+        // Chapter 4 - Design
+        designStep1();
+        designStep2();
+        designStep3Dao();
+        designStep4Packages();
+        checkoutDesignSequence();
+        systemComponents();
+        deployment();
+    }
+}

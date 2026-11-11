@@ -1,0 +1,263 @@
+package essay.gen;
+
+import java.awt.Color;
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.DiagramManager;
+import com.vp.plugin.diagram.IConnectorUIModel;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.diagram.shape.IInteractionLifeLineUIModel;
+import com.vp.plugin.model.*;
+import com.vp.plugin.model.factory.IModelElementFactory;
+
+/** Helpers shared by every diagram of the essay project. */
+public class Base {
+    static final Color BLUE = new Color(122, 207, 245);
+    static final Color LIGHT = new Color(220, 240, 252);
+    static final Color YELLOW = new Color(255, 242, 204);
+    static final Color GREEN = new Color(226, 240, 217);
+    static final Color ORANGE = new Color(252, 228, 214);
+    static final Color LILAC = new Color(232, 224, 245);
+    static final Color GREY = new Color(242, 242, 242);
+    static final Color LINE = new Color(47, 85, 151);
+
+    final IModelElementFactory f = IModelElementFactory.instance();
+    DiagramManager dm;
+    IPackage owner;
+    final Map<String, IModelElement> named = new HashMap<String, IModelElement>();
+    final Map<String, IShapeUIModel> shapes = new HashMap<String, IShapeUIModel>();
+
+    IPackage ownerPackage(String name) {
+        owner = f.createPackage();
+        owner.setName(name);
+        return owner;
+    }
+
+    void init() {
+        dm = ApplicationManager.instance().getDiagramManager();
+    }
+
+    IDiagramUIModel diagram(String type, String name) {
+        IDiagramUIModel d = dm.createDiagram(type);
+        d.setName(name);
+        d.setDiagramBackground(Color.WHITE);
+        d.setShowConnectorName(0);
+        shapes.clear();
+        return d;
+    }
+
+    IShapeUIModel put(IDiagramUIModel d, IModelElement m, String key, int x, int y, int w, int h, Color bg) {
+        IShapeUIModel s = (IShapeUIModel) dm.createDiagramElement(d, m);
+        s.setBounds(x, y, w, h);
+        if (bg != null) {
+            fill(s, bg);
+        }
+        s.setForeground(LINE);
+        s.setRequestResetCaption(true);
+        if (key != null) {
+            shapes.put(key, s);
+        }
+        return s;
+    }
+
+    void fill(IShapeUIModel s, Color c) {
+        s.setBackground(c);
+        try {
+            s.getFillColor().setValues(1, c, c, 0, 0, true);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    IShapeUIModel fit(IShapeUIModel s) {
+        s.fitSize();
+        return s;
+    }
+
+    IConnectorUIModel link(IDiagramUIModel d, IModelElement rel, IDiagramElement a, IDiagramElement b) {
+        return (IConnectorUIModel) dm.createConnector(d, rel, a, b, null);
+    }
+
+    IConnectorUIModel link(IDiagramUIModel d, IModelElement rel, IDiagramElement a, IDiagramElement b, Point[] pts) {
+        return (IConnectorUIModel) dm.createConnector(d, rel, a, b, pts);
+    }
+
+    // ------------------------------------------------------------------ classes
+    IClass cls(String name, String stereotype, String[] attrs, String[] ops) {
+        IClass c = f.createClass();
+        if (owner != null) {
+            owner.addChild(c);
+        }
+        c.setName(name);
+        if (stereotype != null) {
+            for (String st : stereotype.split(",")) {
+                c.addStereotype(st.trim());
+            }
+        }
+        if (attrs != null) {
+            for (String a : attrs) {
+                addAttr(c, a);
+            }
+        }
+        if (ops != null) {
+            for (String o : ops) {
+                addOp(c, o);
+            }
+        }
+        return c;
+    }
+
+    /** "-name : Type" or "+name : Type" (default private). */
+    void addAttr(IClass c, String spec) {
+        String vis = "private";
+        if (spec.startsWith("+")) { vis = "public"; spec = spec.substring(1); }
+        else if (spec.startsWith("-")) { spec = spec.substring(1); }
+        else if (spec.startsWith("#")) { vis = "protected"; spec = spec.substring(1); }
+        String[] p = spec.split(":", 2);
+        IAttribute a = f.createAttribute();
+        a.setName(p[0].trim());
+        if (p.length > 1) {
+            a.setType(p[1].trim());
+        }
+        a.setVisibility(vis);
+        c.addAttribute(a);
+    }
+
+    /** "name(p1 : T1, p2 : T2) : Ret" (default public; prefix - for private). */
+    void addOp(IClass c, String spec) {
+        String vis = "public";
+        if (spec.startsWith("-")) { vis = "private"; spec = spec.substring(1); }
+        else if (spec.startsWith("+")) { spec = spec.substring(1); }
+        IOperation o = f.createOperation();
+        int open = spec.indexOf('('), close = spec.lastIndexOf(')');
+        o.setName(spec.substring(0, open).trim());
+        String params = spec.substring(open + 1, close).trim();
+        if (!params.isEmpty()) {
+            for (String p : params.split(",")) {
+                String[] pp = p.split(":", 2);
+                IParameter par = f.createParameter();
+                par.setName(pp[0].trim());
+                if (pp.length > 1) {
+                    par.setType(pp[1].trim());
+                }
+                o.addParameter(par);
+            }
+        }
+        String rest = spec.substring(close + 1).trim();
+        if (rest.startsWith(":")) {
+            o.setReturnType(rest.substring(1).trim());
+        }
+        o.setVisibility(vis);
+        c.addOperation(o);
+    }
+
+    IAssociation assoc(IModelElement a, IModelElement b, String multA, String multB, String name, String kind) {
+        IAssociation as = f.createAssociation();
+        as.setFrom(a);
+        as.setTo(b);
+        if (name != null) {
+            as.setName(name);
+        }
+        IAssociationEnd ea = (IAssociationEnd) as.getFromEnd();
+        IAssociationEnd eb = (IAssociationEnd) as.getToEnd();
+        if (multA != null) ea.setMultiplicity(multA);
+        if (multB != null) eb.setMultiplicity(multB);
+        if ("composition".equals(kind)) {
+            ea.setAggregationKind(IAssociationEnd.AGGREGATION_KIND_COMPOSITED);
+        } else if ("aggregation".equals(kind)) {
+            ea.setAggregationKind(IAssociationEnd.AGGREGATION_KIND_AGGREGATION);
+        }
+        return as;
+    }
+
+    IGeneralization gen(IModelElement child, IModelElement parent) {
+        IGeneralization g = f.createGeneralization();
+        g.setFrom(parent);
+        g.setTo(child);
+        return g;
+    }
+
+    IUsage use(IModelElement client, IModelElement supplier) {
+        IUsage u = f.createUsage();
+        u.setFrom(client);
+        u.setTo(supplier);
+        return u;
+    }
+
+    IDependency dep(IModelElement client, IModelElement supplier, String stereotype) {
+        IDependency d = f.createDependency();
+        d.setFrom(client);
+        d.setTo(supplier);
+        if (stereotype != null) {
+            d.addStereotype(stereotype);
+        }
+        return d;
+    }
+
+    IRealization realize(IModelElement impl, IModelElement iface) {
+        IRealization r = f.createRealization();
+        r.setFrom(iface);
+        r.setTo(impl);
+        return r;
+    }
+
+    INOTE note(IDiagramUIModel d, String text, int x, int y, int w, int h) {
+        INOTE n = f.createNOTE();
+        n.setDescription(text);
+        put(d, n, null, x, y, w, h, YELLOW);
+        return n;
+    }
+
+    // ------------------------------------------------------------------ sequence
+    IShapeUIModel lifeline(IDiagramUIModel d, String name, String stereotype, int x, int width, int height) {
+        IInteractionLifeLine l = f.createInteractionLifeLine();
+        l.setName(name);
+        if (stereotype != null) {
+            l.setClassLevelStereotype(false);
+            l.addStereotype(stereotype);
+        }
+        IShapeUIModel s = put(d, l, name, x + 50, 40, width, height, BLUE);
+        if (s instanceof IInteractionLifeLineUIModel) {
+            ((IInteractionLifeLineUIModel) s).setShowClassifier(false);
+        }
+        return s;
+    }
+
+    /** Execution bar on a lifeline between two message rows. */
+    void activate(IDiagramUIModel d, String lifeline, int y1, int y2) {
+        IShapeUIModel l = shapes.get(lifeline);
+        IInteractionLifeLine model = (IInteractionLifeLine) l.getModelElement();
+        IActivation a = f.createActivation();
+        model.addActivation(a);
+        IShapeUIModel s = (IShapeUIModel) dm.createDiagramElement(d, a);
+        if (s != null) {
+            s.setBounds(l.getX() + l.getWidth() / 2 - 5, y1 - 6, 10, y2 - y1 + 12);
+            fill(s, BLUE);
+        }
+    }
+
+    IConnectorUIModel msg(IDiagramUIModel d, String from, String to, String seq, String name, int y, boolean ret) {
+        IMessage m = f.createMessage();
+        m.setName(name);
+        m.setSequenceNumber(seq);
+        IShapeUIModel a = shapes.get(from), b = shapes.get(to);
+        boolean self = from.equals(to);
+        if (self) {
+            m.setType(IMessage.TYPE_RECURSIVE_MESSAGE);
+        }
+        m.setActionType(ret ? f.createActionTypeReturn() : f.createActionTypeCall());
+        int ax = a.getX() + a.getWidth() / 2, bx = b.getX() + b.getWidth() / 2;
+        Point[] pts = self
+            ? new Point[] {new Point(ax, y), new Point(ax + 40, y), new Point(ax + 40, y + 18), new Point(ax, y + 18)}
+            : new Point[] {new Point(ax, y), new Point(bx, y)};
+        IConnectorUIModel c = link(d, m, a, b, pts);
+        if (c != null) {
+            c.resetCaption();
+        }
+        return c;
+    }
+}

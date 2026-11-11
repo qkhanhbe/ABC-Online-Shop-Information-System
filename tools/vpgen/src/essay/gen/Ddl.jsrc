@@ -1,0 +1,124 @@
+package essay.gen;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.vp.plugin.model.IDBColumn;
+import com.vp.plugin.model.IDBForeignKeyConstraint;
+import com.vp.plugin.model.IDBTable;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * Generate the SQL script from the ER model: every table of the project with its columns, types,
+ * NOT NULL, UNIQUE, DEFAULT and CHECK rules, the primary key and the foreign keys taken from the
+ * relationship lines. Parents are written before children so every REFERENCES clause points to a
+ * table that already exists. An optional rules file (table|column|check|default) stores the CHECK
+ * and DEFAULT rules in the model first.
+ */
+public class Ddl {
+
+    public void run(IProject project, String rules, String out) throws Exception {
+        Map<String, IDBTable> tables = new LinkedHashMap<>();
+        // only the physical model: tables drawn on the ERD diagrams (CDM01 and LDM01 hold their own entities)
+        for (com.vp.plugin.diagram.IDiagramUIModel d : project.toDiagramArray()) {
+            if (!d.getName().startsWith("ERD0")) continue;
+            for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                IModelElement m = e.getModelElement();
+                if (m instanceof IDBTable && !tables.containsKey(m.getName())) tables.put(m.getName(), (IDBTable) m);
+            }
+        }
+        if (rules != null && new java.io.File(rules).exists()) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(rules), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String[] f = line.split("[|]", -1);
+                    if (f.length < 4 || !tables.containsKey(f[0])) continue;
+                    IDBColumn c = tables.get(f[0]).getDBColumnByName(f[1]);
+                    if (c == null) { System.out.println("DDL no column " + line); continue; }
+                    if (!f[2].isEmpty()) c.setCheckConstraint(f[2]);
+                    if (!f[3].isEmpty()) c.setDefaultValue(f[3]);
+                }
+            }
+        }
+        List<String> done = new ArrayList<>();
+        int fks = 0;
+        StringBuilder sql = new StringBuilder();
+        while (done.size() < tables.size()) {
+            boolean progress = false;
+            for (IDBTable t : tables.values()) {
+                if (done.contains(t.getName())) continue;
+                boolean ready = true;
+                for (String[] k : keys(t)) {
+                    if (!k[1].equals(t.getName()) && !done.contains(k[1])) ready = false;
+                }
+                if (!ready) continue;
+                fks += table(t, sql);
+                done.add(t.getName());
+                progress = true;
+            }
+            if (!progress) throw new IllegalStateException("cycle in foreign keys");
+        }
+        try (PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(out), StandardCharsets.UTF_8))) {
+            w.println("-- Generated from the physical data model of TieuLuan_KHANHBQ.vpp (ERD01, ERD02) by the essay.gen plugin.");
+            w.println("-- " + tables.size() + " tables, " + fks + " foreign keys; parents before children.");
+            w.println("PRAGMA foreign_keys = ON;");
+            w.println();
+            w.print(sql);
+        }
+        System.out.println("DDL " + tables.size() + " tables, " + fks + " foreign keys -> " + out);
+    }
+
+    /**
+     * Foreign keys of a child table as {column, parent table, parent column}, read from the FK
+     * relationship lines (parent -> child). The child column is named by the relationship
+     * (fk_<child>_<column>); the parent column is the parent's primary key.
+     */
+    static List<String[]> keys(IDBTable t) {
+        List<String[]> out = new ArrayList<>();
+        for (com.vp.plugin.model.ISimpleRelationship r : t.toToRelationshipArray()) {
+            if (!(r instanceof com.vp.plugin.model.IDBForeignKey)) continue;
+            IDBTable parent = (IDBTable) r.getFrom();
+            String prefix = "fk_" + t.getName() + "_";
+            String col = r.getName() != null && r.getName().startsWith(prefix) ? r.getName().substring(prefix.length()) : null;
+            String ref = null;
+            for (IDBColumn c : parent.toDBColumnArray()) if (c.isPrimaryKey()) ref = c.getName();
+            if (col == null || t.getDBColumnByName(col) == null) { System.out.println("DDL unknown fk " + r.getName()); continue; }
+            out.add(new String[] {col, parent.getName(), ref});
+        }
+        return out;
+    }
+
+    int table(IDBTable t, StringBuilder sql) {
+        List<String> lines = new ArrayList<>(), pk = new ArrayList<>(), fk = new ArrayList<>();
+        for (IDBColumn c : t.toDBColumnArray()) {
+            String type = c.getTypeInText();
+            if (c.getLength() > 0 && !type.contains("(")) {
+                type += "(" + c.getLength() + (c.getScale() > 0 ? "," + c.getScale() : "") + ")";
+            }
+            StringBuilder l = new StringBuilder("  " + c.getName() + " " + type.toUpperCase());
+            if (!c.isNullable() || c.isPrimaryKey()) l.append(" NOT NULL");
+            if (c.isUnique() && !c.isPrimaryKey()) l.append(" UNIQUE");
+            if (c.getDefaultValue() != null && !c.getDefaultValue().isEmpty()) l.append(" DEFAULT ").append(c.getDefaultValue());
+            if (c.getCheckConstraint() != null && !c.getCheckConstraint().isEmpty()) l.append(" CHECK (").append(c.getCheckConstraint()).append(")");
+            lines.add(l.toString());
+            if (c.isPrimaryKey()) pk.add(c.getName());
+        }
+        for (String[] k : keys(t)) {
+            fk.add("  FOREIGN KEY (" + k[0] + ") REFERENCES " + k[1] + " (" + k[2] + ")");
+        }
+        if (!pk.isEmpty()) lines.add("  PRIMARY KEY (" + String.join(", ", pk) + ")");
+        lines.addAll(fk);
+        sql.append("CREATE TABLE ").append(t.getName()).append(" (\n").append(String.join(",\n", lines)).append("\n);\n\n");
+        return fk.size();
+    }
+}

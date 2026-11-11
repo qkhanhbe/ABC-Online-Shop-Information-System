@@ -1,0 +1,496 @@
+package essay.gen;
+
+import java.io.File;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.ExportDiagramAsImageOption;
+import com.vp.plugin.VPPlugin;
+import com.vp.plugin.VPPluginCommandLineSupport;
+import com.vp.plugin.VPPluginInfo;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/** Command line: -pluginargs "probe|essay OUTPUT.vpp|PNG_FOLDER". */
+public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
+
+    static final File JOB = new File(System.getProperty("user.home"), "essay_gen_job.txt");
+    static final File LOG = new File(System.getProperty("user.home"), "essay_gen_log.txt");
+
+    /** GUI mode: a job file (mode, output .vpp, png folder) makes the plugin generate and exit. */
+    public void loaded(VPPluginInfo info) {
+        if (!JOB.exists()) {
+            return;
+        }
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                runJob();
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** GUI job, read-only: open a COPY of a project, export the listed diagrams with the GUI renderer, exit. */
+    void runJob() {
+        java.io.PrintWriter log = null;
+        try {
+            log = new java.io.PrintWriter(LOG, "UTF-8");
+            java.util.List<String> lines = java.nio.file.Files.readAllLines(JOB.toPath(), java.nio.charset.StandardCharsets.UTF_8);
+            final String mode = lines.get(0).trim(), copy = lines.get(1).trim(), png = lines.get(2).trim();
+            if (!"guiexport".equals(mode) || !copy.toLowerCase().contains("scratchpad") || copy.toLowerCase().contains("tieuluan_v1")) {
+                log.println("refused: only guiexport of a scratchpad copy is allowed");
+                return;
+            }
+            for (int i = 0; i < 25; i++) {
+                Thread.sleep(1000);
+            }
+            final Throwable[] error = new Throwable[1];
+            final java.io.PrintWriter out = log;
+            javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    try {
+                      for (String one : copy.split(";")) {
+                        ApplicationManager.instance().getProjectManager().openProject(new File(one));
+                        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+                        out.println("opened " + project.getProjectFile());
+                        File dir = new File(png, new File(one).getName().replace(".vpp", ""));
+                        dir.mkdirs();
+                        for (IDiagramUIModel d : project.toDiagramArray()) {
+                            String n = d.getName();
+                            if (!(n.startsWith("UCD") || n.startsWith("UC_AI") || n.startsWith("CL01") || n.startsWith("DCL02"))) continue;
+                            ApplicationManager.instance().getDiagramManager().openDiagram(d);
+                            ExportDiagramAsImageOption opt = new ExportDiagramAsImageOption(ExportDiagramAsImageOption.IMAGE_TYPE_PNG);
+                            ApplicationManager.instance().getModelConvertionManager().exportDiagramAsImage(d, new File(dir, n + ".png"), opt);
+                            out.println("exported " + n);
+                        }
+                      }
+                    } catch (Throwable e) {
+                        error[0] = e;
+                    }
+                }
+            });
+            if (error[0] != null) {
+                error[0].printStackTrace(log);
+            }
+            log.println("DONE");
+        } catch (Throwable e) {
+            if (log != null) e.printStackTrace(log);
+        } finally {
+            if (log != null) log.close();
+            JOB.delete();
+            Runtime.getRuntime().halt(0);
+        }
+    }
+
+    public void unloaded() { }
+
+    public void invoke(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i < args.length; i++) {
+            sb.append(i > 1 ? " " : "").append(args[i]);
+        }
+        if (args.length > 0 && "variant".equals(args[0])) {
+            variant(Integer.parseInt(args[1]), sb.toString().substring(sb.indexOf(" ") + 1).trim());
+            return;
+        }
+        if (args.length > 0 && "relayout".equals(args[0])) {
+            String[] pp = sb.toString().trim().split("[|]");
+            try {
+                new Relayout().run(ApplicationManager.instance().getProjectManager().getProject(), pp[0].trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            exportAll(pp[1].trim(), pp[2].trim());
+            return;
+        }
+        if (args.length > 0 && "vpddl".equals(args[0])) {
+            try {
+                new VpDdl().run(ApplicationManager.instance().getProjectManager().getProject(), sb.toString().trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        if (args.length > 0 && "ddl".equals(args[0])) {
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            try {
+                new Ddl().run(project, pp[0].trim(), pp[1].trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[2].trim()));
+            System.out.println("SAVED " + pp[2].trim());
+            return;
+        }
+        if (args.length > 0 && "arrange".equals(args[0])) {
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            try {
+                new Arrange().run(project, pp[0].trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[1].trim()));
+            System.out.println("SAVED " + pp[1].trim());
+            return;
+        }
+        if (args.length > 0 && "polish".equals(args[0])) {
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            new Polish().run(project, pp[2].trim().split(","), pp[1].trim());
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[0].trim()));
+            System.out.println("SAVED " + pp[0].trim());
+            return;
+        }
+        if (args.length > 0 && "cleanup".equals(args[0])) {
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            new Cleanup().run(project);
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(sb.toString().trim()));
+            System.out.println("SAVED " + sb.toString().trim());
+            return;
+        }
+        if (args.length > 0 && "ceexport".equals(args[0])) {
+            String[] pp = sb.toString().substring(sb.indexOf(" ") + 1).trim().split("[|]");
+            ceExport(pp[0].trim(), pp[1].trim());
+            return;
+        }
+        if (args.length > 0 && "dumpdfd".equals(args[0])) {
+            dumpDfd(sb.toString().substring(sb.indexOf(" ") + 1).trim());
+            return;
+        }
+        if (args.length > 0 && "inspect".equals(args[0])) {
+            inspect();
+            return;
+        }
+        String[] parts = sb.toString().split("[|]");
+        try {
+            generate(args.length > 0 ? args[0] : "probe", parts[0].trim(),
+                     parts.length > 1 ? parts[1].trim() : null);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new RuntimeException(t);
+        }
+    }
+
+    /** Right-angle connectors routed around the shapes (shapes keep their place); sequence diagrams excluded. */
+    void routeOrthogonal(IProject project) {
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM.equals(d.getType())) {
+                continue;
+            }
+            System.out.println("LAYOUT " + d.getName() + ": " + Layout.apply(d));
+        }
+    }
+
+    /** Re-create every non-association connector: 1 = plain (no route points), 2 = plain with swapped shapes. */
+    void variant(int v, String out) {
+        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+        com.vp.plugin.DiagramManager dm = ApplicationManager.instance().getDiagramManager();
+        int n = 0;
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            java.util.Map<String, com.vp.plugin.diagram.IShapeUIModel> byModel = new java.util.HashMap<String, com.vp.plugin.diagram.IShapeUIModel>();
+            for (com.vp.plugin.diagram.IShapeUIModel sh : d.toShapeUIModelArray()) {
+                if (sh.getModelElement() != null) byModel.put(sh.getModelElement().getId(), sh);
+            }
+            for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel) || !(e.getModelElement() instanceof com.vp.plugin.model.IRelationship)) continue;
+                String t = e.getModelElement().getModelType();
+                if (!(t.equals("Generalization") || t.equals("Include") || t.equals("Extend") || t.equals("Usage")
+                      || t.equals("Dependency") || t.equals("Realization"))) continue;
+                com.vp.plugin.model.IRelationship r = (com.vp.plugin.model.IRelationship) e.getModelElement();
+                com.vp.plugin.diagram.IShapeUIModel a = byModel.get(r.getFrom().getId()), b = byModel.get(r.getTo().getId());
+                if (a == null || b == null) continue;
+                java.awt.Point[] old = ((com.vp.plugin.diagram.IConnectorUIModel) e).getPoints();
+                e.deleteViewOnly();
+                if (v == 3) {
+                    com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, r, a, b, old);
+                    if (c != null) {
+                        c.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                        c.resetCaption();
+                    }
+                } else if (v == 7) {
+                    d.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                    com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, r, a, b, null);
+                    if (c != null && old != null) {
+                        c.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                        c.setUseFromShapeCenter(false);
+                        c.setUseToShapeCenter(false);
+                        c.clearPoints();
+                        for (java.awt.Point p : old) c.addPoint(p);
+                        c.resetCaption();
+                    }
+                } else if (v == 6) {
+                    com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, r, a, b, null);
+                    if (c != null && old != null) {
+                        c.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                        c.clearPoints();
+                        for (java.awt.Point p : old) c.addPoint(p);
+                        c.resetCaption();
+                    }
+                } else if (v == 5) {
+                    java.awt.Point[] pts = old;
+                    if (pts != null && pts.length >= 2) {
+                        double da = Math.hypot(pts[0].x - (a.getX() + a.getWidth() / 2.0), pts[0].y - (a.getY() + a.getHeight() / 2.0));
+                        double db = Math.hypot(pts[0].x - (b.getX() + b.getWidth() / 2.0), pts[0].y - (b.getY() + b.getHeight() / 2.0));
+                        if (db < da) {
+                            java.awt.Point[] r2 = new java.awt.Point[pts.length];
+                            for (int i = 0; i < pts.length; i++) r2[i] = pts[pts.length - 1 - i];
+                            pts = r2;
+                            System.out.println("REVERSED " + t + " " + a.getModelElement().getName());
+                        }
+                    }
+                    com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, r, a, b, pts);
+                    if (c != null) {
+                        c.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                        c.resetCaption();
+                    }
+                } else if (v == 4) {
+                    com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, r, a, b, null);
+                    if (c != null) {
+                        c.setConnectorStyle(com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                        c.resetCaption();
+                    }
+                } else if (v == 1) dm.createConnector(d, r, a, b, null);
+                else dm.createConnector(d, r, b, a, null);
+                n++;
+            }
+        }
+        ApplicationManager.instance().getProjectManager().saveProjectAs(new File(out));
+        System.out.println("VARIANT " + v + " recreated " + n + " -> " + out);
+    }
+
+    /**
+     * Visual Paradigm CE (and the GUI) does not draw directed relationships (include, extend, generalization,
+     * dependency, usage, realization) that carry routed waypoints; they are re-created without waypoints in
+     * right-angle style, so VP routes them itself. Associations keep the layered, orthogonal routes.
+     */
+    void redrawDirected(IProject project) {
+        com.vp.plugin.DiagramManager dm = ApplicationManager.instance().getDiagramManager();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM.equals(d.getType())
+                || com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
+            java.util.Map<String, com.vp.plugin.diagram.IShapeUIModel> byModel = new java.util.HashMap<String, com.vp.plugin.diagram.IShapeUIModel>();
+            for (com.vp.plugin.diagram.IShapeUIModel sh : d.toShapeUIModelArray()) {
+                if (sh.getModelElement() != null) byModel.put(sh.getModelElement().getId(), sh);
+            }
+            for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel) || e.getModelElement() == null) continue;
+                String t = e.getModelElement().getModelType();
+                if (t.equals("Association") || t.equals("Message")) continue;
+                com.vp.plugin.diagram.IConnectorUIModel old = (com.vp.plugin.diagram.IConnectorUIModel) e;
+                com.vp.plugin.diagram.IShapeUIModel a = old.getFromShape(), b = old.getToShape();
+                if (a == null || b == null) continue;
+                com.vp.plugin.model.IModelElement m = e.getModelElement();
+                e.deleteViewOnly();
+                com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) dm.createConnector(d, m, a, b, null);
+                if (c != null) {
+                    c.setConnectorStyle(d.getName().startsWith("ST01") ? com.vp.plugin.diagram.IConnectorUIModel.CS_OBLIQUE
+                                                                       : com.vp.plugin.diagram.IConnectorUIModel.CS_RECTI_LINEAR);
+                    c.setShowConnectorName(0);
+                    c.resetCaption();
+                }
+            }
+        }
+    }
+
+    /** ST01 keeps the hand-made positions designed for straight transitions (CE cannot keep routed ones). */
+    void placeStateMachine(IProject project) {
+        java.util.Map<String, int[]> pos = new java.util.HashMap<String, int[]>();
+        pos.put("Payment Pending", new int[] {430, 110}); pos.put("Payment Failed", new int[] {40, 110});
+        pos.put("Paid/Confirmed", new int[] {430, 270}); pos.put("On Hold", new int[] {820, 270});
+        pos.put("Processing", new int[] {430, 430}); pos.put("Ready for Shipment", new int[] {430, 590});
+        pos.put("Shipped", new int[] {430, 740}); pos.put("Delivery Failed", new int[] {820, 740});
+        pos.put("Delivered", new int[] {430, 900}); pos.put("Cancelled", new int[] {40, 590});
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (!d.getName().startsWith("ST01")) continue;
+            int finals = 0;
+            for (com.vp.plugin.diagram.IShapeUIModel sh : d.toShapeUIModelArray()) {
+                com.vp.plugin.model.IModelElement m = sh.getModelElement();
+                if (m == null) continue;
+                int[] p = pos.get(m.getName());
+                if (p != null) {
+                    sh.setBounds(p[0], p[1], 170, 50);
+                } else if ("InitialPseudoState".equals(m.getModelType())) {
+                    sh.setBounds(503, 20, 24, 24);
+                } else if ("FinalState2".equals(m.getModelType())) {
+                    int[][] f = {{502, 1010}, {112, 720}, {112, 20}};
+                    sh.setBounds(f[Math.min(finals, 2)][0], f[Math.min(finals, 2)][1], 26, 26);
+                    finals++;
+                }
+                sh.resetCaption();
+            }
+        }
+    }
+
+    void exportAll(String out, String png) {
+        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+        project.setName("TieuLuan_KHANHBQ");
+        ApplicationManager.instance().getProjectManager().saveProjectAs(new File(out));
+        File dir = new File(png);
+        dir.mkdirs();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
+            ExportDiagramAsImageOption opt = new ExportDiagramAsImageOption(ExportDiagramAsImageOption.IMAGE_TYPE_PNG);
+            opt.setTextAntiAliasing(true);
+            try {
+                File target = new File(dir, d.getName() + ".png");
+                for (int pass = 0; pass < 3; pass++) {
+                    ApplicationManager.instance().getModelConvertionManager().exportDiagramAsImage(d, target, opt);
+                    Thread.sleep(700);
+                }
+            } catch (Throwable t) {
+                System.out.println("EXPORT FAILED " + d.getName() + ": " + t);
+            }
+        }
+        System.out.println("SAVED " + out);
+    }
+
+    /** CE: fix the connectors of an existing project, save it, export every diagram CE supports. */
+    void ceExport(String out, String png) {
+        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+        placeStateMachine(project);
+        redrawDirected(project);
+        project.setName("TieuLuan_KHANHBQ");
+        ApplicationManager.instance().getProjectManager().saveProjectAs(new File(out));
+        File dir = new File(png);
+        dir.mkdirs();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
+            ExportDiagramAsImageOption opt = new ExportDiagramAsImageOption(ExportDiagramAsImageOption.IMAGE_TYPE_PNG);
+            opt.setTextAntiAliasing(true);
+            try {
+                File target = new File(dir, d.getName() + ".png");
+                for (int pass = 0; pass < 3; pass++) {
+                    ApplicationManager.instance().getModelConvertionManager().exportDiagramAsImage(d, target, opt);
+                    Thread.sleep(700);
+                }
+                System.out.println("EXPORTED " + d.getName());
+            } catch (Throwable t) {
+                System.out.println("EXPORT FAILED " + d.getName() + ": " + t);
+            }
+        }
+    }
+
+    /** Shapes and flows of the DFD-type diagrams as JSON lines, to draw them outside VP CE. */
+    void dumpDfd(String out) {
+        try (java.io.PrintWriter w = new java.io.PrintWriter(out, "UTF-8")) {
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            for (IDiagramUIModel d : project.toDiagramArray()) {
+                boolean all = out.endsWith("all.jsonl");
+                if (!all && !com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
+                for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                    if (all && e instanceof com.vp.plugin.diagram.IConnectorUIModel) continue;
+                    com.vp.plugin.model.IModelElement m = e.getModelElement();
+                    String type = m == null ? "?" : m.getModelType();
+                    String name = m == null ? "" : String.valueOf(m.getName()).replace("\"", "'");
+                    String dfid = "";
+                    try { dfid = String.valueOf(m.getClass().getMethod("getDfId").invoke(m)); } catch (Throwable ignored) { }
+                    if (e instanceof com.vp.plugin.diagram.IConnectorUIModel) {
+                        com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) e;
+                        StringBuilder pts = new StringBuilder();
+                        if (c.getPoints() != null) for (java.awt.Point p : c.getPoints()) pts.append(pts.length() > 0 ? "," : "").append("[").append(p.x).append(",").append(p.y).append("]");
+                        w.println("{\"d\":\"" + d.getName() + "\",\"k\":\"flow\",\"name\":\"" + name + "\",\"from\":\""
+                            + c.getFromShape().getModelElement().getName() + "\",\"to\":\"" + c.getToShape().getModelElement().getName()
+                            + "\",\"pts\":[" + pts + "]}");
+                    } else {
+                        w.println("{\"d\":\"" + d.getName() + "\",\"k\":\"" + type + "\",\"st\":\"" + e.getShapeType() + "\",\"name\":\"" + name + "\",\"id\":\"" + dfid
+                            + "\",\"b\":[" + e.getX() + "," + e.getY() + "," + e.getWidth() + "," + e.getHeight() + "]}");
+                    }
+                }
+            }
+            System.out.println("DUMPED " + out);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    void inspect() {
+        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (!d.getType().equals(com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_USE_CASE_DIAGRAM)
+                && !d.getType().equals(com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM)) continue;
+            int shown = 0;
+            for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel) || e.getModelElement() == null) continue;
+                com.vp.plugin.model.IModelElement m = e.getModelElement();
+                String t = m.getModelType();
+                if (shown > 8) continue;
+                shown++;
+                com.vp.plugin.model.IModelElement par = m.getParent();
+                com.vp.plugin.diagram.IConnectorUIModel cc = (com.vp.plugin.diagram.IConnectorUIModel) e;
+                System.out.println("SHAPE " + d.getName() + " | " + t + " shapeType=" + e.getShapeType() + " class=" + e.getClass().getName()
+                    + " fromShape=" + (cc.getFromShape() == null ? "null" : cc.getFromShape().getShapeType())
+                    + " toShape=" + (cc.getToShape() == null ? "null" : cc.getToShape().getShapeType())
+                    + " fromModel=" + (cc.getFromShape() == null ? "?" : cc.getFromShape().getModelElement().getName())
+                    + " pts=" + (cc.getPoints() == null ? 0 : cc.getPoints().length));
+                System.out.println("REL " + d.getName() + " | " + t + " parent=" + (par == null ? "null" : par.getModelType() + ":" + par.getName())
+                    + " from=" + ((com.vp.plugin.model.IRelationship) m).getFrom().getName()
+                    + " to=" + ((com.vp.plugin.model.IRelationship) m).getTo().getName()
+                    + " fromParent=" + (((com.vp.plugin.model.IRelationship) m).getFrom().getParent() == null ? "null" : ((com.vp.plugin.model.IRelationship) m).getFrom().getParent().getModelType()));
+            }
+            if (true) continue;
+            System.out.println("DIAGRAM " + d.getName() + " style=" + d.getConnectorStyle());
+            for (com.vp.plugin.diagram.IDiagramElement e : d.toDiagramElementArray()) {
+                if (!(e instanceof com.vp.plugin.diagram.IConnectorUIModel)) continue;
+                com.vp.plugin.diagram.IConnectorUIModel c = (com.vp.plugin.diagram.IConnectorUIModel) e;
+                java.awt.Point[] pts = c.getPoints();
+                StringBuilder sb = new StringBuilder();
+                sb.append(" CONN ").append(e.getModelElement() == null ? "null" : e.getModelElement().getModelType())
+                  .append(" ").append(c.getFromShape() == null ? "?" : c.getFromShape().getModelElement().getName())
+                  .append(" -> ").append(c.getToShape() == null ? "?" : c.getToShape().getModelElement().getName())
+                  .append(" pts=").append(pts == null ? 0 : pts.length)
+                  .append(" style=").append(c.getConnectorStyle())
+                  .append(" fromPin=").append(c.getFromPinType()).append(" toPin=").append(c.getToPinType())
+                  .append(" fg=").append(e.getForeground())
+                  .append(" bounds=").append(e.getX()).append(",").append(e.getY()).append(",").append(e.getWidth()).append(",").append(e.getHeight());
+                if (pts != null) for (java.awt.Point p : pts) sb.append(" (").append(p.x).append(",").append(p.y).append(")");
+                System.out.println(sb);
+            }
+        }
+    }
+
+    void generate(String mode, String out, String png) throws Exception {
+        IProject project = ApplicationManager.instance().getProjectManager().getProject();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            d.delete();
+        }
+        for (IModelElement m : project.toAllLevelModelElementArray()) {
+            try { m.delete(); } catch (Exception ignored) { }
+        }
+        if ("probe".equals(mode)) {
+            new Probe().run();
+        } else {
+            new Essay().run();
+        }
+        routeOrthogonal(project);
+        redrawDirected(project);
+        project.setName("TieuLuan_KHANHBQ");
+        ApplicationManager.instance().getProjectManager().saveProjectAs(new File(out));
+        java.io.PrintWriter w = new java.io.PrintWriter(out + ".diagrams.txt", "UTF-8");
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            w.println(d.getName());
+        }
+        w.close();
+        if (png != null) {
+            File dir = new File(png);
+            dir.mkdirs();
+            for (IDiagramUIModel d : project.toDiagramArray()) {
+                try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
+                ExportDiagramAsImageOption opt = new ExportDiagramAsImageOption(ExportDiagramAsImageOption.IMAGE_TYPE_PNG);
+                opt.setTextAntiAliasing(true);
+                try {
+                    File target = new File(dir, d.getName() + ".png");
+                    for (int pass = 0; pass < 3; pass++) {
+                        ApplicationManager.instance().getModelConvertionManager().exportDiagramAsImage(d, target, opt);
+                        Thread.sleep(700);
+                    }
+                } catch (Throwable t) {
+                    System.out.println("EXPORT FAILED " + d.getName() + ": " + t);
+                }
+            }
+        }
+        System.out.println("GENERATED " + out);
+    }
+}

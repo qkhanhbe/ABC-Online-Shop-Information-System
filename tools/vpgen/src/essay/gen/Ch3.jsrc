@@ -1,0 +1,196 @@
+package essay.gen;
+
+import java.awt.Color;
+
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.*;
+
+/** Chapter 3 - AI in e-commerce: AI use cases, search architecture, AI interactions. */
+public class Ch3 extends Ch2 {
+
+    static final Color PRES = new Color(226, 239, 250);
+    static final Color APP = new Color(253, 240, 226);
+    static final Color DATA = new Color(232, 244, 226);
+
+    void aiUseCases() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_USE_CASE_DIAGRAM, "UC_AI AI-Enabled Use Cases");
+        ISystem sys = null;
+        IShapeUIModel b = null;
+        usecase(d, sys, b, "UC05 Search Products", "s", 230, 250, 200);
+        usecase(d, sys, b, "Search by Keyword", "kw", 500, 60, 200);
+        usecase(d, sys, b, "Search by Voice", "vo", 500, 140, 200);
+        usecase(d, sys, b, "Search by Image", "im", 500, 220, 200);
+        usecase(d, sys, b, "Search by Text and Image", "mm", 500, 300, 220);
+        usecase(d, sys, b, "Ask About My Orders", "aq", 500, 380, 200);
+        usecase(d, sys, b, "UC06 View Product Details", "pd", 230, 470, 220);
+        usecase(d, sys, b, "UC33 View Review Insights", "ri", 520, 470, 230);
+        usecase(d, sys, b, "UC34 View Recommendations", "rc", 520, 550, 230);
+        usecase(d, sys, b, "UC18 Manage Reviews", "mr", 230, 610, 200);
+        usecase(d, sys, b, "Flag Noisy Review", "fl", 750, 620, 170);
+        usecase(d, sys, b, "UC25 View Management Dashboard", "db", 720, 140, 210);
+        actor(d, "Visitor", "vis", 60, 150);
+        actor(d, "Customer", "cus", 60, 400);
+        actor(d, "Administrator", "adm", 60, 590);
+        actor(d, "Manager", "man", 1010, 130);
+        actor(d, "Speech / Vision Engine", "eng", 1010, 300);
+        genShapes(d, "cus", "vis");
+        assocUC(d, "vis", "s");
+        assocUC(d, "vis", "pd");
+        assocUC(d, "cus", "aq");
+        assocUC(d, "adm", "mr");
+        assocUC(d, "man", "db");
+        assocUC(d, "eng", "vo");
+        assocUC(d, "eng", "im");
+        for (String k : new String[] {"kw", "vo", "im", "mm"}) {
+            genShapes(d, k, "s");
+        }
+        extend(d, "ri", "pd");
+        extend(d, "rc", "pd");
+        include(d, "mr", "fl");
+        note(d, "Every AI result has a non-AI fallback:\nkeyword search, plain review list,\nbest-sellers, manual moderation.", 980, 470, 230, 70);
+    }
+
+    IShapeUIModel component(IDiagramUIModel d, IPackage layer, IShapeUIModel frame, String name, String key,
+                            int x, int y, int w) {
+        IComponent c = f.createComponent();
+        c.setName(name);
+        layer.addChild(c);
+        IShapeUIModel s = put(d, c, key, x, y, Math.max(w, (int) (name.length() * 7.6) + 50), 58, BLUE);
+        frame.addChild(s);
+        return s;
+    }
+
+    IPackage layer(IDiagramUIModel d, String name, String key, int x, int y, int w, int h, Color c) {
+        IPackage p = f.createPackage();
+        p.setName(name);
+        put(d, p, key, x, y, w, h, c);
+        return p;
+    }
+
+    void searchComponents() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_COMPONENT_DIAGRAM, "CMP01 AI Search Three-Layer Architecture");
+        IPackage pres = layer(d, "Presentation Layer (controller, view)", "pres", 30, 20, 1100, 150, PRES);
+        IPackage app = layer(d, "Application - Intelligence Layer (ai.search, service)", "app", 30, 230, 1100, 170, APP);
+        IPackage data = layer(d, "Data Layer (dao)", "data", 30, 460, 1100, 160, DATA);
+        IShapeUIModel fp = shapes.get("pres"), fa = shapes.get("app"), fd = shapes.get("data");
+        component(d, pres, fp, "ShopController", "ui", 420, 70, 180);
+        component(d, pres, fp, "SearchForm (text, voice, image)", "form", 80, 70, 230);
+        component(d, pres, fp, "SearchResultsView", "view", 760, 70, 200);
+        component(d, app, fa, "QueryService", "qs", 60, 290, 150);
+        component(d, app, fa, "SpeechService", "sp", 250, 290, 150);
+        component(d, app, fa, "SearchService", "ss", 440, 290, 160);
+        component(d, app, fa, "ImageService", "is", 650, 290, 150);
+        component(d, app, fa, "RankingService", "rk", 850, 290, 160);
+        component(d, data, fd, "ProductDAO", "pdao", 80, 520, 150);
+        component(d, data, fd, "InventoryDAO", "idao", 270, 520, 150);
+        component(d, data, fd, "OrderDAO", "odao", 460, 520, 150);
+        component(d, data, fd, "VectorIndex", "vi", 650, 520, 150);
+        component(d, data, fd, "ImageStorage", "st", 850, 520, 160);
+        uses(d, "form", "ui");
+        uses(d, "ui", "view");
+        uses(d, "ui", "qs");
+        uses(d, "ui", "sp");
+        uses(d, "ui", "is");
+        uses(d, "ui", "ss");
+        uses(d, "ss", "rk");
+        uses(d, "ss", "pdao");
+        uses(d, "ss", "idao");
+        uses(d, "ss", "odao");
+        uses(d, "ss", "vi");
+        uses(d, "ui", "st");
+        uses(d, "is", "st");
+        rel(d, dep(pres, app, "use"), "pres", "app");
+        rel(d, dep(app, data, "use"), "app", "data");
+    }
+
+    void voiceSearchSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD03 Voice Search");
+        int h = 560;
+        lifeline(d, "Customer", null, 20, 90, h);
+        lifeline(d, "ShopController", "boundary", 150, 120, h);
+        lifeline(d, "SpeechService", "control", 320, 110, h);
+        lifeline(d, "QueryService", "control", 480, 110, h);
+        lifeline(d, "SearchService", "control", 640, 110, h);
+        lifeline(d, "ProductDAO", "entity", 800, 100, h);
+        lifeline(d, "RankingService", "control", 950, 120, h);
+        msg(d, "Customer", "ShopController", "1", "search(audio, mode=voice)", 120, false);
+        msg(d, "ShopController", "SpeechService", "2", "transcribe(audio)", 155, false);
+        msg(d, "SpeechService", "ShopController", "3", "text", 185, true);
+        msg(d, "ShopController", "QueryService", "4", "voice_query(text)", 220, false);
+        msg(d, "QueryService", "ShopController", "5", "query {terms, filters}", 250, true);
+        msg(d, "ShopController", "SearchService", "6", "search(query)", 290, false);
+        msg(d, "SearchService", "ProductDAO", "7", "list_products()", 325, false);
+        msg(d, "ProductDAO", "SearchService", "8", "products", 355, true);
+        msg(d, "SearchService", "SearchService", "9", "retrieve(query)", 390, false);
+        msg(d, "SearchService", "RankingService", "10", "rank(candidates, query)", 440, false);
+        msg(d, "RankingService", "SearchService", "11", "ranked results", 470, true);
+        msg(d, "SearchService", "ShopController", "12", "top-5 results", 500, true);
+        msg(d, "ShopController", "Customer", "13", "search_results(results, trace)", 535, true);
+        activate(d, "Customer", 120, 535);
+        activate(d, "ShopController", 120, 535);
+        activate(d, "SpeechService", 155, 185);
+        activate(d, "QueryService", 220, 250);
+        activate(d, "SearchService", 290, 500);
+        activate(d, "ProductDAO", 325, 355);
+        activate(d, "RankingService", 440, 470);
+    }
+
+    void imageSearchSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD04 Image Search");
+        int h = 560;
+        lifeline(d, "Customer", null, 20, 90, h);
+        lifeline(d, "ShopController", "boundary", 150, 120, h);
+        lifeline(d, "ImageStorage", "entity", 320, 110, h);
+        lifeline(d, "ImageService", "control", 480, 110, h);
+        lifeline(d, "SearchService", "control", 640, 110, h);
+        lifeline(d, "VectorIndex", "entity", 800, 100, h);
+        lifeline(d, "RankingService", "control", 950, 120, h);
+        msg(d, "Customer", "ShopController", "1", "search(photo)", 120, false);
+        msg(d, "ShopController", "ImageStorage", "2", "save_upload(photo)", 155, false);
+        msg(d, "ImageStorage", "ShopController", "3", "path", 185, true);
+        msg(d, "ShopController", "ImageService", "4", "encode(path)", 220, false);
+        msg(d, "ImageService", "ShopController", "5", "z (128-d)", 250, true);
+        msg(d, "ShopController", "SearchService", "6", "search(image_query(z))", 290, false);
+        msg(d, "SearchService", "VectorIndex", "7", "search(z, k=5)", 325, false);
+        msg(d, "VectorIndex", "SearchService", "8", "[(id, cosine)]", 355, true);
+        msg(d, "SearchService", "SearchService", "9", "add stock, price filter", 390, false);
+        msg(d, "SearchService", "RankingService", "10", "rank(candidates, query)", 440, false);
+        msg(d, "RankingService", "SearchService", "11", "ranked results", 470, true);
+        msg(d, "SearchService", "ShopController", "12", "top-5 results", 500, true);
+        msg(d, "ShopController", "Customer", "13", "search_results(results, trace)", 535, true);
+        activate(d, "Customer", 120, 535);
+        activate(d, "ShopController", 120, 535);
+        activate(d, "ImageStorage", 155, 185);
+        activate(d, "ImageService", 220, 250);
+        activate(d, "SearchService", 290, 500);
+        activate(d, "VectorIndex", 325, 355);
+        activate(d, "RankingService", 440, 470);
+    }
+
+    void reviewPipelineActivity() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_ACTIVITY_DIAGRAM, "AD04 Review Insight Pipeline");
+        d.setConnectorStyle(1);
+        Node s = start(d, 287, 20);
+        Node a1 = act(d, "Load published reviews of the product", 160, 70, 280);
+        Node d0 = decision(d, "For each review: noise?", 245, 150);
+        Node sk = act(d, "[Yes] Skip, count as noise", 470, 160, 220);
+        Node a2 = act(d, "[No] Split into clauses (. , but however)", 160, 260, 280);
+        Node a3 = act(d, "Detect aspects: quality, price, delivery, service", 160, 340, 280);
+        Node a4 = act(d, "Score polarity with negation window (3 words)", 160, 420, 280);
+        Node a5 = act(d, "Use star rating when a clause has no opinion word", 160, 500, 280);
+        Node m = merge(d, 275, 580);
+        Node d1 = decision(d, "At least 2 usable reviews?", 245, 640);
+        Node f1 = act(d, "[No] Show 'Not enough reviews' (fallback)", 470, 650, 250);
+        Node a6 = act(d, "[Yes] Aggregate +/- per aspect, keep evidence", 160, 750, 280);
+        Node a7 = act(d, "Label: Mostly positive / Mixed / Mostly negative", 160, 830, 280);
+        Node e1 = end(d, 286, 910);
+        Node e2 = end(d, 581, 740);
+        cflow(d, null, s, a1, null); cflow(d, null, a1, d0, null); cflow(d, null, d0, sk, "Yes");
+        cflow(d, null, d0, a2, "No"); cflow(d, null, a2, a3, null); cflow(d, null, a3, a4, null);
+        cflow(d, null, a4, a5, null); cflow(d, null, a5, m, null); cflow(d, null, sk, m, null);
+        cflow(d, null, m, d1, null); cflow(d, null, d1, f1, "No"); cflow(d, null, f1, e2, null);
+        cflow(d, null, d1, a6, "Yes"); cflow(d, null, a6, a7, null); cflow(d, null, a7, e1, null);
+    }
+}

@@ -1,0 +1,212 @@
+# Hand layout for Visual Paradigm CE (see Relayout.jsrc). CODE|name|x|y|w|h
+# ---------------- use case diagrams
+UCD1|ABC Online Shop - Account and Catalogue|270|10|340|560
+UCD1|UC01 Register Account|320|60|220|46
+UCD1|UC04 Browse Products|320|140|220|46
+UCD1|UC05 Search Products|320|220|220|46
+UCD1|UC06 View Product Details|320|300|220|46
+UCD1|UC03 Manage Profile|320|400|220|46
+UCD1|UC02 Login|320|480|220|46
+UCD1|Visitor|60|170|40|70
+UCD1|Customer|200|340|40|70
+UCD1|Staff|200|470|40|70
+UCD2|ABC Online Shop - Cart, Order and Payment|270|10|700|660
+UCD2|UC07 Manage Shopping Cart|300|40|230|46
+UCD2|UC08 Place Order / Checkout|300|200|240|80
+UCD2|UC11 Track Order|300|450|220|46
+UCD2|UC10 View Order History|300|560|230|46
+UCD2|UC30 Check Product Availability|700|40|250|46
+UCD2|UC29 Validate Cart|700|140|220|46
+UCD2|UC31 Calculate Order Total|700|215|230|46
+UCD2|UC32 Apply Promotion|700|290|220|46
+UCD2|UC09 Make Payment|700|400|220|46
+UCD2|UC12 Cancel Order|700|500|220|46
+UCD2|UC13 Submit Review|700|600|220|46
+UCD2|Customer|60|250|40|70
+UCD2|Payment Provider|1010|388|40|70
+UCD2|Sales Staff|1010|488|40|70
+UCD3|ABC Online Shop - Administration|270|20|280|420
+UCD3|UC17 Manage Customers|300|40|220|46
+UCD3|UC16 Manage Promotions|300|120|220|46
+UCD3|UC15 Manage Categories|300|200|220|46
+UCD3|UC18 Manage Reviews|300|280|220|46
+UCD3|UC14 Manage Products|300|360|220|46
+UCD3|Sales Staff|60|28|40|70
+UCD3|Administrator|60|200|40|70
+UCD4|ABC Online Shop - Operations and Reporting|270|15|390|850
+UCD4|UC19 Process Orders|300|40|230|46
+UCD4|UC20 Manage Inventory|300|130|230|46
+UCD4|UC24 Manage Replenishment|300|250|250|46
+UCD4|UC21 Prepare Shipment|300|340|230|46
+UCD4|UC22 Arrange Delivery|300|420|230|46
+UCD4|UC23 Update Shipment Status|300|500|250|46
+UCD4|UC25 View Management Dashboard|300|580|270|46
+UCD4|UC26 Generate Sales Report|300|655|250|46
+UCD4|UC27 Generate Inventory Report|300|730|270|46
+UCD4|UC28 Generate Order and Exception Report|300|805|330|46
+UCD4|Sales Staff|60|25|40|70
+UCD4|Warehouse Staff|60|235|40|70
+UCD4|Manager|60|620|40|70
+UCD4|Shipping Provider|720|425|40|70
+UCD4|Supplier|720|170|40|70
+UC_AI|Customer|60|20|40|70
+UC_AI|Visitor|200|230|40|70
+UC_AI|Administrator|60|600|40|70
+UC_AI|Manager|60|720|40|70
+UC_AI|Speech / Vision Engine|1020|370|40|70
+UC_AI|Ask About My Orders|300|32|220|46
+UC_AI|UC06 View Product Details|300|180|240|46
+UC_AI|UC05 Search Products|300|330|220|68
+UC_AI|UC18 Manage Reviews|300|612|220|46
+UC_AI|UC25 View Management Dashboard|300|732|270|46
+UC_AI|UC33 View Review Insights|700|140|250|46
+UC_AI|UC34 View Recommendations|700|215|250|46
+UC_AI|Search by Keyword|700|300|220|46
+UC_AI|Search by Voice|700|370|220|46
+UC_AI|Search by Image|700|440|220|46
+UC_AI|Search by Text and Image|700|510|240|46
+UC_AI|Flag Noisy Review|700|612|200|46
+UC_AI|@note|700|720|260|70
+# ---------------- activity diagrams
+AD01|@lane|Customer|40|320
+AD01|@lane|System|360|400
+AD01|@lane|Payment Provider|760|300
+AD01|@frame|40|1440
+AD01|@initial|177|90|26|26
+AD01|Select Checkout from cart|60|140|260|50
+AD01|Validate cart lines and prices (UC29)|430|220|260|50
+AD01|Check availability (UC30)|430|300|260|50
+AD01|Cart valid?|505|380|110|70
+AD01|[No] Correct quantities in cart|60|390|260|50
+AD01|Confirm address, enter promotion code|60|550|260|50
+AD01|Apply promotion (UC32), calculate total (UC31)|430|630|260|50
+AD01|Confirm purchase|60|710|260|50
+AD01|Reserve stock and create Payment Pending order|430|790|260|50
+AD01|Send referenced payment request (UC09)|430|870|260|50
+AD01|Authorise payment|780|870|260|50
+AD01|Return signed result|780|950|260|50
+AD01|Verified success?|620|1030|110|70
+AD01|[No] Release reservation, Payment Failed|380|1040|170|60
+AD01|[Yes] Mark Paid/Confirmed, clear cart|600|1170|150|60
+AD01|[No] See failure, cart kept|50|1300|140|50
+AD01|View order confirmation|210|1300|140|50
+AD01|@guard|Cart valid?|valid|invalid
+AD01|@guard|Verified success?|verified|failed
+AD02|@lane|Sales Staff|40|260
+AD02|@lane|System|300|260
+AD02|@lane|Warehouse Staff|560|260
+AD02|@lane|Shipping Provider|820|260
+AD02|@frame|40|1120
+AD02|@initial|157|90|26|26
+AD02|Open processing queue|60|140|220|50
+AD02|List Paid/Confirmed and On Hold orders|320|220|220|50
+AD02|Select order, confirm processing|60|300|220|50
+AD02|Verify payment and reservations|320|380|220|50
+AD02|Eligible?|375|460|110|70
+AD02|[No] Order On Hold, exception recorded|60|470|220|50
+AD02|[Yes] Set Processing, add to pick list|320|580|220|50
+AD02|Pick and pack items|580|660|220|50
+AD02|Issue stock, create shipment, Ready for Shipment|320|740|220|50
+AD02|Hand parcel to carrier|580|820|220|50
+AD02|Create delivery, return carrier reference|840|820|220|50
+AD02|Send milestones (picked up ... delivered)|840|900|220|50
+AD02|Accept new milestones, update order status|320|980|220|50
+AD02|@guard|Eligible?|eligible|not eligible
+AD03|@initial|387|20|26|26
+AD03|Warehouse Staff: select product and event type|260|70|280|50
+AD03|System: show physical, reserved, available, recent events|260|150|280|50
+AD03|Warehouse Staff: enter quantity, reference, reason|260|230|280|50
+AD03|Reference already recorded?|345|310|110|70
+AD03|[Yes] Return earlier event, no change|630|320|250|50
+AD03|Resulting balance valid?|345|440|110|70
+AD03|[No] Reject event and explain|630|450|250|50
+AD03|System: record event, recalculate stock atomically|260|570|280|50
+AD03|Available <= threshold?|345|650|110|70
+AD03|[Yes] Flag low stock, offer UC24 replenishment|630|660|260|50
+AD03|@merge|375|870|50|40
+AD03|System: display new balance and event id|260|960|280|50
+AD03|@guard|Reference already recorded?|duplicate|new reference
+AD03|@guard|Resulting balance valid?|balance ok|balance < 0
+AD03|@guard|Available <= threshold?|low stock|stock ok
+AD04|@initial|387|20|26|26
+AD04|Load published reviews of the product|260|70|280|50
+AD04|For each review: noise?|345|150|110|70
+AD04|[Yes] Skip, count as noise|30|160|220|50
+AD04|[No] Split into clauses (. , but however)|260|270|280|50
+AD04|Detect aspects: quality, price, delivery, service|260|350|280|50
+AD04|Score polarity with negation window (3 words)|260|430|280|50
+AD04|Use star rating when a clause has no opinion word|260|510|280|50
+AD04|@merge|115|600|50|40
+AD04|At least 2 usable reviews?|345|690|110|70
+AD04|[No] Show 'Not enough reviews' (fallback)|10|700|230|50
+AD04|[Yes] Aggregate +/- per aspect, keep evidence|260|810|280|50
+AD04|Label: Mostly positive / Mixed / Mostly negative|260|900|280|50
+AD04|@guard|For each review: noise?|noise|not noise
+AD04|@guard|At least 2 usable reviews?|>= 2 usable|< 2 usable
+# ---------------- components, packages, deployment
+CMP01|Presentation Layer (controller, view)|20|20|1260|140
+CMP01|Application - Intelligence Layer (ai.search, service)|20|250|1260|190
+CMP01|Data Layer (dao)|20|580|1260|150
+CMP01|SearchResultsView|1040|70|220|58
+CMP01|ShopController|700|70|180|58
+CMP01|SearchForm (text, voice, image)|100|70|300|58
+CMP01|SpeechService|40|300|160|58
+CMP01|QueryService|220|300|160|58
+CMP01|SearchService|400|300|170|58
+CMP01|RankingService|640|300|170|58
+CMP01|ImageService|1080|300|160|58
+CMP01|OrderDAO|40|640|160|58
+CMP01|ProductDAO|230|640|160|58
+CMP01|InventoryDAO|420|640|160|58
+CMP01|VectorIndex|640|640|160|58
+CMP01|ImageStorage|1080|640|170|58
+CMP02|ABC Online Shop application (Python WSGI)|40|130|880|430
+CMP02|Web browser|980|201|140|56
+CMP02|Controllers|560|200|180|58
+CMP02|Web UI (view)|100|200|170|58
+CMP02|AI Services|150|340|170|58
+CMP02|Business Services|620|340|190|58
+CMP02|Data Access (DAO)|330|460|190|58
+CMP02|Gateways|700|460|150|58
+CMP02|SQLite database abc_shop.db|290|630|270|62
+CMP02|Payment Provider|600|630|175|62
+CMP02|Shipping Provider|800|630|175|62
+PKG01|@hide|shop.py (composition root)
+PKG01|@hidelink|controller|model
+PKG01|controller|40|40|620|170|
+PKG01|view|720|40|300|110
+PKG01|service|40|290|640|230
+PKG01|ai|720|290|460|230
+PKG01|dao|40|600|620|260
+PKG01|model|720|600|460|300
+PKG01|@flow|controller
+PKG01|@flow|view
+PKG01|@flow|service
+PKG01|@flow|ai
+PKG01|@flow|dao
+PKG01|@flow|model
+DEP01|Payment Provider (external)|1080|60|220|100
+DEP01|Shipping Provider (external)|1080|260|220|100
+# ---------------- ERD
+ERD01|users|40|420|-1|-1
+ERD01|address|40|120|-1|-1
+ERD01|cart|380|120|-1|-1
+ERD01|cart_item|720|120|-1|-1
+ERD01|customer_order|380|420|-1|-1
+ERD01|order_item|720|430|-1|-1
+ERD01|product|1060|420|-1|-1
+ERD01|category|1060|150|-1|-1
+ERD01|inventory_event|1400|150|-1|-1
+ERD01|stock_level|1400|420|-1|-1
+ERD01|replenishment_request|1400|700|-1|-1
+ERD01|review|140|720|-1|-1
+ERD01|order_status_history|380|940|-1|-1
+ERD01|payment|1060|700|-1|-1
+ERD01|shipment|720|800|-1|-1
+ERD01|shipment_milestone|720|1000|-1|-1
+ERD01|audit_log|1060|1000|-1|-1
+ERD01|promotion|1400|1000|-1|-1
+CMP01|@nostereo
+CMP01|@addnote|All dashed arrows are <<use>> dependencies; every arrow crosses a layer boundary downwards.|20|760|520|40
+PKG01|@nostereo
+PKG01|@addnote|All dependencies are <<use>>. The composition root shop.py (creates every object) and controller -> model are left out for readability.|720|930|460|56

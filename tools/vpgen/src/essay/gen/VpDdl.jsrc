@@ -1,0 +1,45 @@
+package essay.gen;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.DatabaseType;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/** Visual Paradigm's own SQL generator (DatabaseManager.generateCreateSQL) on the tables of the physical ERDs. */
+public class VpDdl {
+
+    public void run(IProject project, String out) throws Exception {
+        List<IModelElement> tables = new ArrayList<>();
+        List<String> seen = new ArrayList<>();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            if (!d.getName().startsWith("ERD0")) continue;
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                IModelElement m = e.getModelElement();
+                if (m != null && "DBTable".equals(m.getModelType()) && !seen.contains(m.getId())) {
+                    seen.add(m.getId());
+                    tables.add(m);
+                }
+            }
+        }
+        for (DatabaseType type : new DatabaseType[] {DatabaseType.SQLite, DatabaseType.H2, DatabaseType.MySQL,
+                DatabaseType.PostgreSQL, DatabaseType.HSQL}) {
+            try {
+                String sql = ApplicationManager.instance().getDatabaseManager()
+                        .generateCreateSQL(type, tables.toArray(new IModelElement[0]));
+                File f = new File(out.replace(".sql", "_" + type + ".sql"));
+                Files.write(f.toPath(), sql.getBytes(StandardCharsets.UTF_8));
+                System.out.println("VPDDL " + type + " " + tables.size() + " tables, " + sql.length() + " chars -> " + f);
+            } catch (Throwable t) {
+                System.out.println("VPDDL " + type + " failed: " + t);
+            }
+        }
+    }
+}
