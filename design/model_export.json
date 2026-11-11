@@ -634,6 +634,141 @@
     }
    ]
   },
+  "WatchDetail": {
+   "name": "WatchDetail",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "movement",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "strap",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "water_resistance_m",
+     "type": "int",
+     "visibility": "public"
+    },
+    {
+     "name": "battery_days",
+     "type": "int",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "BagDetail": {
+   "name": "BagDetail",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "capacity_l",
+     "type": "float",
+     "visibility": "public"
+    },
+    {
+     "name": "material",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "laptop_sleeve",
+     "type": "bool",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "ApparelDetail": {
+   "name": "ApparelDetail",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "sizes",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "material",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "fit",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "FootwearDetail": {
+   "name": "FootwearDetail",
+   "owner": "product",
+   "abstract": false,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "sizes",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "upper_material",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "sole",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "purpose",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": []
+  },
+  "ProductDetail": {
+   "name": "ProductDetail",
+   "owner": "product",
+   "abstract": true,
+   "stereotypes": [],
+   "attributes": [
+    {
+     "name": "product_id",
+     "type": "str",
+     "visibility": "public"
+    }
+   ],
+   "operations": [
+    {
+     "name": "spec_rows",
+     "returnType": "list",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    },
+    {
+     "name": "search_terms",
+     "returnType": "str",
+     "visibility": "public",
+     "abstract": false,
+     "params": []
+    }
+   ]
+  },
   "InventoryEvent": {
    "name": "InventoryEvent",
    "owner": "inventory",
@@ -794,6 +929,11 @@
     },
     {
      "name": "name",
+     "type": "str",
+     "visibility": "public"
+    },
+    {
+     "name": "detail_kind",
      "type": "str",
      "visibility": "public"
     }
@@ -1470,6 +1610,58 @@
    "name": null,
    "fromEnd": null,
    "toEnd": null
+  },
+  {
+   "type": "Generalization",
+   "from": "ProductDetail",
+   "to": "FootwearDetail",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Generalization",
+   "from": "ProductDetail",
+   "to": "ApparelDetail",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Generalization",
+   "from": "ProductDetail",
+   "to": "BagDetail",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Generalization",
+   "from": "ProductDetail",
+   "to": "WatchDetail",
+   "name": null,
+   "fromEnd": null,
+   "toEnd": null
+  },
+  {
+   "type": "Association",
+   "from": "Product",
+   "to": "ProductDetail",
+   "name": "detail",
+   "fromEnd": {
+    "class": null,
+    "multiplicity": "1",
+    "aggregation": "composite",
+    "role": "",
+    "navigable": "unspecified"
+   },
+   "toEnd": {
+    "class": null,
+    "multiplicity": "0..1",
+    "aggregation": "none",
+    "role": "detail",
+    "navigable": "true"
+   }
   },
   {
    "type": "Usage",

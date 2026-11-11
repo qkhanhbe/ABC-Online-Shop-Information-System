@@ -85,6 +85,8 @@ def main():
           "(columns, NOT NULL, keys, foreign keys, UNIQUE, CHECK)")
     for n in notes:
         print("    " + n)
+    triggers = [r[0] for r in ref.execute("SELECT name FROM sqlite_master WHERE type='trigger' ORDER BY name")]
+    print(f"    {len(triggers)} triggers (detail row of the category's kind, BR-CAT-01) exist only in schema.sql")
     gen.close()
 
     import dao.database as database

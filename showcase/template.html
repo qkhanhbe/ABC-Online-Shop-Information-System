@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảo vệ tiểu luận · ABC Online Shop</title>
+<style>
+:root{--paper:#f6f3ee;--card:#fffdf9;--ink:#1e1b18;--muted:#6f675e;--line:#e2dbd1;--accent:#b5532c;--soft:#f6e4da;
+--ok:#2f6b4f;--oksoft:#e3efe8;--warn:#8a5a00;--warnsoft:#fbefd6;--serif:Cambria,"Times New Roman",serif;
+--sans:"Segoe UI",system-ui,Arial,sans-serif;--mono:Consolas,"Cascadia Mono",monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:15px/1.6 var(--sans);color:var(--ink);background:var(--paper)}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+nav.side{position:sticky;top:0;height:100vh;overflow:auto;padding:22px 18px;border-right:1px solid var(--line);background:var(--paper)}
+nav .brand{font:700 19px/1.2 var(--serif);margin-bottom:4px}nav .brand small{display:block;font:13px var(--sans);color:var(--muted);margin-top:4px}
+nav .sep{height:1px;background:var(--line);margin:14px 0}
+nav a.s{display:flex;gap:10px;align-items:baseline;color:var(--ink);text-decoration:none;padding:5px 6px;border-radius:6px;font-size:14px}
+nav a.s b{font:700 12px var(--mono);color:var(--accent);min-width:26px}
+nav a.s:hover,nav a.s.on{background:var(--card)}
+nav .tools a{display:block;font-size:13px;padding:4px 6px;text-decoration:none}
+main{padding:34px 48px 80px;max-width:1180px}
+section{padding:26px 0 30px;border-bottom:1px solid var(--line)}
+.eyebrow{font:700 12px var(--mono);letter-spacing:.08em;color:var(--accent);margin:0 0 4px;text-transform:uppercase}
+h1{font:600 38px/1.15 var(--serif);margin:0 0 12px}h1 .muted{color:var(--muted)}
+h2{font:600 28px/1.2 var(--serif);margin:0 0 10px}h3{font:600 19px/1.3 var(--serif);margin:24px 0 10px}
+.lead{font-size:16px;color:#3b3530;max-width:78ch}.muted{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:22px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat b{display:block;font:600 24px var(--serif)}.stat span{font-size:12.5px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.box h3{margin-top:0}
+ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin:3px 0}
+.phases{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.phase{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;position:relative}
+.phase .n{font:700 12px var(--mono);color:var(--accent)}.phase h3{margin:4px 0 6px;font-size:16px}.phase p{margin:0;font-size:13.5px}
+.evo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 18px 14px;margin:16px 0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.step{border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13.5px;background:#fff;position:relative}
+.step .label{display:block;font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.changes{margin:12px 0 0;padding-left:20px;font-size:14px}.changes li{margin:4px 0}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.gallery figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.gallery img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-bottom:1px solid var(--line)}
+.gallery figcaption{font-size:12.5px;padding:8px 10px;color:var(--muted)}.gallery figcaption b{color:var(--ink);font-family:var(--mono)}
+a.fig,a.code,a.test,a.file{font:12.5px var(--mono);padding:0 5px;border-radius:4px;text-decoration:none;overflow-wrap:anywhere}
+a.fig{background:var(--soft);color:var(--accent)}a.code{background:#e8edf3;color:#2b4a6f}a.test{background:var(--oksoft);color:var(--ok)}a.file{background:#eee9e1;color:#4a4036}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);font-size:14px;margin:8px 0}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#efe9e0;font-weight:600;font-size:13px;width:150px}
+.trace{margin:14px 0}.trace h3{margin:14px 0 6px}
+pre.term{background:#23201c;color:#e9e2d6;padding:14px 16px;border-radius:10px;overflow:auto;font:12.5px/1.5 var(--mono)}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px}.pass{background:var(--oksoft);color:var(--ok)}
+.part{background:var(--warnsoft);color:var(--warn)}
+.qa details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:0 16px}
+.qa summary{cursor:pointer;padding:12px 0;font-weight:600;list-style:none;display:flex;gap:12px}
+.qa summary::-webkit-details-marker{display:none}
+.qa .qn{font:700 13px var(--mono);color:var(--accent);min-width:24px}
+.qa .ans{padding:0 0 14px 36px;font-size:14.5px}.qa .ans p{margin:6px 0}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600}
+td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
+#lbx{position:fixed;inset:0;background:rgba(20,16,12,.88);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:20}
+#lbx img{max-width:94vw;max-height:84vh;background:#fff;border-radius:6px}#lbx p{color:#f1ebe2;font-size:14px;margin:10px}
+#lbx.on{display:flex}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}main{padding:20px 16px}
+.stats,.phases,.cols{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side" aria-label="Các phần">
+  <div class="brand">ABC Online Shop<small>Bảo vệ tiểu luận · Bế Quốc Khánh · B23DCCE049</small></div>
+  <div class="sep"></div>
+  <a class="s" href="#a"><b>A</b>Tổng quan dự án</a>
+  <a class="s" href="#b"><b>B</b>Quy trình phát triển</a>
+  <a class="s" href="#c"><b>C</b>Diễn tiến của mô hình</a>
+  <a class="s" href="#all"><b>%%count%%</b>Tất cả sơ đồ</a>
+  <a class="s" href="#d"><b>D</b>Truy vết đến mã</a>
+  <a class="s" href="#e"><b>E</b>Cơ sở dữ liệu</a>
+  <a class="s" href="#ai"><b>AI</b>AI trong hệ thống</a>
+  <a class="s" href="#f"><b>F</b>Demo trực tiếp</a>
+  <a class="s" href="#g"><b>G</b>Kiểm chứng</a>
+  <a class="s" href="#h"><b>H</b>Kịch bản bảo vệ</a>
+  <a class="s" href="#q"><b>50</b>Câu hỏi thi vấn đáp</a>
+  <div class="sep"></div>
+  <div class="tools">
+    <a href="http://localhost:8000/" target="_blank" rel="noopener">Mở cửa hàng (localhost:8000) ↗</a>
+    <a href="../Tieuluan_V4_04_10_KhanhBQ_049.pdf">Tiểu luận V4 (PDF)</a>
+    <a href="../TieuLuan_KHANHBQ.vpp">Dự án Visual Paradigm (.vpp)</a>
+    <a href="../design/create_tables.sql">Script SQL sinh từ ERD</a>
+    <a href="../abc_shop/dao/schema.sql">schema.sql của ứng dụng</a>
+    <a href="../README.md">README (cài đặt, chạy)</a>
+  </div>
+</nav>
+<main>
+
+<section id="a">
+  <p class="eyebrow">Phân tích và thiết kế hệ thống thông tin · PTIT 2026</p>
+  <h1>Từ một bài toán kinh doanh đến mã chạy được. <span class="muted">Mỗi bước đều lần ngược lại được.</span></h1>
+  <p class="lead">ABC Online Shop là một cửa hàng trực tuyến vừa và nhỏ bán giày, túi, áo, mũ và đồng hồ. Vấn đề của shop không phải
+  thiếu website mà là thông tin rời rạc và chậm: dữ liệu sản phẩm khác nhau ở nhiều nơi, tồn kho lệch so với kho thật, trạng thái
+  thanh toán và giao hàng được nhập tay, báo cáo đến muộn hơn quyết định. Hệ thống giải quyết các nguyên nhân gốc này: một nguồn
+  dữ liệu sản phẩm, tồn kho ghi bằng sự kiện, trạng thái đơn theo máy trạng thái, mỗi trao đổi với đối tác có mã tham chiếu duy nhất,
+  và báo cáo tính từ dữ liệu vận hành.</p>
+  <div class="stats">
+    <div class="stat"><b>32</b><span>use case trong 5 sơ đồ use case</span></div>
+    <div class="stat"><b>%%count%%</b><span>sơ đồ trong một dự án VP</span></div>
+    <div class="stat"><b>23</b><span>bảng, sinh từ mô hình vật lý</span></div>
+    <div class="stat"><b>28</b><span>class sinh từ class thiết kế, 28/28 khớp code</span></div>
+    <div class="stat"><b>45</b><span>test tự động, tất cả pass</span></div>
+    <div class="stat"><b>92,3%</b><span>truy vấn tìm kiếm AI đúng ở vị trí 1</span></div>
+  </div>
+  <div class="cols">
+    <div class="box"><h3>Mục tiêu và phạm vi</h3><ul class="tight">
+      <li>Khách tìm sản phẩm bằng chữ, giọng nói (bản ghi) hoặc ảnh; xem thông số theo nhóm sản phẩm; đặt hàng, thanh toán, theo dõi đơn.</li>
+      <li>Nhân viên bán hàng xử lý đơn, nhân viên kho ghi sự kiện tồn kho và đóng gói, admin quản lý danh mục và duyệt đánh giá, quản lý xem báo cáo.</li>
+      <li>Ba thành phần AI: tìm kiếm đa phương thức, tóm tắt đánh giá theo khía cạnh, gợi ý sản phẩm có xét tồn kho.</li>
+      <li>Ngoài phạm vi: cổng thanh toán và hãng vận chuyển thật (được mô phỏng sau giao diện cố định).</li></ul></div>
+    <div class="box"><h3>Điểm nổi bật để trình bày</h3><ul class="tight">
+      <li>Sơ đồ phân tích và thiết kế tách biệt rõ: {fig:CL01} → {fig:DCL01}, {fig:SD01} → {fig:SD05}.</li>
+      <li>Dữ liệu đi đủ ba mức: {fig:CDM01} → {fig:LDM01} → {fig:ERD02} → {file:design/create_tables.sql}.</li>
+      <li>Product chỉ giữ thuộc tính chung; thông số riêng ở bảng chi tiết theo Category (góp ý của thầy).</li>
+      <li>Database và khung code được <i>sinh từ mô hình</i> rồi đối chiếu tự động với ứng dụng.</li></ul></div>
+  </div>
+</section>
+
+<section id="b">
+  <p class="eyebrow">B · Quy trình</p><h2>Quy trình phát triển</h2>
+  <p class="lead">Mỗi pha dùng kết quả của pha trước. Khi viết code phát hiện mô hình sai, mô hình được sửa trước (ví dụ trường
+  Customer.orders không có trong sơ đồ đã bị xoá khỏi code, không phải thêm vào sơ đồ).</p>
+  <div class="phases">%%phases%%</div>
+</section>
+
+<section id="c">
+  <p class="eyebrow">C · Diễn tiến</p><h2>Diễn tiến của mô hình qua các pha</h2>
+  <p class="lead">Ba chuỗi được đầu tư kỹ nhất. Mỗi chuỗi nêu cái gì thay đổi giữa hai mô hình, vì sao, và thay đổi đó nằm ở đâu trong code.</p>
+  %%evolution%%
+</section>
+
+<section id="all">
+  <p class="eyebrow">Tất cả sơ đồ</p><h2>%%count%% sơ đồ của dự án VP</h2>
+  <p class="lead">Tất cả được vẽ trong Visual Paradigm (dự án {file:TieuLuan_KHANHBQ.vpp}) và xuất ảnh bằng Visual Paradigm Community Edition.
+  Ba sơ đồ DFD được vẽ lại từ chính bố cục lưu trong dự án vì bản CE không mở được DFD. Bấm vào ảnh để phóng to, phím ← → để chuyển.</p>
+  %%gallery%%
+</section>
+
+<section id="d">
+  <p class="eyebrow">D · Truy vết</p><h2>Từ yêu cầu đến mã và test</h2>
+  <p class="lead">Bốn nghiệp vụ trọng tâm. Mỗi ô mở đúng sơ đồ, đúng hàm (có số dòng) hoặc đúng test.</p>
+  %%trace%%
+</section>
+
+<section id="e">
+  <p class="eyebrow">E · Dữ liệu</p><h2>Thiết kế và sinh cơ sở dữ liệu</h2>
+  <div class="cols">
+    <div class="box"><h3>Category, Product và bảng chi tiết</h3>
+      <p>Product chỉ giữ thuộc tính mọi sản phẩm đều có (tên, hãng, màu, giá, mô tả, ảnh, trạng thái). Thuộc tính riêng của từng
+      nhóm nằm ở một bảng chi tiết: <code>footwear_detail</code>, <code>apparel_detail</code>, <code>bag_detail</code>,
+      <code>watch_detail</code>, khoá chính <code>product_id</code> đồng thời là khoá ngoại tới product. Cột
+      <code>category.detail_kind</code> cho biết sản phẩm của danh mục dùng bảng chi tiết nào.</p>
+      <p>Quy tắc "dòng chi tiết phải đúng loại của danh mục" (BR-CAT-01) được kiểm hai lần: ở {code:service/catalog_service.py:CatalogService.save_product}
+      và bằng trigger trong {file:abc_shop/dao/schema.sql}; test {test:test_database_trigger_rejects_a_detail_of_the_wrong_group}.</p>
+      <p>Phương án bị loại: một bảng Product có mọi cột (nhiều cột rỗng, không đặt được NOT NULL theo nhóm) và bảng EAV
+      thuộc tính–giá trị (mất kiểu dữ liệu và ràng buộc).</p></div>
+    <div class="box"><h3>Từ mô hình đến database</h3><ol class="tight">
+      <li>Mô hình khái niệm {fig:CDM01}: 19 thực thể, quan hệ và bội số.</li>
+      <li>Mô hình logic {fig:LDM01}: quan hệ, khoá, cột tuỳ chọn (N), duy nhất (U).</li>
+      <li>Mô hình vật lý {fig:ERD01} và {fig:ERD02}: tên và kiểu SQLite.</li>
+      <li>Plugin essay.gen đọc mô hình vật lý trong VP, ghi {file:design/create_tables.sql} (23 bảng, 22 khoá ngoại).</li>
+      <li>{file:design/build_db.py} tạo database từ script, so với schema của ứng dụng, nạp dữ liệu bằng chính ứng dụng và thử 6 câu lệnh vi phạm.</li></ol>
+      <p class="muted">Menu Tools › DB › Generate Database của VP Enterprise cần cấu hình driver trong dự án; lệnh qua API báo
+      "Dialect class not found", nên chưa có ảnh chụp quy trình của menu này. Các bước để làm trực tiếp trước thầy có trong README.</p></div>
+  </div>
+  <h3>Một phần script sinh từ ERD</h3><pre class="term">%%ddl%%</pre>
+  <h3>Kết quả build_db.py</h3><pre class="term">%%build_db%%</pre>
+</section>
+
+<section id="ai">
+  <p class="eyebrow">AI</p><h2>AI trong hệ thống (Chương 3)</h2>
+  <div class="cols">
+    <div class="box"><h3>Tìm kiếm đa phương thức</h3><p>Câu hỏi bằng chữ hoặc bản ghi giọng nói được {code:ai/search/query_service.py:QueryService}
+    tách từ khoá, giá, màu; ảnh được {code:ai/search/image_service.py:ImageService} mã hoá thành vector. {code:ai/search/ranking_service.py:RankingService}
+    xếp hạng theo S = α·S_text + β·S_image + γ·S_business, trong đó S_business ưu tiên hàng còn trong kho. Sơ đồ {fig:CMP01}, {fig:SD03}, {fig:SD04}.</p></div>
+    <div class="box"><h3>Tóm tắt đánh giá và gợi ý</h3><p>{code:ai/review_insights.py:ReviewInsightService} tách mệnh đề, tìm khía cạnh
+    (chất lượng, giá, giao hàng, dịch vụ), xử lý phủ định, loại đánh giá rác ({fig:AD04}). {code:ai/recommender.py:RecommenderService}
+    kết hợp TF-IDF với mua chung và không bao giờ gợi ý hàng hết.</p></div>
+  </div>
+  <h3>Kết quả evaluate.py</h3><pre class="term">%%evaluation%%</pre>
+</section>
+
+<section id="f">
+  <p class="eyebrow">F · Demo</p><h2>Demo trực tiếp</h2>
+  <p>Chạy: <code>cd abc_shop</code> rồi <code>python main.py serve</code> (lần đầu tự nạp dữ liệu), mở <a href="http://localhost:8000/">http://localhost:8000</a>.</p>
+  <div class="cols">
+    <div class="box"><h3>Kịch bản demo (khoảng 3 phút)</h3><ol class="tight">
+      <li>Trang chủ → tìm "backpack with laptop sleeve" → chỉ P16 đứng đầu (thông số chi tiết được tìm kiếm).</li>
+      <li>Mở P16: bảng thông số từ <code>bag_detail</code>; mở P01: thông số giày, tóm tắt đánh giá AI, gợi ý.</li>
+      <li>Đăng nhập <code>khanh@example.com / khanh2026</code>, thêm vào giỏ, checkout với mã <code>WELCOME10</code>, chọn "Card accepted".</li>
+      <li>Theo dõi đơn: dòng thời gian trạng thái; hỏi "where is my latest order" ở ô tìm kiếm.</li>
+      <li>Thử lỗi: checkout với "Card declined" → đơn Payment Failed, giỏ hàng giữ nguyên, tồn kho được trả lại.</li>
+      <li>Đăng nhập <code>sales@abc.vn / sales2026</code> xử lý đơn; <code>manager@abc.vn / report2026</code> xem báo cáo.</li></ol></div>
+    <div class="box"><h3>Ảnh chụp màn hình</h3><div class="gallery">
+      <figure><a href="../demo_results/web_01_catalogue.png" data-lbx data-cap="Trang chủ và ô tìm kiếm đa phương thức"><img src="../demo_results/web_01_catalogue.png" alt=""></a><figcaption>Trang chủ</figcaption></figure>
+      <figure><a href="../demo_results/web_03b_product_bag.png" data-lbx data-cap="Thông số từ bag_detail"><img src="../demo_results/web_03b_product_bag.png" alt=""></a><figcaption>Thông số theo nhóm</figcaption></figure>
+      <figure><a href="../demo_results/web_04_checkout.png" data-lbx data-cap="Checkout"><img src="../demo_results/web_04_checkout.png" alt=""></a><figcaption>Checkout</figcaption></figure>
+      <figure><a href="../demo_results/web_10_dashboard.png" data-lbx data-cap="Báo cáo quản lý"><img src="../demo_results/web_10_dashboard.png" alt=""></a><figcaption>Báo cáo</figcaption></figure>
+    </div></div>
+  </div>
+</section>
+
+<section id="g">
+  <p class="eyebrow">G · Kiểm chứng</p><h2>Kiểm chứng và kết luận</h2>
+  <table><tr><th>Hạng mục</th><th>Trạng thái</th><th>Bằng chứng</th></tr>
+  <tr><td>Yêu cầu chức năng của luồng giao dịch (FR01–FR14, FR18–FR24)</td><td><span class="pill pass">PASS</span></td><td>45 test, demo_results/demo_output.txt</td></tr>
+  <tr><td>Quản trị danh mục, khách hàng (FR15–FR17)</td><td><span class="pill part">PARTIAL</span></td><td>Có service và test, chưa có trang quản lý danh mục và khách hàng</td></tr>
+  <tr><td>Database đúng mô hình vật lý</td><td><span class="pill pass">PASS</span></td><td>build_db.py: 21/23 bảng giống hệt; 2 khoá UNIQUE ghép và 4 trigger chỉ có trong schema.sql (ERD không biểu diễn được)</td></tr>
+  <tr><td>Code đúng class thiết kế</td><td><span class="pill pass">PASS</span></td><td>check_code.py: 28/28 class đủ thuộc tính và phương thức</td></tr>
+  <tr><td>Kiến trúc ba lớp, phụ thuộc chỉ đi xuống</td><td><span class="pill pass">PASS</span></td><td>{test:test_dependencies_only_point_downwards}</td></tr>
+  <tr><td>Sinh database bằng menu Generate Database của VP</td><td><span class="pill part">PARTIAL</span></td><td>Script sinh bằng plugin đọc mô hình VP; menu VP cần cấu hình driver, làm trực tiếp theo README</td></tr>
+  <tr><td>Hiệu năng, tải (NFR01–03, NFR12)</td><td><span class="pill part">NOT MEASURED</span></td><td>Bản mẫu chạy một tiến trình trên SQLite</td></tr></table>
+  <h3>Kết quả pytest</h3><pre class="term">%%tests%%</pre>
+  <h3>Kết quả check_code.py (mô hình thiết kế ↔ code)</h3><pre class="term">%%check_code%%</pre>
+</section>
+
+<section id="h">
+  <p class="eyebrow">H · Bảo vệ</p><h2>Kịch bản trình bày 5–7 phút</h2>
+  <table><tr><th>Thời gian</th><th>Nói gì</th><th>Mở gì</th></tr>%%script%%</table>
+  <h3>Các quyết định thiết kế cần giải thích được</h3>
+  <table><tr><th>Quyết định</th><th>Vì sao</th><th>Phương án khác và lý do không chọn</th><th>Nằm ở đâu</th></tr>%%decisions%%</table>
+</section>
+
+<section id="q">
+  <p class="eyebrow">Ngân hàng câu hỏi</p><h2>50 câu hỏi thi vấn đáp và câu trả lời theo dự án</h2>
+  <p class="lead">Mỗi câu trả lời gắn với artefact của chính dự án; bấm vào câu hỏi để mở. Khi trả lời nên theo thứ tự thầy gợi ý:
+  <b>WHY</b> (vì sao chọn), <b>HOW</b> (thành package, class, method, bảng ra sao), <b>WHAT IF</b> (nếu yêu cầu đổi thì sao).</p>
+  %%answers%%
+</section>
+</main>
+</div>
+<div id="lbx" role="dialog" aria-label="Ảnh sơ đồ"><img alt=""><p></p></div>
+<script>
+const links=[...document.querySelectorAll('a[data-lbx]')];const box=document.getElementById('lbx');let cur=-1;
+function show(i){cur=(i+links.length)%links.length;const a=links[cur];box.querySelector('img').src=a.getAttribute('href');
+box.querySelector('p').textContent=a.dataset.cap||a.textContent;box.classList.add('on')}
+links.forEach((a,i)=>a.addEventListener('click',e=>{e.preventDefault();show(i)}));
+box.addEventListener('click',()=>box.classList.remove('on'));
+document.addEventListener('keydown',e=>{if(!box.classList.contains('on'))return;if(e.key==='Escape')box.classList.remove('on');
+if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)});
+const navs=[...document.querySelectorAll('nav a.s')];
+new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navs.forEach(n=>n.classList.toggle('on',n.getAttribute('href')==='#'+en.target.id))}),{rootMargin:'-40% 0px -55% 0px'})
+ .observe&&document.querySelectorAll('section').forEach(s=>new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navs.forEach(n=>n.classList.toggle('on',n.getAttribute('href')==='#'+en.target.id))}),{rootMargin:'-40% 0px -55% 0px'}).observe(s));
+</script>
+</body>
+</html>

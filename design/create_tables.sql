@@ -1,6 +1,16 @@
--- Generated from the ER model of TieuLuan_KHANHBQ.vpp (ERD01, ERD02) by the essay.gen plugin.
--- 19 tables, 18 foreign keys; parents before children.
+-- Generated from the physical data model of TieuLuan_KHANHBQ.vpp (ERD01, ERD02) by the essay.gen plugin.
+-- 23 tables, 22 foreign keys; parents before children.
 PRAGMA foreign_keys = ON;
+
+CREATE TABLE promotion (
+  code VARCHAR(40) NOT NULL,
+  percent DECIMAL(10,2) NOT NULL CHECK (percent > 0 AND percent <= 50),
+  min_total DECIMAL(10,2) NOT NULL DEFAULT 0,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  PRIMARY KEY (code)
+);
 
 CREATE TABLE users (
   user_id VARCHAR(40) NOT NULL,
@@ -12,21 +22,42 @@ CREATE TABLE users (
   PRIMARY KEY (user_id)
 );
 
-CREATE TABLE address (
-  customer_id VARCHAR(40) NOT NULL,
-  receiver VARCHAR(200) NOT NULL,
-  phone VARCHAR(200) NOT NULL,
-  street VARCHAR(200) NOT NULL,
-  city VARCHAR(200) NOT NULL,
-  PRIMARY KEY (customer_id),
-  FOREIGN KEY (customer_id) REFERENCES users (user_id)
+CREATE TABLE sequence (
+  name VARCHAR(200) NOT NULL,
+  value INTEGER NOT NULL,
+  PRIMARY KEY (name)
 );
 
-CREATE TABLE cart (
-  cart_id VARCHAR(40) NOT NULL,
-  customer_id VARCHAR(40) NOT NULL UNIQUE,
-  PRIMARY KEY (cart_id),
-  FOREIGN KEY (customer_id) REFERENCES users (user_id)
+CREATE TABLE audit_log (
+  id INTEGER NOT NULL,
+  actor VARCHAR(200) NOT NULL,
+  action VARCHAR(200) NOT NULL,
+  entity VARCHAR(200) NOT NULL,
+  entity_id VARCHAR(40) NOT NULL,
+  detail VARCHAR(1000) NOT NULL DEFAULT '',
+  at TIMESTAMP NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE category (
+  category_id VARCHAR(40) NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  detail_kind VARCHAR(40) NOT NULL CHECK (detail_kind IN ('footwear','apparel','bag','watch')),
+  PRIMARY KEY (category_id)
+);
+
+CREATE TABLE product (
+  product_id VARCHAR(40) NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  category_id VARCHAR(40) NOT NULL,
+  brand VARCHAR(200) NOT NULL,
+  color VARCHAR(200) NOT NULL,
+  price DECIMAL(10,2) NOT NULL CHECK (price > 0),
+  description VARCHAR(1000) NOT NULL DEFAULT '',
+  image VARCHAR(200) NOT NULL DEFAULT '',
+  status VARCHAR(40) NOT NULL DEFAULT 'active' CHECK (status IN ('active','unpublished')),
+  PRIMARY KEY (product_id),
+  FOREIGN KEY (category_id) REFERENCES category (category_id)
 );
 
 CREATE TABLE customer_order (
@@ -44,124 +75,58 @@ CREATE TABLE customer_order (
   FOREIGN KEY (customer_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE order_status_history (
-  id INTEGER NOT NULL,
-  order_id VARCHAR(40) NOT NULL,
-  status VARCHAR(40) NOT NULL,
-  actor VARCHAR(200) NOT NULL,
-  at TIMESTAMP NOT NULL,
-  note VARCHAR(1000) NOT NULL DEFAULT '',
-  PRIMARY KEY (id),
-  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
+CREATE TABLE cart (
+  cart_id VARCHAR(40) NOT NULL,
+  customer_id VARCHAR(40) NOT NULL UNIQUE,
+  PRIMARY KEY (cart_id),
+  FOREIGN KEY (customer_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE payment (
-  payment_id VARCHAR(40) NOT NULL,
-  order_id VARCHAR(40) NOT NULL,
-  attempt_ref VARCHAR(40) NOT NULL UNIQUE,
-  amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
-  currency VARCHAR(40) NOT NULL DEFAULT 'USD',
-  status VARCHAR(40) NOT NULL,
-  provider_ref VARCHAR(40) NOT NULL DEFAULT '',
-  created_at TIMESTAMP NOT NULL,
-  PRIMARY KEY (payment_id),
-  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
+CREATE TABLE address (
+  customer_id VARCHAR(40) NOT NULL,
+  receiver VARCHAR(200) NOT NULL,
+  phone VARCHAR(200) NOT NULL,
+  street VARCHAR(200) NOT NULL,
+  city VARCHAR(200) NOT NULL,
+  PRIMARY KEY (customer_id),
+  FOREIGN KEY (customer_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE shipment (
-  shipment_id VARCHAR(40) NOT NULL,
-  order_id VARCHAR(40) NOT NULL UNIQUE,
-  carrier_ref VARCHAR(40) NOT NULL DEFAULT '',
-  status VARCHAR(40) NOT NULL,
-  PRIMARY KEY (shipment_id),
-  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
-);
-
-CREATE TABLE shipment_milestone (
-  shipment_id VARCHAR(40) NOT NULL,
-  seq INTEGER NOT NULL,
-  code VARCHAR(40) NOT NULL,
-  at TIMESTAMP NOT NULL,
-  location VARCHAR(200) NOT NULL DEFAULT '',
-  PRIMARY KEY (shipment_id, seq),
-  FOREIGN KEY (shipment_id) REFERENCES shipment (shipment_id)
-);
-
-CREATE TABLE promotion (
-  code VARCHAR(40) NOT NULL,
-  percent DECIMAL(10,2) NOT NULL CHECK (percent > 0 AND percent <= 50),
-  min_total DECIMAL(10,2) NOT NULL DEFAULT 0,
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  active INTEGER NOT NULL DEFAULT 1,
-  PRIMARY KEY (code)
-);
-
-CREATE TABLE category (
-  category_id VARCHAR(40) NOT NULL,
-  name VARCHAR(200) NOT NULL,
-  PRIMARY KEY (category_id)
-);
-
-CREATE TABLE audit_log (
-  id INTEGER NOT NULL,
-  actor VARCHAR(200) NOT NULL,
-  action VARCHAR(200) NOT NULL,
-  entity VARCHAR(200) NOT NULL,
-  entity_id VARCHAR(40) NOT NULL,
-  detail VARCHAR(1000) NOT NULL DEFAULT '',
-  at TIMESTAMP NOT NULL,
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE sequence (
-  name VARCHAR(200) NOT NULL,
-  value INTEGER NOT NULL,
-  PRIMARY KEY (name)
-);
-
-CREATE TABLE product (
+CREATE TABLE watch_detail (
   product_id VARCHAR(40) NOT NULL,
-  name VARCHAR(200) NOT NULL,
-  category_id VARCHAR(40) NOT NULL,
-  brand VARCHAR(200) NOT NULL,
-  color VARCHAR(200) NOT NULL,
-  price DECIMAL(10,2) NOT NULL CHECK (price > 0),
-  description VARCHAR(1000) NOT NULL DEFAULT '',
-  image VARCHAR(200) NOT NULL DEFAULT '',
-  status VARCHAR(40) NOT NULL DEFAULT 'active' CHECK (status IN ('active','unpublished')),
-  PRIMARY KEY (product_id),
-  FOREIGN KEY (category_id) REFERENCES category (category_id)
-);
-
-CREATE TABLE stock_level (
-  product_id VARCHAR(40) NOT NULL,
-  physical INTEGER NOT NULL CHECK (physical >= 0),
-  reserved INTEGER NOT NULL CHECK (reserved >= 0 AND reserved <= physical),
-  threshold INTEGER NOT NULL DEFAULT 3,
+  movement VARCHAR(40) NOT NULL CHECK (movement IN ('smart','quartz','automatic')),
+  strap VARCHAR(200) NOT NULL,
+  water_resistance_m INTEGER NOT NULL CHECK (water_resistance_m >= 0),
+  battery_days INTEGER,
   PRIMARY KEY (product_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id)
 );
 
-CREATE TABLE inventory_event (
-  event_id VARCHAR(40) NOT NULL,
+CREATE TABLE bag_detail (
   product_id VARCHAR(40) NOT NULL,
-  kind VARCHAR(40) NOT NULL CHECK (kind IN ('RECEIPT','RESERVE','RELEASE','ISSUE','ADJUST')),
-  quantity INTEGER NOT NULL,
-  reference VARCHAR(40) NOT NULL,
-  reason VARCHAR(200) NOT NULL DEFAULT '',
-  created_at TIMESTAMP NOT NULL,
-  PRIMARY KEY (event_id),
+  capacity_l DECIMAL(10,2) NOT NULL CHECK (capacity_l > 0),
+  material VARCHAR(200) NOT NULL,
+  laptop_sleeve INTEGER NOT NULL DEFAULT 0 CHECK (laptop_sleeve IN (0, 1)),
+  PRIMARY KEY (product_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id)
 );
 
-CREATE TABLE replenishment_request (
-  request_id VARCHAR(40) NOT NULL,
+CREATE TABLE apparel_detail (
   product_id VARCHAR(40) NOT NULL,
-  quantity INTEGER NOT NULL CHECK (quantity > 0),
-  status VARCHAR(40) NOT NULL DEFAULT 'Requested',
-  created_at TIMESTAMP NOT NULL,
-  PRIMARY KEY (request_id),
+  sizes VARCHAR(200) NOT NULL,
+  material VARCHAR(200) NOT NULL,
+  fit VARCHAR(200) NOT NULL,
+  PRIMARY KEY (product_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE footwear_detail (
+  product_id VARCHAR(40) NOT NULL,
+  sizes VARCHAR(200) NOT NULL,
+  upper_material VARCHAR(200) NOT NULL,
+  sole VARCHAR(200) NOT NULL,
+  purpose VARCHAR(200) NOT NULL,
+  PRIMARY KEY (product_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id)
 );
 
@@ -180,15 +145,68 @@ CREATE TABLE review (
   FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
 );
 
-CREATE TABLE cart_item (
-  cart_id VARCHAR(40) NOT NULL,
+CREATE TABLE replenishment_request (
+  request_id VARCHAR(40) NOT NULL,
   product_id VARCHAR(40) NOT NULL,
-  name VARCHAR(200) NOT NULL,
-  cart_price DECIMAL(10,2) NOT NULL,
   quantity INTEGER NOT NULL CHECK (quantity > 0),
-  PRIMARY KEY (cart_id, product_id),
-  FOREIGN KEY (cart_id) REFERENCES cart (cart_id),
+  status VARCHAR(40) NOT NULL DEFAULT 'Requested',
+  created_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (request_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE inventory_event (
+  event_id VARCHAR(40) NOT NULL,
+  product_id VARCHAR(40) NOT NULL,
+  kind VARCHAR(40) NOT NULL CHECK (kind IN ('RECEIPT','RESERVE','RELEASE','ISSUE','ADJUST')),
+  quantity INTEGER NOT NULL,
+  reference VARCHAR(40) NOT NULL,
+  reason VARCHAR(200) NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (event_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE stock_level (
+  product_id VARCHAR(40) NOT NULL,
+  physical INTEGER NOT NULL CHECK (physical >= 0),
+  reserved INTEGER NOT NULL CHECK (reserved >= 0 AND reserved <= physical),
+  threshold INTEGER NOT NULL DEFAULT 3,
+  PRIMARY KEY (product_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE shipment (
+  shipment_id VARCHAR(40) NOT NULL,
+  order_id VARCHAR(40) NOT NULL UNIQUE,
+  carrier_ref VARCHAR(40) NOT NULL DEFAULT '',
+  status VARCHAR(40) NOT NULL,
+  PRIMARY KEY (shipment_id),
+  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
+);
+
+CREATE TABLE payment (
+  payment_id VARCHAR(40) NOT NULL,
+  order_id VARCHAR(40) NOT NULL,
+  attempt_ref VARCHAR(40) NOT NULL UNIQUE,
+  amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
+  currency VARCHAR(40) NOT NULL DEFAULT 'USD',
+  status VARCHAR(40) NOT NULL,
+  provider_ref VARCHAR(40) NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (payment_id),
+  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
+);
+
+CREATE TABLE order_status_history (
+  id INTEGER NOT NULL,
+  order_id VARCHAR(40) NOT NULL,
+  status VARCHAR(40) NOT NULL,
+  actor VARCHAR(200) NOT NULL,
+  at TIMESTAMP NOT NULL,
+  note VARCHAR(1000) NOT NULL DEFAULT '',
+  PRIMARY KEY (id),
+  FOREIGN KEY (order_id) REFERENCES customer_order (order_id)
 );
 
 CREATE TABLE order_item (
@@ -200,5 +218,26 @@ CREATE TABLE order_item (
   PRIMARY KEY (order_id, product_id),
   FOREIGN KEY (order_id) REFERENCES customer_order (order_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE cart_item (
+  cart_id VARCHAR(40) NOT NULL,
+  product_id VARCHAR(40) NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  cart_price DECIMAL(10,2) NOT NULL,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  PRIMARY KEY (cart_id, product_id),
+  FOREIGN KEY (cart_id) REFERENCES cart (cart_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id)
+);
+
+CREATE TABLE shipment_milestone (
+  shipment_id VARCHAR(40) NOT NULL,
+  seq INTEGER NOT NULL,
+  code VARCHAR(40) NOT NULL,
+  at TIMESTAMP NOT NULL,
+  location VARCHAR(200) NOT NULL DEFAULT '',
+  PRIMARY KEY (shipment_id, seq),
+  FOREIGN KEY (shipment_id) REFERENCES shipment (shipment_id)
 );
 

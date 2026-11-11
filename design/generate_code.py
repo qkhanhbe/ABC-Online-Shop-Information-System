@@ -27,10 +27,10 @@ LAYERS = ["view", "controller", "service", "ai", "dao", "model"]
 
 
 def vp(tool, **args):
-    body = json.dumps({"toolName": tool, "arguments": args}).encode("utf-8")
-    req = urllib.request.Request("http://localhost:2026/api/execute", body, {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return json.loads(r.read().decode("utf-8"))["result"]
+    """Call the Visual Paradigm MCP plugin through the shared client of tools/vp."""
+    sys.path.insert(0, os.path.join(os.path.dirname(HERE), "tools", "vp"))
+    from vp import call
+    return call(tool, quiet=True, **args)
 
 
 def export():

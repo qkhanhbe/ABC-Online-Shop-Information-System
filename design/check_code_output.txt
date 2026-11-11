@@ -10,11 +10,11 @@
   model.inventory          InventoryEvent, StockLevel
   model.order              Order, OrderItem, StatusChange
   model.payment            Payment
-  model.product            Category, Product, Promotion
+  model.product            Category, Product, ProductDetail, Promotion, ApparelDetail, BagDetail, FootwearDetail, WatchDetail
   model.review             Review
   model.shipment           Milestone, Shipment
 
-[2] py_compile and import of 12 modules (23 classes): no errors
+[2] py_compile and import of 12 modules (28 classes): no errors
 
 [3] Design model against the hand-written code in abc_shop/
   class            module                        fields  methods  difference
@@ -33,15 +33,20 @@
   OrderItem        model.order                    4/4     1/1     -
   StatusChange     model.order                    4/4     0/0     -
   Payment          model.payment                  8/8     2/2     -
-  Category         model.product                  2/2     0/0     -
-  Product          model.product                  9/9     3/3     -
+  ApparelDetail    model.product                  4/4     2/2     -
+  BagDetail        model.product                  4/4     2/2     -
+  Category         model.product                  3/3     0/0     -
+  FootwearDetail   model.product                  5/5     2/2     -
+  Product          model.product                 10/10    3/3     -
+  ProductDetail    model.product                  1/1     2/2     -
   Promotion        model.product                  6/6     2/2     -
+  WatchDetail      model.product                  5/5     2/2     -
   Review           model.review                   8/8     1/1     -
   Milestone        model.shipment                 4/4     0/0     -
   Shipment         model.shipment                 5/5     2/2     -
   CartService      service.cart_service           3/3     6/6     -
   templates        view.templates                 0/0     2/2     -
-  23 of 23 classes: every field and method of the model exists in the code
+  28 of 28 classes: every field and method of the model exists in the code
 
 [4] Members of the generated class model.order.Order
   field  order_id: str

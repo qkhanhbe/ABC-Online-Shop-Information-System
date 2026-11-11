@@ -1,14 +1,15 @@
 > python build_db.py
 
-[1] create_tables.sql (generated from ERD01 + ERD02) executed: 19 tables, 18 foreign keys
-    address, audit_log, cart, cart_item, category, customer_order
-    inventory_event, order_item, order_status_history, payment, product, promotion
-    replenishment_request, review, sequence, shipment, shipment_milestone, stock_level
-    users
+[1] create_tables.sql (generated from ERD01 + ERD02) executed: 23 tables, 22 foreign keys
+    address, apparel_detail, audit_log, bag_detail, cart, cart_item
+    category, customer_order, footwear_detail, inventory_event, order_item, order_status_history
+    payment, product, promotion, replenishment_request, review, sequence
+    shipment, shipment_milestone, stock_level, users, watch_detail
 
-[2] Compared with abc_shop/dao/schema.sql: 17 of 19 tables identical (columns, NOT NULL, keys, foreign keys, UNIQUE, CHECK)
+[2] Compared with abc_shop/dao/schema.sql: 21 of 23 tables identical (columns, NOT NULL, keys, foreign keys, UNIQUE, CHECK)
     inventory_event: differs in UNIQUE (product_id, kind, reference)
     review: differs in UNIQUE (customer_id, product_id, order_id)
+    4 triggers (detail row of the category's kind, BR-CAT-01) exist only in schema.sql
 
 [3] The application seeded one month of history into the generated database:
     users=8, product=16, customer_order=16, order_item=25,

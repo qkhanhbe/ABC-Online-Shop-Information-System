@@ -7,5 +7,8 @@ venv/
 .*.vpp.lck
 abc_shop/data/abc_shop.db
 abc_shop/data/uploads/
-tmp/
 design/abc_design.db
+tools/report/cache/
+tools/vpgen/classes/
+tools/vpgen/mode.log
+design/abc_design*.db

@@ -1,1 +1,1 @@
-generated 23 classes in 12 modules under generated\abc_shop_design
+generated 28 classes in 12 modules under generated\abc_shop_design
