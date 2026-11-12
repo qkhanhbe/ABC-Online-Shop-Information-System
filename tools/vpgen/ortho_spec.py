@@ -343,6 +343,59 @@ def dm01():
     return out
 
 
+# ---------------------------------------------------------------- DCL05 data access layer
+DCL05_DAOS = [
+    ("CustomerDAO", 4, "find_by_email(email)"), ("ProductDAO", 6, "list_products(category_id=None, active_only=True)"),
+    ("InventoryDAO", 7, "add_replenishment(request_id, product_id, quantity, at)"), ("PromotionDAO", 3, "save_promotion(promotion)"),
+    ("ReviewDAO", 4, "exists(customer_id, product_id, order_id)"), ("CartDAO", 2, "get_cart(customer_id)"),
+    ("OrderDAO", 6, "find_by_idempotency_key(key)"), ("PaymentDAO", 3, "get_by_attempt(attempt_ref)"),
+    ("ShipmentDAO", 3, "get_by_carrier_ref(carrier_ref)"), ("AuditDAO", 2, "record(actor, action, entity, entity_id, detail=)")]
+
+
+def dcl05():
+    code, gap = "DCL05", 50
+    hi = lambda ops: 46 + 8 + 19 * ops + 14
+    width = lambda longest: max(220, 7 * len(longest) + 30)
+    cols, x = [], 40
+    for k in range(5):
+        w = max(width(DCL05_DAOS[k][2]), width(DCL05_DAOS[k + 5][2]), width("SqliteInventoryDAO"))
+        cols.append((x, w))
+        x += w + gap
+    out = []
+    ha = max(hi(n) for _, n, _ in DCL05_DAOS[:5])
+    hd = max(hi(n) for _, n, _ in DCL05_DAOS[5:])
+    himpl = 46 + 19 + 14 + 8
+    yA = 40
+    yB = yA + ha + 70
+    bus1 = yB + himpl + 40
+    yM = bus1 + 40
+    hdb = 46 + 19 * 2 + 19 * 8 + 20
+    bus2 = yM + hdb + 40
+    yC = bus2 + 40
+    yD = yC + himpl + 70
+    for k in range(5):
+        cx, cw = cols[k]
+        for (name, n, _), (yi, yimpl, grp) in ((DCL05_DAOS[k], (yA, yB, 1)), (DCL05_DAOS[k + 5], (yD, yC, 2))):
+            out.append(f"{code}|@box|{name}|{cx}|{yi}|{cw}|{hi(n)}")
+            out.append(f"{code}|@box|Sqlite{name}|{cx}|{yimpl}|{cw}|{himpl}")
+            out.append(f"{code}|@link|{name}|Sqlite{name}|{'B' if grp == 1 else 'T'}|{'T' if grp == 1 else 'B'}|R")
+    dbx, dbw = cols[2]
+    dbc = dbx + dbw // 2
+    out.append(f"{code}|@box|Database|{dbx}|{yM}|{dbw}|{hdb}")
+    out.append(f"{code}|@box|VectorIndex|{cols[3][0]}|{yM}|{cols[3][1]}|{46 + 19 + 19 * 3 + 20}")
+    out.append(f"{code}|@box|ImageStorage|{cols[4][0]}|{yM}|{cols[4][1]}|{46 + 19 + 19 * 3 + 20}")
+    out.append(f"{code}|@link|VectorIndex|ImageStorage|R|L|R")
+    for k in range(5):
+        cx, cw = cols[k]
+        c = cx + cw // 2
+        for name, side, bus, dside in ((DCL05_DAOS[k][0], "B", bus1, "T"), (DCL05_DAOS[k + 5][0], "T", bus2, "B")):
+            if c == dbc:
+                out.append(f"{code}|@link|Sqlite{name}|Database|{side}|{dside}|R")
+            else:
+                out.append(f"{code}|@path|Sqlite{name}|Database|{side}|{dside}|{c},{bus};{dbc},{bus}|R")
+    return out
+
+
 HEAD = """# Tidy redraw (Redraw.jsrc), written by ortho_spec.py.
 # CODE|@at|name|cx|cy|w|h  CODE|@box|name|x|y|w|h  CODE|@bus|actor|trunkX  CODE|@link|A|B|sideA|sideB|labelSide
 # CODE|@path|A|B|sideA|sideB|x,y;...  CTX01|@ctx|...  SDxx|@seq|step|minGap
@@ -357,7 +410,7 @@ SD06|@seq|42|150
 
 if __name__ == "__main__":
     body = []
-    for f in (ucd1, ucd2, ucd3, ucd4, uc00, ucai, dm01):
+    for f in (ucd1, ucd2, ucd3, ucd4, uc00, ucai, dm01, dcl05):
         body += f() + [""]
     with open(os.path.join(HERE, "redraw_spec.txt"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(HEAD + "\n" + "\n".join(body))

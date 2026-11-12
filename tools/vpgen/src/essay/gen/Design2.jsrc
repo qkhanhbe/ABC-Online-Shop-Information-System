@@ -14,6 +14,7 @@ public class Design2 extends Ch4 {
         init();
         ownerPackage("Design (added)");
         if (codes.contains("SD06")) trackDesignSequence();
+        if (codes.contains("DCL05")) dataAccessLayer();
     }
 
     void trackDesignSequence() {
@@ -63,5 +64,41 @@ public class Design2 extends Ch4 {
              + "WebApp answers 404, a foreign order looks like a missing one (UC11 E2).\n"
              + "opt [10: shipment is not None]  the carrier milestones are added to the order history; "
              + "the timeline is sorted by time.", 300, y + 20, 900, 96);
+    }
+
+    static final String[][] DAOS = {
+        {"CustomerDAO", "get_user(user_id);find_by_email(email);save_user(user);list_customers()"},
+        {"ProductDAO", "get_product(product_id);list_products(category_id=None, active_only=True);save_product(product);get_category(category_id);list_categories();save_category(category)"},
+        {"InventoryDAO", "get_stock(product_id);save_stock(stock);find_event(product_id, kind, reference);add_event(event);events_for(product_id, limit=10);add_replenishment(request_id, product_id, quantity, at);open_replenishments()"},
+        {"PromotionDAO", "get_promotion(code);save_promotion(promotion);list_promotions()"},
+        {"ReviewDAO", "for_product(product_id, status=published);exists(customer_id, product_id, order_id);save_review(review);list_reviews(status=None)"},
+        {"CartDAO", "get_cart(customer_id);update_cart(cart)"},
+        {"OrderDAO", "get_order(order_id);find_by_idempotency_key(key);find_by_customer(customer_id);find_by_status(*statuses);save_order(order);list_orders()"},
+        {"PaymentDAO", "get_by_attempt(attempt_ref);for_order(order_id);save_payment(payment)"},
+        {"ShipmentDAO", "get_by_order(order_id);get_by_carrier_ref(carrier_ref);save_shipment(shipment)"},
+        {"AuditDAO", "record(actor, action, entity, entity_id, detail=);recent(limit=20)"}};
+
+    /** DCL05: dao/interfaces.py, dao/sqlite_dao.py, dao/database.py, dao/vector_index.py, dao/image_storage.py. */
+    void dataAccessLayer() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM, "DCL05 Data Access Layer");
+        com.vp.plugin.model.IClass db = cls("Database", null, new String[] {"-path : str", "-conn : sqlite3.Connection"},
+            new String[] {"init_schema()", "now()", "transaction()", "execute(sql, params=())", "query(sql, params=())",
+                          "query_one(sql, params=())", "next_id(name, prefix, width=3)", "close()"});
+        put(d, db, "Database", 0, 0, 100, 100, BLUE);
+        com.vp.plugin.model.IClass vi = cls("VectorIndex", null, new String[] {"-vectors : dict"},
+            new String[] {"build(storage, products, encode)", "add(product_id, embedding)", "search(query_embedding, k=None)"});
+        put(d, vi, "VectorIndex", 0, 0, 100, 100, BLUE);
+        com.vp.plugin.model.IClass is = cls("ImageStorage", null, new String[] {"-root : str"},
+            new String[] {"path(relative)", "exists(relative)", "save_upload(filename, content)"});
+        put(d, is, "ImageStorage", 0, 0, 100, 100, BLUE);
+        link(d, use(vi, is), shapes.get("VectorIndex"), shapes.get("ImageStorage"));
+        for (String[] dao : DAOS) {
+            com.vp.plugin.model.IClass i = cls(dao[0], "interface", null, dao[1].split(";"));
+            put(d, i, dao[0], 0, 0, 100, 100, LIGHT);
+            com.vp.plugin.model.IClass impl = cls("Sqlite" + dao[0], null, new String[] {"-db : Database"}, null);
+            put(d, impl, "Sqlite" + dao[0], 0, 0, 100, 100, BLUE);
+            link(d, realize(impl, i), shapes.get(dao[0]), shapes.get("Sqlite" + dao[0]));
+            link(d, assoc(impl, db, null, "1", null, null), shapes.get("Sqlite" + dao[0]), shapes.get("Database"));
+        }
     }
 }

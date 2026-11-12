@@ -76,6 +76,7 @@ public class Redraw {
             if (code.startsWith("CTX")) context(d, spec.get(code));
             else if (code.startsWith("UC")) useCases(d, spec.get(code));
             else if (code.startsWith("SD")) sequence(d, spec.get(code));
+            else if (code.startsWith("DCL0")) orthoUseCases(d, spec.get(code));
             else if (code.startsWith("DM")) { dataModel(project, d, spec.get(code)); orthoUseCases(d, spec.get(code)); }
             System.out.println("REDRAWN " + d.getName());
         }
@@ -279,8 +280,8 @@ public class Redraw {
                 font(c, 11);
                 done.add(c.getId());
                 String t = type(c);
-                if (t.equals("Include") || t.equals("Extend")) {
-                    String text = "<<" + t + ">>";
+                if (t.equals("Include") || t.equals("Extend") || t.equals("Usage")) {
+                    String text = "<<" + (t.equals("Usage") ? "use" : t) + ">>";
                     int w = CHAR * text.length() + 6, h = 18;
                     Point a0 = null, a1 = null;          // longest horizontal segment
                     for (int k = 0; k + 1 < pts.size(); k++) {
