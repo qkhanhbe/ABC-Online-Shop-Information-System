@@ -424,6 +424,17 @@ BLOCKS = [
           "payment is requested only after the transaction has committed, so that a provider never receives a request "
           "for an order that does not exist."),
     ("fig", os.path.join(D, "SD05 Checkout Through the Layers (Design).png"), "Checkout through the layers - VP diagram \"SD05 Checkout Through the Layers (Design)\"", 165),
+    ("p", "Order tracking is the design counterpart of the analysis sequence SD02. The analysis control object becomes "
+          "two classes: OrderController.track handles the request and first asks AuthService.require for the role "
+          "own_orders (messages 2-4), and OrderService.track does the work of the use case (5-11). OrderService.own_order "
+          "reads the order with OrderDAO.get_order and raises NotFound both when the order does not exist and when it "
+          "belongs to another customer, so a foreign order id looks exactly like a missing one (UC11 E2, NFR05). "
+          "ShipmentDAO.get_by_order returns the shipment, which is absent before packing; the timeline is then built "
+          "from the order history alone, otherwise the carrier milestones are merged in by time. The view "
+          "templates.track renders the page (12-13). The analysis entities Order and Shipment are now read through "
+          "their DAOs, which the analysis model did not need to know. The two error branches and the optional "
+          "milestones are written as a guard note under the lifelines with the message numbers they belong to."),
+    ("fig", os.path.join(D, "SD06 Track Order (Design).png"), "Order tracking through the layers - VP diagram \"SD06 Track Order (Design)\"", 165),
 
     # ------------------------------------------------------------------ 4.5
     ("h2", "4.5. Code Generated from the Layered Model"),
