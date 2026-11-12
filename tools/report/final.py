@@ -165,6 +165,23 @@ c4 = list(ch4.BLOCKS)
 c4[0] = ("h1", "CHAPTER 4. SYSTEM DESIGN")
 i = find(c4, "h3", "4.2.1. ")
 c4 = c4[:i] + [
+    ("h3", "4.2.0. Data model of the persistent classes"),
+    ("p", "The first step from the analysis classes towards the database selects the classes whose objects must outlive a "
+          "request and states what is stored about them. They are drawn as a class diagram in which every class carries "
+          "the stereotype &lt;&lt;ORM Persistable&gt;&gt;: twenty-three classes with private, typed attributes (String, "
+          "Integer, Decimal, Date, Boolean), twenty named associations with multiplicities at both ends and five "
+          "generalizations. Classes that only exist while the program runs (controllers, services, gateways) and the "
+          "technical tables (sequence, audit_log) are not part of it."),
+    ("p", "Four decisions of this model carry into the database. Compositions mark the parts that cannot exist without "
+          "their whole: Product ◆ ProductDetail, Cart ◆ CartItem, Order ◆ OrderItem, Order ◆ StatusChange and "
+          "Shipment ◆ Milestone; their keys later contain the key of the whole. Customer is a subclass of User, and the "
+          "abstract ProductDetail has the four kinds FootwearDetail, ApparelDetail, BagDetail and WatchDetail, with "
+          "Category.detailKind naming the kind. Order keeps its own copies of what must not change afterwards (the "
+          "address, and the name and unit price of every OrderItem). And InventoryEvent is linked to Product (explained by), "
+          "because every stock movement is a fact about one product; StockLevel holds only the current figures. The "
+          "twenty-three classes become the twenty-one domain tables of Section 4.2.2: User and Customer share one table and "
+          "ProductDetail has none."),
+    fig("DM01", "Data model of the persistent classes (ORM Persistable): attributes with types, named associations and multiplicities", 160),
     ("h3", "4.2.0. Conceptual data model"),
     ("p", "The conceptual model names the things the shop keeps data about and how they are related, without attributes "
           "or keys. It is drawn in Visual Paradigm's ER notation (crow's foot): a bar is one, a circle zero, a foot many. "
@@ -193,7 +210,7 @@ c4 = c4[:i] + [
           "trigger on each detail table that rejects such a row. Both are tested.")] + c4[i:]
 i = find(c4, "h2", "4.2. ")
 c4[i + 1] = ("p", "The data model decides what is stored and how the stored records are linked. It was built in three levels, "
-             "each drawn in Visual Paradigm: a conceptual model of entities and relationships, a logical model of relations "
+             "each drawn in Visual Paradigm, after a class diagram of the persistent classes: a conceptual model of entities and relationships, a logical model of relations "
              "with keys, and a physical model of SQLite tables. The SQL script was then generated from the physical model "
              "and a working database was created from it (Section 4.2.3).")
 j = find(c4, "h3", "4.2.1. From classes")

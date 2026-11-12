@@ -28,6 +28,7 @@ DIAGRAMS = [
         ("SD03", "Tìm kiếm bằng giọng nói"),
         ("SD04", "Tìm kiếm bằng ảnh")]),
     ("Dữ liệu", [
+        ("DM01", "Mô hình dữ liệu: các lớp «ORM Persistable», kiểu thuộc tính, tên quan hệ và bản số"),
         ("CDM01", "Mô hình dữ liệu khái niệm"),
         ("LDM01", "Mô hình dữ liệu logic"),
         ("ERD01", "Mô hình vật lý 1: khách hàng, giỏ, đơn, thanh toán, giao hàng"),
@@ -46,7 +47,7 @@ DIAGRAMS = [
 PHASES = [
     ("Yêu cầu", "Khảo sát (A01): bên liên quan {fig:STK01}, quy trình {fig:BP01}, cây vấn đề {fig:PT01}, ngữ cảnh {fig:CTX01}; 24 FR, 12 NFR, 32 use case."),
     ("Phân tích", "Use case {fig:UC00}, đặc tả UC08; activity {fig:AD01}, DFD {fig:DFD0}, sequence BCE {fig:SD01}, class phân tích {fig:CL01}, trạng thái {fig:ST01}."),
-    ("Thiết kế", "Dữ liệu {fig:CDM01} → {fig:LDM01} → {fig:ERD02}; class thiết kế {fig:DCL01}; ba lớp {fig:PKG01}; sequence thiết kế {fig:SD05}."),
+    ("Thiết kế", "Dữ liệu {fig:DM01} → {fig:CDM01} → {fig:LDM01} → {fig:ERD02}; class thiết kế {fig:DCL01}; ba lớp {fig:PKG01}; sequence thiết kế {fig:SD05}."),
     ("Cài đặt", "Python, SQLite: model, dao, service, ai, controller, view; SQL và khung code sinh từ mô hình ({file:design/create_tables.sql})."),
     ("Kiểm chứng", "45 test, build_db.py, check_code.py, evaluate.py, ảnh chụp demo; kết quả lưu trong demo_results và design."),
 ]
@@ -350,7 +351,7 @@ ANSWERS = [
      "(đọc dòng hàng), PaymentService đổi trạng thái qua {code:model/order.py:Order.change_status}. Phân biệt: đối tượng Order trong bộ nhớ có danh sách lồng; "
      "trong CSDL nó là 1 dòng customer_order + n dòng order_item + m dòng order_status_history; bảng là cấu trúc, bản ghi là dữ liệu.</p>"),
     (G7, "Trình bày ERD: thực thể, thuộc tính, khoá, quan hệ; chuyển thành bảng thế nào?",
-     "<p>Ba mức: {fig:CDM01} (thực thể, quan hệ), {fig:LDM01} (khoá, cột), {fig:ERD01} + {fig:ERD02} (bảng SQLite). Ví dụ customer_order (PK order_id, FK "
+     "<p>Bắt đầu từ {fig:DM01} (các lớp cần lưu, thuộc tính có kiểu, quan hệ có tên và bản số), rồi ba mức: {fig:CDM01} (thực thể, quan hệ), {fig:LDM01} (khoá, cột), {fig:ERD01} + {fig:ERD02} (bảng SQLite). Ví dụ customer_order (PK order_id, FK "
      "customer_id → users) 1–n order_item (PK ghép order_id, product_id). Quy tắc chuyển: mỗi thực thể một bảng; quan hệ 1–n thành khoá ngoại ở phía n; "
      "hợp thành thì khoá con chứa khoá cha; n–n qua bảng nối (cart_item nối cart và product); kế thừa User–Customer thành một bảng users có role; "
      "ProductDetail thành 4 bảng chi tiết có khoá chính đồng thời là khoá ngoại. Script: {file:design/create_tables.sql}.</p>"),

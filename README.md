@@ -13,8 +13,8 @@ traceability to code, database, AI, demo script and answers to the 50 oral-exami
 |---|---|
 | Essay (official report) | [Tieuluan_V4_04_10_KhanhBQ_049.pdf](Tieuluan_V4_04_10_KhanhBQ_049.pdf), 6 chapters |
 | Requirement specification | Essay chapters 1-2 (needs, 24 FR, 12 NFR, 32 use cases, specifications, business rules, acceptance criteria) |
-| Diagrams per phase | [TieuLuan_KHANHBQ.vpp](TieuLuan_KHANHBQ.vpp), 35 diagrams drawn in Visual Paradigm; PNG export (Community Edition) in [diagrams/](diagrams) |
-| Data models and schema | CDM01, LDM01, ERD01-02 in the project; [design/create_tables.sql](design/create_tables.sql) generated from ERD01-02; application schema [abc_shop/dao/schema.sql](abc_shop/dao/schema.sql) |
+| Diagrams per phase | [TieuLuan_KHANHBQ.vpp](TieuLuan_KHANHBQ.vpp), 36 diagrams drawn in Visual Paradigm; PNG export (Community Edition) in [diagrams/](diagrams) |
+| Data models and schema | DM01 (persistent classes), CDM01, LDM01, ERD01-02 in the project; [design/create_tables.sql](design/create_tables.sql) generated from ERD01-02; application schema [abc_shop/dao/schema.sql](abc_shop/dao/schema.sql) |
 | Database check | [design/build_db.py](design/build_db.py) and its output [design/build_db_output.txt](design/build_db_output.txt) |
 | Code generated from the design | [design/generate_code.py](design/generate_code.py), [design/generated/](design/generated), checked by [design/check_code.py](design/check_code.py) |
 | Source code | [abc_shop/](abc_shop) (Python, SQLite; model, dao, service, ai, controller, view) |
