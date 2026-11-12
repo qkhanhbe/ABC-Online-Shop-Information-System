@@ -94,6 +94,19 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
             variant(Integer.parseInt(args[1]), sb.toString().substring(sb.indexOf(" ") + 1).trim());
             return;
         }
+        if (args.length > 0 && "design2".equals(args[0])) {         // out.vpp|CODE,CODE  (new design diagrams)
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            try {
+                new Design2().run(pp[1].trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            project.setName("TieuLuan_KHANHBQ");
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[0].trim()));
+            System.out.println("SAVED " + pp[0].trim());
+            return;
+        }
         if (args.length > 0 && "redraw".equals(args[0])) {          // spec|out.vpp|CODE,CODE,...
             String[] pp = sb.toString().trim().split("[|]");
             IProject project = ApplicationManager.instance().getProjectManager().getProject();

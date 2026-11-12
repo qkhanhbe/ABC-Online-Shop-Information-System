@@ -1,0 +1,67 @@
+package essay.gen;
+
+import com.vp.plugin.diagram.IDiagramTypeConstants;
+import com.vp.plugin.diagram.IDiagramUIModel;
+
+/**
+ * Design diagrams added after the essay was generated, drawn from the code of abc_shop:
+ * SD06 Track Order (Design) - controller/order_controller.py OrderController.track,
+ * service/order_service.py OrderService.track / own_order, dao/sqlite_dao.py.
+ */
+public class Design2 extends Ch4 {
+
+    void run(String codes) {
+        init();
+        ownerPackage("Design (added)");
+        if (codes.contains("SD06")) trackDesignSequence();
+    }
+
+    void trackDesignSequence() {
+        IDiagramUIModel d = diagram(IDiagramTypeConstants.DIAGRAM_TYPE_INTERACTION_DIAGRAM, "SD06 Track Order (Design)");
+        int h = 760;
+        lifeline(d, "Customer", null, 10, 80, h);
+        lifeline(d, "WebApp", "boundary", 120, 90, h);
+        lifeline(d, "OrderController", "boundary", 240, 120, h);
+        lifeline(d, "AuthService", "control", 400, 100, h);
+        lifeline(d, "OrderService", "control", 540, 110, h);
+        lifeline(d, "OrderDAO", "entity", 690, 90, h);
+        lifeline(d, "ShipmentDAO", "entity", 820, 100, h);
+        lifeline(d, "templates", "boundary", 960, 90, h);
+        String[][] m = {
+            {"Customer", "WebApp", "1", "GET /orders/O011", "0"},
+            {"WebApp", "OrderController", "2", "track(request, order_id)", "0"},
+            {"OrderController", "AuthService", "3", "require(request.user, \"own_orders\")", "0"},
+            {"AuthService", "OrderController", "4", "customer", "1"},
+            {"OrderController", "OrderService", "5", "track(customer.user_id, order_id)", "0"},
+            {"OrderService", "OrderService", "6", "own_order(customer_id, order_id)", "0"},
+            {"OrderService", "OrderDAO", "7", "get_order(order_id)", "0"},
+            {"OrderDAO", "OrderService", "8", "order", "1"},
+            {"OrderService", "ShipmentDAO", "9", "get_by_order(order.order_id)", "0"},
+            {"ShipmentDAO", "OrderService", "10", "shipment or None", "1"},
+            {"OrderService", "OrderController", "11", "{order, status, carrier_ref, timeline, last_update}", "1"},
+            {"OrderController", "templates", "12", "track(request, tracking)", "0"},
+            {"templates", "OrderController", "13", "html", "1"},
+            {"OrderController", "WebApp", "14", "Response(html)", "1"},
+            {"WebApp", "Customer", "15", "200 order page with status timeline", "1"}};
+        int y = 120;
+        int[] ys = new int[m.length];
+        for (int k = 0; k < m.length; k++) {
+            ys[k] = y;
+            msg(d, m[k][0], m[k][1], m[k][2], m[k][3], y, "1".equals(m[k][4]));
+            y += m[k][0].equals(m[k][1]) ? 55 : 38;
+        }
+        activate(d, "Customer", ys[0], ys[14]);
+        activate(d, "WebApp", ys[0], ys[14]);
+        activate(d, "OrderController", ys[1], ys[13]);
+        activate(d, "AuthService", ys[2], ys[3]);
+        activate(d, "OrderService", ys[4], ys[10]);
+        activate(d, "OrderDAO", ys[6], ys[7]);
+        activate(d, "ShipmentDAO", ys[8], ys[9]);
+        activate(d, "templates", ys[11], ys[12]);
+        note(d, "alt [3: no user or no 'own_orders' permission]  PermissionDenied: WebApp redirects to /login.\n"
+             + "alt [6-8: order is None or order.customer_id != customer_id]  NotFound(\"order not found\"): "
+             + "WebApp answers 404, a foreign order looks like a missing one (UC11 E2).\n"
+             + "opt [10: shipment is not None]  the carrier milestones are added to the order history; "
+             + "the timeline is sorted by time.", 300, y + 20, 900, 96);
+    }
+}

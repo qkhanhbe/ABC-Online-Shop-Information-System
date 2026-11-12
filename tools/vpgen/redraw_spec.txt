@@ -7,6 +7,7 @@ SD02|@seq|42|150
 SD03|@seq|42|150
 SD04|@seq|42|150
 SD05|@seq|42|150
+SD06|@seq|42|150
 
 UCD1|@box|ABC Online Shop - Account and Catalogue|390|30|340|686
 UCD1|@at|UC06 View Product Details|560|110|240|52
