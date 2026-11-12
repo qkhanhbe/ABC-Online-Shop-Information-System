@@ -114,12 +114,83 @@ def gallery():
     return n, "".join(out)
 
 
+def source_path(rel):
+    return os.path.join(APP, rel) if not rel.startswith(("design/", "tools/")) else os.path.join(ROOT, rel)
+
+
+def code_excerpt(rel, symbols, pick=None):
+    """Real lines of the source: for a class, its header, typed fields and method signatures;
+    for a function, its signature and the lines matching `pick`. Never hand-written."""
+    lines = open(source_path(rel), encoding="utf-8").read().split("\n")
+    tree = ast.parse("\n".join(lines))
+    out = []
+    for symbol in symbols:
+        nodes, node = tree.body, None
+        for part in symbol.split("."):
+            node = next(n for n in nodes if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and n.name == part)
+            nodes = node.body
+        if isinstance(node, ast.ClassDef):
+            out.append(lines[node.lineno - 1])
+            for stmt in node.body:
+                if isinstance(stmt, (ast.AnnAssign, ast.FunctionDef)):
+                    out.append(lines[stmt.lineno - 1])
+        else:
+            body = lines[node.lineno - 1:node.end_lineno]
+            out += [l for i, l in enumerate(body) if i == 0 or (pick and re.search(pick, l))]
+        out.append("")
+    indent = min(len(l) - len(l.lstrip()) for l in out if l.strip())
+    return [l[indent:] for l in out[:-1]], locate(rel, symbols[0])
+
+
+def highlight(lines, comment="#"):
+    out = []
+    for l in lines:
+        code, _, note = l.partition(comment) if comment in l else (l, "", "")
+        code = html.escape(code.rstrip() if note else code)
+        code = re.sub(r"\b(class|def|with|return|if|for|in|not|is|None|True|False|CREATE TABLE|PRIMARY KEY|FOREIGN KEY|"
+                      r"REFERENCES|NOT NULL|DEFAULT|CHECK)\b", r'<span class="k">\1</span>', code)
+        out.append(code + (f'  <span class="c">{html.escape(comment + note)}</span>' if note else ""))
+    return "\n".join(out)
+
+
+def evo_step(step):
+    label = html.escape(step["label"])
+    if "fig" in step:
+        f, code = diagram_file(step["fig"]), step["fig"]
+        link = f'<a href="../diagrams/{f}" data-lbx data-cap="{html.escape(f[:-4])}">{code}</a>'
+        thumb = (f'<a class="thumb" href="../diagrams/{f}" data-lbx data-cap="{html.escape(f[:-4])}">'
+                 f'<img src="../diagrams/{f}" alt="{html.escape(f[:-4])}" loading="lazy"></a>')
+    elif "shot" in step:
+        name = os.path.basename(step["shot"])
+        link = f'<a href="../{step["shot"]}" data-lbx data-cap="{html.escape(step["cap"][:80])}">{name}</a>'
+        thumb = (f'<a class="thumb shot" href="../{step["shot"]}" data-lbx data-cap="{html.escape(name)}">'
+                 f'<img src="../{step["shot"]}" alt="{html.escape(name)}" loading="lazy"></a>')
+    elif "code" in step:
+        rel, symbols = step["code"]
+        lines, line = code_excerpt(rel, symbols, step.get("pick"))
+        link = f'<a href="{code_page(rel)}#L{line}" title="{rel}:{line}">{os.path.basename(rel)}</a>'
+        thumb = f'<a class="thumb code" href="{code_page(rel)}#L{line}">{highlight(lines)}</a>'
+    else:
+        rel, table = step["sql"]
+        text = open(source_path(rel), encoding="utf-8").read()
+        block = re.search(rf"CREATE TABLE {table} \(.*?\);", text, re.S).group(0)
+        line = text[:text.index(block)].count("\n") + 1
+        link = f'<a href="{code_page(rel)}#L{line}">{os.path.basename(rel)}</a>'
+        thumb = f'<a class="thumb code" href="{code_page(rel)}#L{line}">{highlight(block.split(chr(10)), "--")}</a>'
+    return (f'<div class="step"><div class="label"><span>{label}</span>{link}</div>{thumb}'
+            f'<div class="cap">{expand(step["cap"])}</div></div>')
+
+
 def evolution():
     out = []
-    for title, steps, changes in EVOLUTION:
-        cols = "".join(f'<div class="step"><span class="label">{html.escape(lbl)}</span>{expand(body)}</div>' for lbl, body in steps)
-        rows = "".join(f"<li>{expand(c)}</li>" for c in changes)
-        out.append(f'<div class="evo"><h3>{title}</h3><div class="steps">{cols}</div><ul class="changes">{rows}</ul></div>')
+    for chain in EVOLUTION:
+        steps = chain["steps"]
+        cols = " 30px ".join(["minmax(0,1fr)"] * len(steps))
+        row = '<div class="arrow" aria-hidden="true">→</div>'.join(evo_step(s) for s in steps)
+        changes = "".join(f'<div><h4>{h}</h4><ul>{"".join(f"<li>{expand(x)}</li>" for x in chain[k])}</ul></div>'
+                          for h, k in (("Thay đổi gì", "what"), ("Vì sao", "why"), ("Lợi ích", "gain")))
+        out.append(f'<div class="evo"><div class="evo-title"><h3>{chain["title"]}</h3><span class="note">{chain["note"]}</span></div>'
+                   f'<div class="steps" style="grid-template-columns:{cols}">{row}</div><div class="changes">{changes}</div></div>')
     return "".join(out)
 
 

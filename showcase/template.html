@@ -35,11 +35,23 @@ ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin:3px 0}
 .phases{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .phase{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;position:relative}
 .phase .n{font:700 12px var(--mono);color:var(--accent)}.phase h3{margin:4px 0 6px;font-size:16px}.phase p{margin:0;font-size:13.5px}
-.evo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 18px 14px;margin:16px 0}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
-.step{border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13.5px;background:#fff;position:relative}
-.step .label{display:block;font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;margin-bottom:4px}
-.changes{margin:12px 0 0;padding-left:20px;font-size:14px}.changes li{margin:4px 0}
+.evo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:22px 0}
+.evo-title{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}.evo-title h3{margin:0}
+.note{font-size:13px;color:var(--muted)}
+.steps{display:grid;align-items:start;margin-top:16px}
+.steps .arrow{align-self:center;text-align:center;color:var(--muted);font-size:22px;margin-top:-30px}
+.step .label{font:600 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+display:flex;justify-content:space-between;gap:8px}.step .label a{letter-spacing:0;text-transform:none;font:600 12px var(--mono);text-decoration:none}
+.thumb{display:block;background:#fff;border:1px solid var(--line);border-radius:8px;height:180px;overflow:hidden;cursor:zoom-in;
+transition:border-color .15s,box-shadow .15s}
+.thumb:hover{border-color:#d3c6b6;box-shadow:0 8px 22px -14px rgba(60,40,20,.45)}
+.thumb img{width:100%;height:100%;object-fit:contain;padding:6px}.thumb.shot img{object-fit:cover;object-position:top;padding:0}
+.thumb.code{background:#1f1c18;color:#efe9df;cursor:pointer;padding:12px;font:10.5px/1.55 var(--mono);white-space:pre;text-decoration:none}
+.thumb.code .k{color:#e8a48c}.thumb.code .c{color:#8a8279}
+.step .cap{font-size:13px;color:#4a433c;margin-top:8px}
+.changes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px;padding-top:16px;border-top:1px dashed var(--line)}
+.changes h4{font:600 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.changes ul{margin:0;padding-left:18px;font-size:14px;color:#3b3530}.changes li{margin-bottom:5px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
 .gallery figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .gallery img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-bottom:1px solid var(--line)}
@@ -64,7 +76,8 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
 #lbx img{max-width:94vw;max-height:84vh;background:#fff;border-radius:6px}#lbx p{color:#f1ebe2;font-size:14px;margin:10px}
 #lbx.on{display:flex}
 @media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}main{padding:20px 16px}
-.stats,.phases,.cols{grid-template-columns:1fr 1fr}}
+.stats,.phases,.cols{grid-template-columns:1fr 1fr}
+.steps,.changes{grid-template-columns:1fr!important}.steps .arrow{transform:rotate(90deg);margin:6px 0}.thumb.code{white-space:pre-wrap;height:auto}}
 </style>
 </head>
 <body>
@@ -134,7 +147,8 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
 
 <section id="c">
   <p class="eyebrow">C · Diễn tiến</p><h2>Diễn tiến của mô hình qua các pha</h2>
-  <p class="lead">Ba chuỗi được đầu tư kỹ nhất. Mỗi chuỗi nêu cái gì thay đổi giữa hai mô hình, vì sao, và thay đổi đó nằm ở đâu trong code.</p>
+  <p class="lead">Ba chuỗi, mỗi chuỗi đọc từ trái sang phải. Dưới mỗi chuỗi: điều gì thay đổi giữa các bước, vì sao, và thay đổi đó
+  mang lại lợi ích gì. Bấm vào hình để mở kích thước đầy đủ; đoạn code là trích nguyên văn từ mã nguồn, bấm để mở đúng dòng.</p>
   %%evolution%%
 </section>
 
