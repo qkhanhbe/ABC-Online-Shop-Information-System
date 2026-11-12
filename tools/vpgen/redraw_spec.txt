@@ -1,0 +1,65 @@
+# Tidy redraw (Redraw.jsrc).  CODE|name|x|y|w|h   CODE|@route|from|to|x,y;...   CTX01|@ctx|...   SDxx|@seq|step|minGap
+# ---------------- context diagram: four entities left, four right, one inflow and one outflow each
+CTX01|@ctx|Customer / Visitor;Administrator;Sales Staff;Warehouse Staff|Payment Provider;Shipping Provider;Supplier;Manager|570|20|240|600|40|1150|40|160|190|80
+
+# ---------------- use case diagrams (absolute coordinates, straight connectors)
+UCD1|ABC Online Shop - Account and Catalogue|300|20|380|590
+UCD1|UC06 View Product Details|370|70|240|46
+UCD1|UC04 Browse Products|370|150|240|46
+UCD1|UC05 Search Products|370|230|240|46
+UCD1|UC01 Register Account|370|310|240|46
+UCD1|UC03 Manage Profile|370|420|240|46
+UCD1|UC02 Login|370|510|240|46
+UCD1|Visitor|200|165|40|70
+UCD1|Customer|40|430|40|70
+UCD1|Staff|40|560|40|70
+UCD1|@route|Visitor|Customer|60,200
+
+UCD2|ABC Online Shop - Cart, Order and Payment|260|20|780|700
+UCD2|UC07 Manage Shopping Cart|300|70|240|46
+UCD2|UC08 Place Order / Checkout|295|250|260|60
+UCD2|UC11 Track Order|300|480|240|46
+UCD2|UC10 View Order History|300|600|240|46
+UCD2|UC30 Check Product Availability|750|60|260|46
+UCD2|UC29 Validate Cart|750|150|260|46
+UCD2|UC31 Calculate Order Total|750|240|260|46
+UCD2|UC32 Apply Promotion|750|330|260|46
+UCD2|UC09 Make Payment|750|420|260|46
+UCD2|UC12 Cancel Order|750|560|260|46
+UCD2|UC13 Submit Review|750|650|260|46
+UCD2|Customer|100|345|40|70
+UCD2|Payment Provider|1090|408|40|70
+UCD2|Sales Staff|1090|548|40|70
+
+UCD3|ABC Online Shop - Administration|260|20|350|470
+UCD3|UC17 Manage Customers|320|70|240|46
+UCD3|UC16 Manage Promotions|320|150|240|46
+UCD3|UC15 Manage Categories|320|230|240|46
+UCD3|UC18 Manage Reviews|320|310|240|46
+UCD3|UC14 Manage Products|320|390|240|46
+UCD3|Administrator|100|230|40|70
+UCD3|Sales Staff|660|58|40|70
+
+UCD4|ABC Online Shop - Operations and Reporting|270|20|700|560
+UCD4|UC19 Process Orders|300|70|250|46
+UCD4|UC25 View Management Dashboard|300|210|290|46
+UCD4|UC26 Generate Sales Report|300|300|270|46
+UCD4|UC27 Generate Inventory Report|300|390|290|46
+UCD4|UC28 Generate Order and Exception Report|300|480|340|46
+UCD4|UC24 Manage Replenishment|690|70|260|46
+UCD4|UC20 Manage Inventory|690|170|260|46
+UCD4|UC21 Prepare Shipment|690|260|260|46
+UCD4|UC22 Arrange Delivery|690|350|260|46
+UCD4|UC23 Update Shipment Status|690|440|260|46
+UCD4|Sales Staff|120|58|40|70
+UCD4|Manager|120|320|40|70
+UCD4|Supplier|1020|30|40|70
+UCD4|Warehouse Staff|1020|240|40|70
+UCD4|Shipping Provider|1020|420|40|70
+
+# ---------------- sequence diagrams: message step, smallest distance between lifelines
+SD01|@seq|42|150
+SD02|@seq|42|150
+SD03|@seq|42|150
+SD04|@seq|42|150
+SD05|@seq|42|150

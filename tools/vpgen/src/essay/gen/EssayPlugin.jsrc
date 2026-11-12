@@ -94,6 +94,34 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
             variant(Integer.parseInt(args[1]), sb.toString().substring(sb.indexOf(" ") + 1).trim());
             return;
         }
+        if (args.length > 0 && "redraw".equals(args[0])) {          // spec|out.vpp|CODE,CODE,...
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            try {
+                new Redraw().run(project, pp[0].trim(), pp[2].trim().split(","));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            project.setName("TieuLuan_KHANHBQ");
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[1].trim()));
+            System.out.println("SAVED " + pp[1].trim());
+            return;
+        }
+        if (args.length > 0 && "exportonly".equals(args[0])) {      // png dir|CODE,CODE,...  (no change, no save)
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            File dir = new File(pp[0].trim());
+            dir.mkdirs();
+            for (IDiagramUIModel d : project.toDiagramArray()) {
+                String code = d.getName().split(" ")[0];
+                if (!java.util.Arrays.asList(pp[1].trim().split(",")).contains(code)) continue;
+                if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
+                try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
+                Polish.export(d, dir);
+                System.out.println("EXPORTED " + d.getName());
+            }
+            return;
+        }
         if (args.length > 0 && "relayout".equals(args[0])) {
             String[] pp = sb.toString().trim().split("[|]");
             try {

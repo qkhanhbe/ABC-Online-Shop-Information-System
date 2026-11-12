@@ -1,0 +1,395 @@
+package essay.gen;
+
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.diagram.ICaptionUIModel;
+import com.vp.plugin.diagram.IConnectorUIModel;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * Tidy redraw of the context diagram, the use case diagrams and the sequence diagrams (spec: redraw_spec.txt).
+ *
+ *  CTX  two columns of external entities around a tall process; every entity has one inflow and one
+ *       outflow, both straight and horizontal, each name above its own line.
+ *  UCD  shapes at hand-picked places; every connector straight from shape edge to shape edge;
+ *       include/extend keywords beside their own line in the diagram font.
+ *  SD   lifelines spread so that every message name fits between the lifelines it joins, messages at an
+ *       even vertical step; activations, fragments and operands follow the same coordinate mapping.
+ *
+ * Spec lines:  CODE|name|x|y|w|h           place a shape (w/h -1 keep the size)
+ *              CODE|@route|from|to|x,y;x,y  explicit bend points for one connector (from/to = shape names)
+ *              CTX01|@ctx|left names;...|right names;...|px|py|pw|ph|leftX|rightX|top|step|entW|entH
+ *              SDxx|@seq|gap|minLifelineGap
+ */
+public class Redraw {
+
+    static final int CHAR = 8;          // CE width of one caption character at the diagram font
+    final Map<String, List<String[]>> spec = new LinkedHashMap<>();
+
+    void run(IProject project, String specPath, String[] codes) throws Exception {
+        for (String line : Files.readAllLines(new File(specPath).toPath(), StandardCharsets.UTF_8)) {
+            if (line.trim().isEmpty() || line.startsWith("#")) continue;
+            String[] p = line.split("\\|", -1);
+            spec.computeIfAbsent(p[0], k -> new ArrayList<>()).add(p);
+        }
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            String code = d.getName().split(" ")[0];
+            boolean hit = false;
+            for (String c : codes) if (code.equals(c)) hit = true;
+            if (!hit || !spec.containsKey(code)) continue;
+            try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
+            if (code.startsWith("CTX")) context(d, spec.get(code));
+            else if (code.startsWith("UCD")) useCases(d, spec.get(code));
+            else if (code.startsWith("SD")) sequence(d, spec.get(code));
+            System.out.println("REDRAWN " + d.getName());
+        }
+    }
+
+    // ------------------------------------------------------------------ helpers
+    static String name(IDiagramElement e) {
+        IModelElement m = e == null ? null : e.getModelElement();
+        return m == null || m.getName() == null ? "" : m.getName();
+    }
+
+    static String type(IDiagramElement e) {
+        IModelElement m = e == null ? null : e.getModelElement();
+        return m == null ? "" : m.getModelType();
+    }
+
+    static IShapeUIModel find(IDiagramUIModel d, String n) {
+        for (IShapeUIModel s : d.toShapeUIModelArray()) if (n.equals(name(s))) return s;
+        return null;
+    }
+
+    static List<IConnectorUIModel> connectors(IDiagramUIModel d) {
+        List<IConnectorUIModel> out = new ArrayList<>();
+        for (IDiagramElement e : d.toDiagramElementArray()) if (e instanceof IConnectorUIModel) out.add((IConnectorUIModel) e);
+        return out;
+    }
+
+    static void points(IConnectorUIModel c, Point... pts) {
+        c.setConnectorStyle(IConnectorUIModel.CS_OBLIQUE);
+        c.clearPoints();
+        for (Point p : pts) c.addPoint(p);
+        fit(c, pts);
+    }
+
+    /** The renderer clips a connector to its own bounds, which a headless change does not update. */
+    static void fit(IConnectorUIModel c, Point[] pts) {
+        int x0 = Integer.MAX_VALUE, y0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
+        for (Point p : pts) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); }
+        c.setBounds(x0 - 20, y0 - 20, x1 - x0 + 40, y1 - y0 + 40);
+    }
+
+    static void font(IDiagramElement e, int size) {
+        try {
+            com.vp.plugin.diagram.format.IElementFont f = ((com.vp.plugin.diagram.IBaseDiagramElement) e).getElementFont();
+            if (f != null) { f.setSize(size); f.setBold(false); f.setItalic(false); }
+        } catch (Throwable ignored) { }
+    }
+
+    static void caption(IConnectorUIModel c, int x, int y, int w, int h) {
+        ICaptionUIModel cap = c.getCaptionUIModel();
+        if (cap == null) return;
+        cap.setBounds(x, y, w, h);
+        c.setRequestResetCaption(false);
+    }
+
+    // ------------------------------------------------------------------ context diagram
+    void context(IDiagramUIModel d, List<String[]> lines) {
+        for (String[] p : lines) {
+            if (!"@ctx".equals(p[1])) continue;
+            String[] left = p[2].split(";"), right = p[3].split(";");
+            int px = i(p[4]), py = i(p[5]), pw = i(p[6]), ph = i(p[7]), lx = i(p[8]), rx = i(p[9]), top = i(p[10]), step = i(p[11]),
+                ew = i(p[12]), eh = i(p[13]);
+            IShapeUIModel proc = null;
+            for (IShapeUIModel s : d.toShapeUIModelArray()) if ("DFProcess".equals(type(s))) proc = s;
+            proc.setBounds(px, py, pw, ph);
+            proc.resetCaption();
+            Map<String, Boolean> side = new HashMap<>();
+            for (int k = 0; k < left.length; k++) { place(d, left[k], lx, top + k * step, ew, eh); side.put(left[k], true); }
+            for (int k = 0; k < right.length; k++) { place(d, right[k], rx, top + k * step, ew, eh); side.put(right[k], false); }
+            for (IConnectorUIModel c : connectors(d)) {
+                IShapeUIModel a = c.getFromShape(), b = c.getToShape();
+                boolean inflow = side.containsKey(name(a));
+                IShapeUIModel ent = inflow ? a : b;
+                Boolean isLeft = side.get(name(ent));
+                if (isLeft == null) { System.out.println("  CTX unknown flow " + name(c)); continue; }
+                int y = ent.getY() + (inflow ? 24 : 54);
+                int ex = isLeft ? ent.getX() + ent.getWidth() : ent.getX();
+                int pxEdge = isLeft ? px : px + pw;
+                Point e = new Point(ex, y), q = new Point(pxEdge, y);
+                if (inflow) points(c, e, q); else points(c, q, e);
+                font(c, 11);
+                int w = CHAR * name(c).length() + 12;
+                caption(c, (ex + pxEdge) / 2 - w / 2, y - 21, w, 18);
+                System.out.println("  FLOW " + name(c) + " y=" + y + (inflow ? " in" : " out"));
+            }
+        }
+    }
+
+    void place(IDiagramUIModel d, String n, int x, int y, int w, int h) {
+        IShapeUIModel s = find(d, n);
+        if (s == null) { System.out.println("  NOT FOUND " + n); return; }
+        s.setBounds(x, y, w < 0 ? s.getWidth() : w, h < 0 ? s.getHeight() : h);
+        s.resetCaption();
+    }
+
+    static int i(String s) { return Integer.parseInt(s.trim()); }
+
+    // ------------------------------------------------------------------ use case diagrams
+    void useCases(IDiagramUIModel d, List<String[]> lines) {
+        Map<String, Point[]> routes = new HashMap<>();
+        for (String[] p : lines) {
+            if ("@route".equals(p[1])) {
+                String[] xy = p[4].split(";");
+                Point[] pts = new Point[xy.length];
+                for (int k = 0; k < xy.length; k++) pts[k] = new Point(i(xy[k].split(",")[0]), i(xy[k].split(",")[1]));
+                routes.put(p[2] + "->" + p[3], pts);
+                continue;
+            }
+            if (p[1].startsWith("@")) continue;
+            place(d, p[1], i(p[2]), i(p[3]), i(p[4]), i(p[5]));
+        }
+        // straight connectors between the shape outlines
+        List<Rectangle> labels = new ArrayList<>();
+        for (IConnectorUIModel c : connectors(d)) {
+            IShapeUIModel a = c.getFromShape(), b = c.getToShape();
+            if (a == null || b == null) continue;
+            Point[] via = routes.get(name(a) + "->" + name(b));
+            Point ca = centre(a), cb = centre(b);
+            Point pa = edge(a, via == null ? cb : via[0]);
+            Point pb = edge(b, via == null ? ca : via[via.length - 1]);
+            List<Point> pts = new ArrayList<>();
+            pts.add(pa);
+            if (via != null) for (Point v : via) pts.add(v);
+            pts.add(pb);
+            points(c, pts.toArray(new Point[0]));
+            font(c, 11);
+            String t = type(c);
+            if (t.equals("Include") || t.equals("Extend")) {
+                String text = "<<" + t + ">>";
+                int w = CHAR * text.length() + 6, h = 18;
+                // label beside the middle of the longest segment, on the side away from the system centre line
+                Point s0 = pts.get(0), s1 = pts.get(1);
+                for (int k = 0; k + 1 < pts.size(); k++) {
+                    Point u = pts.get(k), v = pts.get(k + 1);
+                    if (u.distance(v) > s0.distance(s1)) { s0 = u; s1 = v; }
+                }
+                // centred on the middle of its own line (VP leaves a gap in the dashed line around the label)
+                int mx = (s0.x + s1.x) / 2, my = (s0.y + s1.y) / 2;
+                Rectangle r = new Rectangle(mx - w / 2, my - h / 2, w, h);
+                caption(c, r.x, r.y, r.width, r.height);
+                labels.add(r);
+                System.out.println("  " + t + " " + name(a) + " -> " + name(b) + " label " + r.x + "," + r.y);
+            }
+        }
+    }
+
+    static Point centre(IShapeUIModel s) {
+        return new Point(s.getX() + s.getWidth() / 2, s.getY() + s.getHeight() / 2);
+    }
+
+    /** Where the line from the shape centre towards p leaves the shape (ellipse for use cases, box otherwise). */
+    static Point edge(IShapeUIModel s, Point p) {
+        double cx = s.getX() + s.getWidth() / 2.0, cy = s.getY() + s.getHeight() / 2.0;
+        double dx = p.x - cx, dy = p.y - cy;
+        if (dx == 0 && dy == 0) return new Point((int) cx, (int) cy);
+        double a = s.getWidth() / 2.0, b = s.getHeight() / 2.0, t;
+        if ("UseCase".equals(type(s))) {
+            t = 1.0 / Math.sqrt(dx * dx / (a * a) + dy * dy / (b * b));
+        } else {
+            t = Math.min(dx == 0 ? Double.MAX_VALUE : a / Math.abs(dx), dy == 0 ? Double.MAX_VALUE : b / Math.abs(dy));
+        }
+        return new Point((int) Math.round(cx + dx * t), (int) Math.round(cy + dy * t));
+    }
+
+    // ------------------------------------------------------------------ sequence diagrams
+    static final int R = 26;   // points within R of a lifeline centre move with the lifeline
+
+    void sequence(IDiagramUIModel d, List<String[]> lines) {
+        int gapY = 40, minGap = 140;
+        for (String[] p : lines) if ("@seq".equals(p[1])) { gapY = i(p[2]); minGap = i(p[3]); }
+
+        List<IShapeUIModel> lifelines = new ArrayList<>(), others = new ArrayList<>();
+        for (IShapeUIModel s : d.toShapeUIModelArray()) {
+            String t = type(s);
+            if (t.equals("InteractionLifeLine") || t.equals("InteractionActor")) lifelines.add(s); else others.add(s);
+        }
+        lifelines.sort((a, b) -> centre(a).x - centre(b).x);
+        int n = lifelines.size();
+        int[] cx = new int[n], w = new int[n];
+        for (int k = 0; k < n; k++) { cx[k] = centre(lifelines.get(k)).x; w[k] = lifelines.get(k).getWidth(); }
+        Map<String, Rectangle> before = new HashMap<>();
+        for (IShapeUIModel s : d.toShapeUIModelArray()) before.put(s.getId(), new Rectangle(s.getX(), s.getY(), s.getWidth(), s.getHeight()));
+        List<IConnectorUIModel> msgs = connectors(d);
+        Map<IConnectorUIModel, Point[]> oldPts = new HashMap<>();
+        for (IConnectorUIModel c : msgs) oldPts.put(c, c.getPoints());
+
+        // ---- horizontal: minimum gaps from header widths and from message names
+        double[] gap = new double[Math.max(0, n - 1)];
+        for (int k = 0; k + 1 < n; k++) gap[k] = Math.max(minGap, (w[k] + w[k + 1]) / 2.0 + 30);
+        List<int[]> need = new ArrayList<>();      // {from, to, width}
+        for (IConnectorUIModel c : msgs) {
+            Point[] pts = oldPts.get(c);
+            if (pts == null || pts.length < 2) continue;
+            int a = nearest(cx, pts[0].x), b = nearest(cx, pts[pts.length - 1].x);
+            int lw = CHAR * label(c).length() + 24;
+            if (a == b) {
+                if (a + 1 < n) gap[a] = Math.max(gap[a], lw + 46);
+            } else {
+                need.add(new int[] {Math.min(a, b), Math.max(a, b), lw});
+            }
+        }
+        double uniform = 0;
+        for (double g : gap) uniform = Math.max(uniform, g);
+        for (int[] m : need) uniform = Math.max(uniform, (double) m[2] / (m[1] - m[0]));
+        need.sort((p, q) -> (p[1] - p[0]) - (q[1] - q[0]));
+        for (int[] m : need) {
+            double have = 0;
+            for (int k = m[0]; k < m[1]; k++) have += gap[k];
+            if (have < m[2]) for (int k = m[0]; k < m[1]; k++) gap[k] += (m[2] - have) / (m[1] - m[0]);
+        }
+        double total = 0;
+        for (double g : gap) total += g;
+        boolean even = uniform * (n - 1) <= total * 1.3;
+        int[] ncx = new int[n];
+        ncx[0] = Math.max(cx[0], w[0] / 2 + 20);
+        for (int k = 1; k < n; k++) ncx[k] = ncx[k - 1] + (int) Math.ceil(even ? uniform : gap[k - 1]);
+        System.out.println("  lifelines " + n + (even ? " evenly spaced " + (int) uniform : " spaced by need"));
+
+        // ---- vertical: one level per message, an even step (more where a fragment header needs room)
+        TreeSet<Integer> lv = new TreeSet<>();
+        for (IConnectorUIModel c : msgs) {
+            Point[] pts = oldPts.get(c);
+            if (pts != null && pts.length > 0) lv.add(pts[0].y);
+        }
+        Integer[] oldY = lv.toArray(new Integer[0]);
+        int[] newY = new int[oldY.length];
+        for (int k = 0; k < oldY.length; k++) {
+            if (k == 0) { newY[k] = oldY[k] + 10; continue; }
+            int diff = oldY[k] - oldY[k - 1];
+            boolean header = false;
+            for (IShapeUIModel s : others) {
+                if (!type(s).equals("CombinedFragment") && !type(s).equals("InteractionOperand")) continue;
+                Rectangle r = before.get(s.getId());
+                if (r.y > oldY[k - 1] && r.y < oldY[k]) header = true;
+                if (r.y + r.height > oldY[k - 1] && r.y + r.height < oldY[k]) header = true;
+            }
+            newY[k] = newY[k - 1] + (header ? Math.max(gapY + 34, diff) : gapY);
+        }
+
+        // ---- apply
+        int bottom = (newY.length > 0 ? newY[newY.length - 1] : 0) + 60;
+        for (int k = 0; k < n; k++) {
+            IShapeUIModel s = lifelines.get(k);
+            Rectangle r = before.get(s.getId());
+            s.setBounds(ncx[k] - r.width / 2, r.y, r.width, bottom - r.y);
+        }
+        // containers first (fragments), then operands, then activations
+        others.sort((a, b) -> rank(a) - rank(b));
+        for (IShapeUIModel s : others) {
+            Rectangle r = before.get(s.getId());
+            String t = type(s);
+            if (t.equals("NOTE")) {                     // a remark goes below the lifelines, at its own width
+                int x0 = Math.max(10, mapX(cx, ncx, r.x + r.width / 2) - r.width / 2);
+                s.setBounds(x0, bottom + 16, r.width, r.height);
+            } else if (t.equals("Activation")) {
+                int c0 = mapX(cx, ncx, r.x + r.width / 2);
+                int y0 = mapY(oldY, newY, r.y), y1 = mapY(oldY, newY, r.y + r.height);
+                s.setBounds(c0 - r.width / 2, y0, r.width, Math.max(16, y1 - y0));
+            } else {
+                int x0 = mapX(cx, ncx, r.x), x1 = mapX(cx, ncx, r.x + r.width);
+                int y0 = mapY(oldY, newY, r.y), y1 = mapY(oldY, newY, r.y + r.height);
+                s.setBounds(x0, y0, Math.max(20, x1 - x0), Math.max(20, y1 - y0));
+            }
+        }
+        for (IConnectorUIModel c : msgs) {
+            Point[] pts = oldPts.get(c);
+            if (pts == null) continue;
+            c.clearPoints();
+            Point[] np = new Point[pts.length];
+            for (int k = 0; k < pts.length; k++) {
+                np[k] = new Point(mapX(cx, ncx, pts[k].x), mapY(oldY, newY, pts[k].y));
+                c.addPoint(np[k]);
+            }
+            fit(c, np);
+            font(c, 11);
+            String text = label(c);
+            int lw = CHAR * text.length() + 10;
+            if (np.length >= 2) {
+                Point a = np[0], b = np[np.length - 1];
+                if (Math.abs(a.x - b.x) < 3 || np.length > 2 && Math.abs(np[0].x - np[np.length - 1].x) < 3) {
+                    int right = 0;
+                    for (Point q : np) right = Math.max(right, q.x);
+                    caption(c, right + 6, Math.min(a.y, b.y) - 4, lw, 18);
+                } else {
+                    caption(c, (a.x + b.x) / 2 - lw / 2, a.y - 20, lw, 18);
+                }
+            }
+        }
+        for (IShapeUIModel s : lifelines) s.resetCaption();
+    }
+
+    static int rank(IShapeUIModel s) {
+        String t = type(s);
+        return t.equals("CombinedFragment") ? 0 : t.equals("InteractionOperand") ? 1 : 2;
+    }
+
+    String label(IConnectorUIModel c) {
+        IModelElement m = c.getModelElement();
+        String seq = "";
+        try { seq = String.valueOf(m.getClass().getMethod("getSequenceNumber").invoke(m)); } catch (Throwable ignored) { }
+        String n = m == null || m.getName() == null ? "" : m.getName();
+        return (seq.isEmpty() || "null".equals(seq) ? "" : seq + ": ") + n;
+    }
+
+    static int nearest(int[] cx, int x) {
+        int best = 0;
+        for (int k = 1; k < cx.length; k++) if (Math.abs(cx[k] - x) < Math.abs(cx[best] - x)) best = k;
+        return best;
+    }
+
+    /** Piecewise mapping: near a lifeline a point moves with it; between lifelines it is interpolated. */
+    static int mapX(int[] cx, int[] ncx, int x) {
+        int n = cx.length;
+        if (x <= cx[0] + R) return x + ncx[0] - cx[0];
+        if (x >= cx[n - 1] - R) return x + ncx[n - 1] - cx[n - 1];
+        for (int k = 0; k + 1 < n; k++) {
+            if (Math.abs(x - cx[k]) <= R) return x + ncx[k] - cx[k];
+            if (x > cx[k] + R && x < cx[k + 1] - R) {
+                double a0 = cx[k] + R, a1 = cx[k + 1] - R, b0 = ncx[k] + R, b1 = ncx[k + 1] - R;
+                return (int) Math.round(b0 + (x - a0) * (b1 - b0) / (a1 - a0));
+            }
+        }
+        return x + ncx[n - 1] - cx[n - 1];
+    }
+
+    static int mapY(Integer[] oy, int[] ny, int y) {
+        int n = oy.length;
+        if (n == 0) return y;
+        if (y <= oy[0]) return y + ny[0] - oy[0];
+        if (y >= oy[n - 1]) return y + ny[n - 1] - oy[n - 1];
+        for (int k = 0; k + 1 < n; k++) {
+            if (y >= oy[k] && y <= oy[k + 1]) {
+                return (int) Math.round(ny[k] + (double) (y - oy[k]) * (ny[k + 1] - ny[k]) / (oy[k + 1] - oy[k]));
+            }
+        }
+        return y;
+    }
+}
