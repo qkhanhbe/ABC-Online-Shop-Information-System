@@ -39,6 +39,7 @@ DIAGRAMS = [
         ("DCL03", "Class thiết kế 3: danh mục, chi tiết sản phẩm, tồn kho"),
         ("PKG01", "Các lớp kiến trúc, package và class"),
         ("DCL04", "Lát cắt qua các lớp: thêm sản phẩm vào giỏ"),
+        ("DCL05", "Tầng truy cập dữ liệu: interface DAO, lớp SQLite, Database"),
         ("SD05", "Sequence thiết kế: checkout qua các lớp"),
         ("SD06", "Sequence thiết kế: theo dõi đơn hàng qua các tầng"),
         ("CMP02", "Sơ đồ thành phần của hệ thống"),

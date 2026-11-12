@@ -226,7 +226,7 @@ BLOCKS = [
     ("bullets", [
         "<b>Scope.</b> Screens exist for the transaction path; profile editing (UC03), category and customer management (UC15, UC17) are implemented in services but not as pages.",
         "<b>Providers.</b> Payment and carrier are simulated behind PaymentGateway and ShippingGateway; a real integration needs webhooks over HTTPS and a reconciliation job for Payment Pending orders.",
-        "<b>AI.</b> Speech is simulated, the image encoder only sees colour and shape, and the review analyser is a lexicon; Section 3.12 lists the production replacements behind the same interfaces.",
+        "<b>AI.</b> Speech recognition uses the small English Whisper model (no Vietnamese), the image encoder only sees colour and shape, and the review analyser is a lexicon; Section 3.12 lists the production replacements behind the same interfaces.",
         "<b>Non-functional requirements.</b> NFR01-03 and NFR12 (performance, availability, load) were not measured; the prototype runs on one process with SQLite.",
         "<b>Data.</b> 16 products and synthetic images; the AI numbers do not predict accuracy on a real catalogue."]),
     ("h2", "5.14. Chapter Summary"),

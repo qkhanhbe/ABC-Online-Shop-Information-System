@@ -12,3 +12,4 @@ tools/report/cache/
 tools/vpgen/classes/
 tools/vpgen/mode.log
 design/abc_design*.db
+abc_shop/data/stt_model/

@@ -142,8 +142,17 @@ def serve(port):
     from controller.router import WebApp
     if not os.path.exists(DB_PATH):
         seed()
-    app = WebApp(build_shop(DB_PATH))
+    shop = build_shop(DB_PATH)
+    app = WebApp(shop)
     lock = threading.Lock()
+
+    def preload_speech():                # load Whisper in the background; the shop is usable meanwhile
+        try:
+            shop.speech.load()
+            print("Speech model ready (Whisper tiny.en)")
+        except Exception as e:           # pragma: no cover - optional dependency
+            print("Voice search unavailable:", e)
+    threading.Thread(target=preload_speech, daemon=True).start()
 
     def locked_app(environ, start_response):
         # Connections are read in parallel threads (an idle browser connection no longer blocks the

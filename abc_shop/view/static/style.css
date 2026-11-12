@@ -156,3 +156,9 @@ summary { cursor: pointer; color: var(--muted); font-size: 14px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   table { display: block; overflow-x: auto; }
 }
+
+/* voice search: record in the browser, recognise on the server (Whisper tiny.en) */
+.search .mic.rec { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.2s infinite; }
+.search .mic-status { flex-basis: 100%; min-height: 0; }
+.search .mic-status:empty { display: none; }
+@keyframes pulse { 50% { opacity: .65; } }

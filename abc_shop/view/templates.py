@@ -32,7 +32,7 @@ def layout(request, title, body):
     heading = "" if title == "Catalogue" else f"<h1>{e(title)}</h1>"
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=4"></head>
+<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=5"></head>
 <body><header><a class="brand" href="/">ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
 <main>{note}{heading}{body}</main>
 <footer><span>ABC Online Shop &middot; course essay prototype</span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
@@ -49,8 +49,38 @@ def search_box(query="", mode="text"):
     return f"""<form class="search" method="post" action="/search" enctype="multipart/form-data">
 <input name="q" value="{e(query)}" placeholder="black running shoes under 150 &middot; backpack with laptop sleeve &middot; where is my latest order">
 <span class="modes">{modes}</span>
+<button type="button" class="ghost mic" title="Speak your search (English); click again to stop">&#127908; Speak</button>
+<input type="file" name="audio" accept="audio/*" hidden>
 <span class="button ghost file">Photo<input type="file" name="image" accept="image/*" title="Search by a photo"></span>
-<button>Search</button></form>"""
+<button>Search</button><span class="mic-status hint"></span></form>
+<script>
+(() => {{
+  const form = document.currentScript.previousElementSibling, btn = form.querySelector('.mic'),
+        status = form.querySelector('.mic-status'), audio = form.querySelector('input[name=audio]');
+  let rec = null, timer = null;
+  btn.addEventListener('click', async () => {{
+    if (rec) {{ rec.stop(); return; }}
+    if (!navigator.mediaDevices || !window.MediaRecorder) {{ status.textContent = 'This browser cannot record audio.'; return; }}
+    let stream;
+    try {{ stream = await navigator.mediaDevices.getUserMedia({{audio: true}}); }}
+    catch (e) {{ status.textContent = 'Microphone not allowed.'; return; }}
+    const chunks = [];
+    rec = new MediaRecorder(stream);
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = () => {{
+      clearTimeout(timer); stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(chunks, {{type: rec.mimeType || 'audio/webm'}}); rec = null;
+      const dt = new DataTransfer(); dt.items.add(new File([blob], 'voice.webm', {{type: blob.type}}));
+      audio.files = dt.files;
+      form.querySelector('input[value=voice]').checked = true;
+      btn.disabled = true; status.textContent = 'Recognising speech...'; form.submit();
+    }};
+    rec.start(); btn.classList.add('rec'); btn.innerHTML = '&#9679; Stop';
+    status.textContent = 'Listening... say e.g. "black running shoes under 150 dollars"';
+    timer = setTimeout(() => rec && rec.stop(), 7000);
+  }});
+}})();
+</script>"""
 
 
 def stock_pill(available):

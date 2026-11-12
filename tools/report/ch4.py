@@ -371,6 +371,10 @@ BLOCKS = [
         ["PaymentDAO", "get_by_attempt(ref), for_order, save_payment", "payment"],
         ["ShipmentDAO", "get_by_order, get_by_carrier_ref, save_shipment", "shipment, shipment_milestone"],
         ["ReviewDAO, AuditDAO", "for_product, exists, save_review / record, recent", "review / audit_log"]], [28, 85, 52]),
+    ("p", "The class diagram of the layer shows the same structure: each interface is realized by its SQLite "
+          "implementation, and every implementation uses the one Database object that owns the connection and the "
+          "transaction. Services see only the interfaces."),
+    ("figl", os.path.join(D, "DCL05 Data Access Layer.png"), "Data access layer: DAO interfaces, their SQLite implementations and Database - VP diagram \"DCL05 Data Access Layer\""),
     ("h3", "4.4.3. One slice through the layers"),
     ("p", "A package diagram shows the layers but not the classes that talk to each other. The next figure therefore "
           "cuts one slice through all five layers: everything that takes part when a customer adds a product to the "

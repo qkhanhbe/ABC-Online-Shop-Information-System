@@ -57,9 +57,12 @@ BLOCKS = [
           "The synonym table is new in this essay; it addresses the main error class reported in Assignment 06. A "
           "sentence that contains the word <i>order</i> becomes an order query that always carries the customer id of "
           "the session (AI-R2)."),
-    ("p", "<b>Voice.</b> SpeechService.transcribe(audio) returns text. In the prototype the speech recognition is "
-          "<b>simulated</b>: the argument already is the sentence that a speech-to-text engine would return. The method "
-          "is the seam where a real engine such as Whisper is plugged in without changing any caller (AI-N1)."),
+    ("p", "<b>Voice.</b> The browser records the question with the microphone and sends the recording with the search "
+          "form. SpeechService.transcribe_audio(path) turns it into text with Whisper tiny.en, a small English speech "
+          "model (about 75 MB) run offline on the shop's own computer through faster-whisper; a short question takes "
+          "under a second. The recording is deleted as soon as it is transcribed. The transcript then follows exactly "
+          "the path of a typed query, so the rest of the search does not know where the words came from (AI-N1). "
+          "SpeechService.transcribe(text) still accepts a typed transcript, which the tests and the terminal demo use."),
     ("p", "<b>Images.</b> ImageService.encode(image) is a hand-made encoder f(I) → z of 128 values: a 4×4×4 RGB "
           "histogram of the object's pixels (colour) and an 8×8 occupancy grid of the object mask (shape), both "
           "L2-normalised. The background colour is estimated from the image border, so a photo on a different background "
@@ -118,7 +121,7 @@ BLOCKS = [
         ["Multimodal search", "16 products (name, category, brand, colour, price) from ProductDAO; stock from InventoryDAO; "
                               "16 catalogue images and 10 query photos (synthetic drawings)",
          "Images are drawings, so accuracy does not transfer to real photos; stock is read live"],
-        ["Speech", "Transcript standing for audio (simulation)", "No audio stored; a real engine must not keep recordings"],
+        ["Speech", "Microphone recording, transcribed locally by Whisper tiny.en", "The recording is deleted after transcription; no audio leaves the shop's computer"],
         ["Review insights", "Published reviews from ReviewDAO (14 seeded); 30 hand-labelled reviews with 39 aspect labels for evaluation",
          "Only reviews linked to a delivered order; no personal data used"],
         ["Recommender", "Product text; 16 seeded orders (co-purchase)", "Cold start handled by content similarity"],
@@ -160,7 +163,7 @@ BLOCKS = [
           "rules of Chapter 4."),
     ("h2", "3.12. Technology Options for a Production Version"),
     ("table", "Prototype components and production replacements", ["Prototype", "Production option", "What stays the same"], [
-        ["SpeechService (simulated)", "Whisper or a cloud speech API with Vietnamese support", "transcribe(audio) -> text"],
+        ["SpeechService (Whisper tiny.en, English only)", "A larger Whisper model or a cloud speech API with Vietnamese support", "transcribe_audio(path) -> text"],
         ["ImageService (colour + shape)", "CLIP image encoder (shared space with text)", "encode(image) -> vector"],
         ["VectorIndex (in memory)", "FAISS or a vector database", "search(z, k) -> [(id, score)]"],
         ["Lexicon review analyser", "PhoBERT fine-tuned for ABSA (Assignment 02)", "analyse(reviews) -> aspects, label"],
@@ -173,6 +176,6 @@ BLOCKS = [
           "existing use cases, read the shop's own data, have fallbacks and are measured. The search keeps the "
           "Assignment 06 design and reaches 96.2% top-1 success on 26 queries; the review analyser reaches an aspect F1 "
           "of 0.96; the recommender never suggests unavailable or already-bought items. The honest limits (synthetic "
-          "images, simulated speech, a lexicon instead of a trained model) are stated together with the production "
+          "images, a small English-only speech model, a lexicon instead of a trained model) are stated together with the production "
           "replacements that the interfaces allow."),
 ]

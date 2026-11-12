@@ -1,5 +1,6 @@
 """Presentation layer: UC04 Browse Products, UC05 Search Products (text / voice / image /
 text + image, Chapter 3), UC06 View Product Details with review insights and recommendations."""
+import os
 from controller.http import Response
 from view import templates
 
@@ -27,9 +28,23 @@ class ShopController:
         mode = request.get("mode", "text")
         text = request.get("q")
         trace = []
-        if mode == "voice":
+        recording = request.files.get("audio")
+        if recording and recording[1]:
+            mode = "voice"
+            path = self.storage.save_upload(recording[0] or "voice.webm", recording[1])
+            try:
+                text = self.speech.transcribe_audio(path)
+            except Exception as e:                      # model missing or audio unreadable
+                return Response.redirect("/", f"Voice search is not available: {e}", request)
+            finally:
+                os.remove(path)                         # the recording is never kept
+            if not text:
+                return Response.redirect("/", "No speech was heard. Try again a little closer to the microphone.",
+                                         request)
+            trace.append(f"SpeechService.transcribe_audio -> '{text}' (Whisper tiny.en, offline)")
+        elif mode == "voice":
             text = self.speech.transcribe(text)
-            trace.append(f"SpeechService.transcribe -> '{text}' (simulated speech-to-text)")
+            trace.append(f"SpeechService.transcribe -> '{text}' (typed transcript)")
         if text and self.query.is_order_question(text):
             if request.user is None:
                 return Response.redirect("/login", "Log in to search your orders.", request)
