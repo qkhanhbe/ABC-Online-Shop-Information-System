@@ -40,6 +40,7 @@ public class Redraw {
 
     static final int CHAR = 8;          // CE width of one caption character at the diagram font
     final Map<String, List<String[]>> spec = new LinkedHashMap<>();
+    boolean routeOnly;
 
     void run(IProject project, String specPath, String[] codes) throws Exception {
         for (String line : Files.readAllLines(new File(specPath).toPath(), StandardCharsets.UTF_8)) {
@@ -50,11 +51,15 @@ public class Redraw {
         for (IDiagramUIModel d : project.toDiagramArray()) {
             String code = d.getName().split(" ")[0];
             boolean hit = false;
-            for (String c : codes) if (code.equals(c)) hit = true;
+            routeOnly = false;
+            for (String c : codes) {
+                if (code.equals(c)) hit = true;
+                if ((code + "!").equals(c)) { hit = true; routeOnly = true; }   // second pass: shapes stay, lines re-routed
+            }
             if (!hit || !spec.containsKey(code)) continue;
             try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
             if (code.startsWith("CTX")) context(d, spec.get(code));
-            else if (code.startsWith("UCD")) useCases(d, spec.get(code));
+            else if (code.startsWith("UC")) useCases(d, spec.get(code));
             else if (code.startsWith("SD")) sequence(d, spec.get(code));
             System.out.println("REDRAWN " + d.getName());
         }
@@ -84,6 +89,7 @@ public class Redraw {
 
     static void points(IConnectorUIModel c, Point... pts) {
         c.setConnectorStyle(IConnectorUIModel.CS_OBLIQUE);
+        fit(c, pts);
         c.clearPoints();
         for (Point p : pts) c.addPoint(p);
         fit(c, pts);
@@ -152,8 +158,154 @@ public class Redraw {
 
     static int i(String s) { return Integer.parseInt(s.trim()); }
 
+    // ------------------------------------------------------------------ use case diagrams, orthogonal
+    /**
+     * CODE|@at|name|cx|cy|w|h            shape by its centre
+     * CODE|@box|name|x|y|w|h             shape by its corner (system boundary, note)
+     * CODE|@bus|actor|trunkX             associations of an actor: branch, vertical trunk, branch
+     * CODE|@link|A|B|sideA|sideB|labelSide   straight or one-bend connector between side middles (T,B,L,R, T+40 ...)
+     * CODE|@path|A|B|sideA|sideB|x,y;x,y     connector through explicit bend points
+     */
+    void orthoUseCases(IDiagramUIModel d, List<String[]> lines) {
+        for (String[] p : lines) {
+            if (routeOnly) break;
+            if ("@at".equals(p[1])) {
+                int cx = i(p[3]), cy = i(p[4]), w = i(p[5]), h = i(p[6]);
+                place(d, p[2], cx - w / 2, cy - h / 2, w, h);
+            } else if ("@box".equals(p[1])) {
+                IShapeUIModel s = find(d, p[2]);
+                if (s == null && "@note".equals(p[2])) {
+                    for (IShapeUIModel n : d.toShapeUIModelArray()) if ("NOTE".equals(type(n))) s = n;
+                }
+                if (s == null) { System.out.println("  NOT FOUND " + p[2]); continue; }
+                s.setBounds(i(p[3]), i(p[4]), i(p[5]), i(p[6]));
+                if ("System".equals(type(s))) {                     // the same light boundary in every use case diagram
+                    java.awt.Color light = new java.awt.Color(234, 245, 252);
+                    s.setBackground(light);
+                    try { s.getFillColor().setValues(1, light, light, 0, 0, true); } catch (Throwable ignored) { }
+                }
+                s.resetCaption();
+            }
+        }
+        java.util.Set<String> done = new java.util.HashSet<>();
+        for (String[] p : lines) {
+            if ("@bus".equals(p[1])) {
+                IShapeUIModel actor = find(d, p[2]);
+                int trunk = i(p[3]);
+                for (IConnectorUIModel c : connectors(d)) {
+                    IShapeUIModel a = c.getFromShape(), b = c.getToShape();
+                    if (a == null || b == null || !"Association".equals(type(c))) continue;
+                    boolean fromActor = name(a).equals(p[2]);
+                    if (!fromActor && !name(b).equals(p[2])) continue;
+                    IShapeUIModel uc = fromActor ? b : a;
+                    Point ac = centre(actor), uu = centre(uc);
+                    boolean right = uu.x > ac.x;
+                    Point s = side(actor, right ? "R" : "L"), e = side(uc, right ? "L" : "R");
+                    List<Point> pts = new ArrayList<>();
+                    pts.add(s);
+                    if (Math.abs(s.y - e.y) > 1) { pts.add(new Point(trunk, s.y)); pts.add(new Point(trunk, e.y)); }
+                    pts.add(e);
+                    if (!fromActor) java.util.Collections.reverse(pts);
+                    pin(c, pts.toArray(new Point[0]));
+                    points(c, pts.toArray(new Point[0]));
+                    font(c, 11);
+                    done.add(c.getId());
+                }
+            } else if ("@link".equals(p[1]) || "@path".equals(p[1])) {
+                IConnectorUIModel c = null;
+                boolean reversed = false;
+                for (IConnectorUIModel k : connectors(d)) {
+                    String f = name(k.getFromShape()), t = name(k.getToShape());
+                    if (f.equals(p[2]) && t.equals(p[3])) { c = k; reversed = false; }
+                    else if (f.equals(p[3]) && t.equals(p[2])) { c = k; reversed = true; }
+                }
+                if (c == null) { System.out.println("  NO LINK " + p[2] + " - " + p[3]); continue; }
+                Point s = side(find(d, p[2]), p[4]), e = side(find(d, p[3]), p[5]);
+                if (Math.abs(s.x - e.x) <= 3) e.x = s.x;            // nearly aligned: one straight line
+                if (Math.abs(s.y - e.y) <= 3) e.y = s.y;
+                List<Point> pts = new ArrayList<>();
+                pts.add(s);
+                if ("@path".equals(p[1])) {
+                    for (String xy : p[6].split(";")) pts.add(new Point(i(xy.split(",")[0]), i(xy.split(",")[1])));
+                } else if (s.x != e.x && s.y != e.y) {
+                    boolean horizontalFirst = p[4].startsWith("L") || p[4].startsWith("R");
+                    pts.add(horizontalFirst ? new Point(e.x, s.y) : new Point(s.x, e.y));
+                }
+                pts.add(e);
+                // bend points given in the spec snap onto the real side middles (VP may move a shape by a pixel or two)
+                for (int k = 1; k < pts.size() - 1; k++) {
+                    Point prev = pts.get(k - 1), cur = pts.get(k);
+                    if (Math.abs(cur.y - prev.y) <= 3) cur.y = prev.y;
+                    if (Math.abs(cur.x - prev.x) <= 3) cur.x = prev.x;
+                }
+                if (pts.size() > 2) {
+                    Point last = pts.get(pts.size() - 2);
+                    if (Math.abs(last.y - e.y) <= 3) last.y = e.y;
+                    if (Math.abs(last.x - e.x) <= 3) last.x = e.x;
+                }
+                List<Point> drawn = new ArrayList<>(pts);
+                if (reversed) java.util.Collections.reverse(drawn);
+                pin(c, drawn.toArray(new Point[0]));
+                points(c, drawn.toArray(new Point[0]));
+                font(c, 11);
+                done.add(c.getId());
+                String t = type(c);
+                if (t.equals("Include") || t.equals("Extend")) {
+                    String text = "<<" + t + ">>";
+                    int w = CHAR * text.length() + 6, h = 18;
+                    Point a0 = null, a1 = null;          // longest horizontal segment
+                    for (int k = 0; k + 1 < pts.size(); k++) {
+                        Point u = pts.get(k), v = pts.get(k + 1);
+                        if (u.y == v.y && (a0 == null || Math.abs(u.x - v.x) > Math.abs(a0.x - a1.x))) { a0 = u; a1 = v; }
+                    }
+                    Rectangle r;
+                    if (a0 != null) {
+                        r = new Rectangle((a0.x + a1.x) / 2 - w / 2, a0.y - h - 3, w, h);
+                    } else {
+                        Point u = pts.get(0), v = pts.get(pts.size() - 1);
+                        boolean left = p.length > 6 && "L".equals(p[6]);
+                        r = new Rectangle(left ? u.x - 6 - w : u.x + 6, (u.y + v.y) / 2 - h / 2, w, h);
+                    }
+                    caption(c, r.x, r.y, r.width, r.height);
+                }
+            }
+        }
+        for (IConnectorUIModel c : connectors(d)) {
+            if (!done.contains(c.getId())) System.out.println("  UNROUTED " + type(c) + " " + name(c.getFromShape()) + " -> " + name(c.getToShape()));
+        }
+    }
+
+    /** Pin both ends where the route starts and ends, so VP does not move them back to their old place. */
+    // no pin: VP keeps the end points exactly where the route puts them (a ratio pin re-snaps them by a pixel or two)
+    static int PIN = IConnectorUIModel.PINTYPE_NONE;
+
+    static void pin(IConnectorUIModel c, Point[] pts) {
+        if (pts == null || pts.length < 2) return;
+        IShapeUIModel a = c.getFromShape(), b = c.getToShape();
+        c.setFromPinType(PIN);
+        c.setToPinType(PIN);
+        c.setFromPinRatio(new java.awt.geom.Point2D.Double((pts[0].x - a.getX()) / (double) a.getWidth(), (pts[0].y - a.getY()) / (double) a.getHeight()));
+        Point e = pts[pts.length - 1];
+        c.setToPinRatio(new java.awt.geom.Point2D.Double((e.x - b.getX()) / (double) b.getWidth(), (e.y - b.getY()) / (double) b.getHeight()));
+    }
+
+    /** Middle of a side of a shape: T, B, L, R, optionally shifted along the side (T+60 = 60 px right of the top middle). */
+    static Point side(IShapeUIModel s, String spec) {
+        char k = spec.charAt(0);
+        int off = spec.length() > 1 ? Integer.parseInt(spec.substring(1).replace("+", "")) : 0;
+        double cx = s.getX() + s.getWidth() / 2.0, cy = s.getY() + s.getHeight() / 2.0, a = s.getWidth() / 2.0, b = s.getHeight() / 2.0;
+        boolean ellipse = "UseCase".equals(type(s));
+        if (k == 'T' || k == 'B') {
+            double dy = ellipse ? b * Math.sqrt(Math.max(0, 1 - (off / a) * (off / a))) : b;
+            return new Point((int) Math.round(cx + off), (int) Math.round(k == 'T' ? cy - dy : cy + dy));
+        }
+        double dx = ellipse ? a * Math.sqrt(Math.max(0, 1 - (off / b) * (off / b))) : a;
+        return new Point((int) Math.round(k == 'L' ? cx - dx : cx + dx), (int) Math.round(cy + off));
+    }
+
     // ------------------------------------------------------------------ use case diagrams
     void useCases(IDiagramUIModel d, List<String[]> lines) {
+        for (String[] p : lines) if ("@at".equals(p[1])) { orthoUseCases(d, lines); return; }
         Map<String, Point[]> routes = new HashMap<>();
         for (String[] p : lines) {
             if ("@route".equals(p[1])) {

@@ -1,65 +1,155 @@
-# Tidy redraw (Redraw.jsrc).  CODE|name|x|y|w|h   CODE|@route|from|to|x,y;...   CTX01|@ctx|...   SDxx|@seq|step|minGap
-# ---------------- context diagram: four entities left, four right, one inflow and one outflow each
+# Tidy redraw (Redraw.jsrc), written by ortho_spec.py.
+# CODE|@at|name|cx|cy|w|h  CODE|@box|name|x|y|w|h  CODE|@bus|actor|trunkX  CODE|@link|A|B|sideA|sideB|labelSide
+# CODE|@path|A|B|sideA|sideB|x,y;...  CTX01|@ctx|...  SDxx|@seq|step|minGap
 CTX01|@ctx|Customer / Visitor;Administrator;Sales Staff;Warehouse Staff|Payment Provider;Shipping Provider;Supplier;Manager|570|20|240|600|40|1150|40|160|190|80
-
-# ---------------- use case diagrams (absolute coordinates, straight connectors)
-UCD1|ABC Online Shop - Account and Catalogue|300|20|380|590
-UCD1|UC06 View Product Details|370|70|240|46
-UCD1|UC04 Browse Products|370|150|240|46
-UCD1|UC05 Search Products|370|230|240|46
-UCD1|UC01 Register Account|370|310|240|46
-UCD1|UC03 Manage Profile|370|420|240|46
-UCD1|UC02 Login|370|510|240|46
-UCD1|Visitor|200|165|40|70
-UCD1|Customer|40|430|40|70
-UCD1|Staff|40|560|40|70
-UCD1|@route|Visitor|Customer|60,200
-
-UCD2|ABC Online Shop - Cart, Order and Payment|260|20|780|700
-UCD2|UC07 Manage Shopping Cart|300|70|240|46
-UCD2|UC08 Place Order / Checkout|295|250|260|60
-UCD2|UC11 Track Order|300|480|240|46
-UCD2|UC10 View Order History|300|600|240|46
-UCD2|UC30 Check Product Availability|750|60|260|46
-UCD2|UC29 Validate Cart|750|150|260|46
-UCD2|UC31 Calculate Order Total|750|240|260|46
-UCD2|UC32 Apply Promotion|750|330|260|46
-UCD2|UC09 Make Payment|750|420|260|46
-UCD2|UC12 Cancel Order|750|560|260|46
-UCD2|UC13 Submit Review|750|650|260|46
-UCD2|Customer|100|345|40|70
-UCD2|Payment Provider|1090|408|40|70
-UCD2|Sales Staff|1090|548|40|70
-
-UCD3|ABC Online Shop - Administration|260|20|350|470
-UCD3|UC17 Manage Customers|320|70|240|46
-UCD3|UC16 Manage Promotions|320|150|240|46
-UCD3|UC15 Manage Categories|320|230|240|46
-UCD3|UC18 Manage Reviews|320|310|240|46
-UCD3|UC14 Manage Products|320|390|240|46
-UCD3|Administrator|100|230|40|70
-UCD3|Sales Staff|660|58|40|70
-
-UCD4|ABC Online Shop - Operations and Reporting|270|20|700|560
-UCD4|UC19 Process Orders|300|70|250|46
-UCD4|UC25 View Management Dashboard|300|210|290|46
-UCD4|UC26 Generate Sales Report|300|300|270|46
-UCD4|UC27 Generate Inventory Report|300|390|290|46
-UCD4|UC28 Generate Order and Exception Report|300|480|340|46
-UCD4|UC24 Manage Replenishment|690|70|260|46
-UCD4|UC20 Manage Inventory|690|170|260|46
-UCD4|UC21 Prepare Shipment|690|260|260|46
-UCD4|UC22 Arrange Delivery|690|350|260|46
-UCD4|UC23 Update Shipment Status|690|440|260|46
-UCD4|Sales Staff|120|58|40|70
-UCD4|Manager|120|320|40|70
-UCD4|Supplier|1020|30|40|70
-UCD4|Warehouse Staff|1020|240|40|70
-UCD4|Shipping Provider|1020|420|40|70
-
-# ---------------- sequence diagrams: message step, smallest distance between lifelines
 SD01|@seq|42|150
 SD02|@seq|42|150
 SD03|@seq|42|150
 SD04|@seq|42|150
 SD05|@seq|42|150
+
+UCD1|@box|ABC Online Shop - Account and Catalogue|390|30|340|686
+UCD1|@at|UC06 View Product Details|560|110|240|52
+UCD1|@at|UC04 Browse Products|560|210|200|52
+UCD1|@at|UC05 Search Products|560|310|200|52
+UCD1|@at|UC01 Register Account|560|410|220|52
+UCD1|@at|UC03 Manage Profile|560|540|200|52
+UCD1|@at|UC02 Login|560|640|200|52
+UCD1|@box|Visitor|190|224|40|72
+UCD1|@bus|Visitor|340
+UCD1|@box|Customer|190|554|40|72
+UCD1|@bus|Customer|340
+UCD1|@box|Staff|870|604|40|72
+UCD1|@bus|Staff|780
+UCD1|@path|Visitor|Customer|L|L|160,260;160,590
+
+UCD2|@box|ABC Online Shop - Cart, Order and Payment|270|30|1120|876
+UCD2|@at|UC07 Manage Shopping Cart|440|110|240|52
+UCD2|@at|UC11 Track Order|440|530|200|52
+UCD2|@at|UC10 View Order History|440|710|240|52
+UCD2|@at|UC30 Check Product Availability|820|110|300|52
+UCD2|@at|UC08 Place Order / Checkout|820|340|260|60
+UCD2|@at|UC09 Make Payment|820|580|200|52
+UCD2|@at|UC12 Cancel Order|820|710|200|52
+UCD2|@at|UC13 Submit Review|820|830|200|52
+UCD2|@at|UC29 Validate Cart|1210|220|200|52
+UCD2|@at|UC31 Calculate Order Total|1210|340|260|52
+UCD2|@at|UC32 Apply Promotion|1210|460|200|52
+UCD2|@box|Customer|70|374|40|72
+UCD2|@bus|Customer|220
+UCD2|@box|Payment Provider|1530|544|40|72
+UCD2|@bus|Payment Provider|1440
+UCD2|@box|Sales Staff|1530|674|40|72
+UCD2|@bus|Sales Staff|1440
+UCD2|@link|UC07 Manage Shopping Cart|UC30 Check Product Availability|R|L|R
+UCD2|@link|UC08 Place Order / Checkout|UC30 Check Product Availability|T|B|L
+UCD2|@link|UC08 Place Order / Checkout|UC29 Validate Cart|T+70|L|R
+UCD2|@link|UC08 Place Order / Checkout|UC31 Calculate Order Total|R|L|R
+UCD2|@link|UC08 Place Order / Checkout|UC32 Apply Promotion|B+70|L|R
+UCD2|@link|UC08 Place Order / Checkout|UC09 Make Payment|B|T|L
+UCD2|@link|UC10 View Order History|UC12 Cancel Order|R|L|R
+UCD2|@link|UC10 View Order History|UC13 Submit Review|B|L|R
+
+UCD3|@box|ABC Online Shop - Administration|400|30|320|556
+UCD3|@at|UC17 Manage Customers|560|110|220|52
+UCD3|@at|UC16 Manage Promotions|560|210|220|52
+UCD3|@at|UC15 Manage Categories|560|310|220|52
+UCD3|@at|UC18 Manage Reviews|560|410|200|52
+UCD3|@at|UC14 Manage Products|560|510|200|52
+UCD3|@box|Administrator|200|274|40|72
+UCD3|@bus|Administrator|350
+UCD3|@box|Sales Staff|860|74|40|72
+UCD3|@bus|Sales Staff|770
+
+UCD4|@box|ABC Online Shop - Operations and Reporting|310|30|460|1036
+UCD4|@at|UC19 Process Orders|540|100|200|52
+UCD4|@at|UC24 Manage Replenishment|540|210|240|52
+UCD4|@at|UC20 Manage Inventory|540|330|220|52
+UCD4|@at|UC21 Prepare Shipment|540|420|220|52
+UCD4|@at|UC22 Arrange Delivery|540|510|220|52
+UCD4|@at|UC23 Update Shipment Status|540|600|260|52
+UCD4|@at|UC25 View Management Dashboard|540|720|280|52
+UCD4|@at|UC26 Generate Sales Report|540|810|260|52
+UCD4|@at|UC27 Generate Inventory Report|540|900|280|52
+UCD4|@at|UC28 Generate Order and Exception Report|540|990|360|52
+UCD4|@box|Sales Staff|110|64|40|72
+UCD4|@bus|Sales Staff|260
+UCD4|@box|Warehouse Staff|110|324|40|72
+UCD4|@bus|Warehouse Staff|260
+UCD4|@box|Manager|110|819|40|72
+UCD4|@bus|Manager|260
+UCD4|@box|Supplier|910|174|40|72
+UCD4|@bus|Supplier|820
+UCD4|@box|Shipping Provider|910|519|40|72
+UCD4|@bus|Shipping Provider|820
+UCD4|@link|UC20 Manage Inventory|UC24 Manage Replenishment|T|B|L
+
+UC00|@box|ABC Online Shop|290|30|770|1192
+UC00|@at|UC04 Browse Products|480|90|200|44
+UC00|@at|UC05 Search Products|480|170|200|44
+UC00|@at|UC01 Register Account|480|250|220|44
+UC00|@at|UC07 Manage Shopping Cart|480|350|240|44
+UC00|@at|UC08 Place Order / Checkout|480|430|260|44
+UC00|@at|UC11 Track Order|480|510|200|44
+UC00|@at|UC13 Submit Review|480|590|200|44
+UC00|@at|UC14 Manage Products|480|690|200|44
+UC00|@at|UC16 Manage Promotions|480|770|220|44
+UC00|@at|UC19 Process Orders|480|870|200|44
+UC00|@at|UC20 Manage Inventory|480|970|220|44
+UC00|@at|UC21 Prepare Shipment|480|1050|220|44
+UC00|@at|UC25 View Management Dashboard|480|1150|280|44
+UC00|@at|UC09 Make Payment|880|430|200|44
+UC00|@at|UC23 Update Shipment Status|880|950|260|44
+UC00|@at|UC24 Manage Replenishment|880|1090|240|44
+UC00|@box|Visitor|90|134|40|72
+UC00|@bus|Visitor|240
+UC00|@box|Customer|90|434|40|72
+UC00|@bus|Customer|240
+UC00|@box|Administrator|90|694|40|72
+UC00|@bus|Administrator|240
+UC00|@box|Sales Staff|90|834|40|72
+UC00|@bus|Sales Staff|240
+UC00|@box|Warehouse Staff|90|974|40|72
+UC00|@bus|Warehouse Staff|240
+UC00|@box|Manager|90|1114|40|72
+UC00|@bus|Manager|240
+UC00|@box|Payment Provider|1200|394|40|72
+UC00|@bus|Payment Provider|1110
+UC00|@box|Shipping Provider|1200|914|40|72
+UC00|@bus|Shipping Provider|1110
+UC00|@box|Supplier|1200|1054|40|72
+UC00|@bus|Supplier|1110
+UC00|@link|UC08 Place Order / Checkout|UC09 Make Payment|R|L|R
+UC00|@path|Visitor|Customer|L|L|60,170;60,470
+
+UC_AI|@at|Ask About My Orders|560|90|200|52
+UC_AI|@at|UC18 Manage Reviews|560|210|200|52
+UC_AI|@at|UC06 View Product Details|560|330|240|52
+UC_AI|@at|UC05 Search Products|560|610|200|60
+UC_AI|@at|UC25 View Management Dashboard|560|970|280|52
+UC_AI|@at|Flag Noisy Review|1000|210|200|52
+UC_AI|@at|UC33 View Review Insights|1000|330|240|52
+UC_AI|@at|UC34 View Recommendations|1000|430|240|52
+UC_AI|@at|Search by Keyword|1000|610|200|52
+UC_AI|@at|Search by Text and Image|1000|690|240|52
+UC_AI|@at|Search by Image|1000|770|200|52
+UC_AI|@at|Search by Voice|1000|850|200|52
+UC_AI|@box|Customer|170|54|40|72
+UC_AI|@bus|Customer|320
+UC_AI|@box|Administrator|170|174|40|72
+UC_AI|@bus|Administrator|320
+UC_AI|@box|Visitor|170|434|40|72
+UC_AI|@bus|Visitor|320
+UC_AI|@box|Manager|170|934|40|72
+UC_AI|@bus|Manager|320
+UC_AI|@box|Speech / Vision Engine|1310|774|40|72
+UC_AI|@bus|Speech / Vision Engine|1220
+UC_AI|@box|@note|870|940|260|70
+UC_AI|@link|UC18 Manage Reviews|Flag Noisy Review|R|L|R
+UC_AI|@link|UC06 View Product Details|UC33 View Review Insights|R|L|R
+UC_AI|@link|UC06 View Product Details|UC34 View Recommendations|B|L|R
+UC_AI|@path|UC05 Search Products|Search by Text and Image|R|L|770,610;770,690
+UC_AI|@path|UC05 Search Products|Search by Image|R|L|770,610;770,770
+UC_AI|@path|UC05 Search Products|Search by Voice|R|L|770,610;770,850
+UC_AI|@link|UC05 Search Products|Search by Keyword|R|L|R
+UC_AI|@path|Visitor|Customer|L|L|120,470;120,90
