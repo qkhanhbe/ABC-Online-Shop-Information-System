@@ -10,7 +10,7 @@ import html
 import os
 import re
 
-from content import ANSWERS, DIAGRAMS, EVOLUTION, PHASES, SCRIPT, TRACE, DECISIONS
+from content import ANSWERS, DIAGRAMS, EVOLUTION, PHASES, SCRIPT, TRACE, DECISIONS, kind
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -107,9 +107,10 @@ def gallery():
         for code, caption in items:
             f = diagram_file(code)
             n += 1
-            cards.append(f'<figure><a href="../diagrams/{f}" data-lbx data-cap="{html.escape(code + " · " + caption)}">'
+            k = kind(code)
+            cards.append(f'<figure><a href="../diagrams/{f}" data-lbx data-cap="{html.escape(code + " (" + k + ") · " + caption)}">'
                          f'<img loading="lazy" src="../diagrams/{f}" alt="{html.escape(code)}"></a>'
-                         f'<figcaption><b>{code}</b> {html.escape(caption)}</figcaption></figure>')
+                         f'<figcaption><b>{code}</b> <span class="kind">({html.escape(k)})</span> {html.escape(caption)}</figcaption></figure>')
         out.append(f'<h3>{phase} <span class="muted">({len(items)})</span></h3><div class="gallery">{"".join(cards)}</div>')
     return n, "".join(out)
 

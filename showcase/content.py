@@ -44,6 +44,43 @@ DIAGRAMS = [
         ("DEP01", "Sơ đồ triển khai")]),
 ]
 
+# Kind of each diagram as Visual Paradigm stores it (DIAGRAM_TYPE in the .vpp), shown after the code in the gallery.
+KINDS = {
+    "BP01": "BPMN Business Process Diagram",
+    "STK01": "Stakeholder Map, vẽ bằng Class Diagram",
+    "PT01": "Problem Tree, vẽ bằng Flowchart",
+    "CTX01": "Context Diagram, Data Flow Diagram mức ngữ cảnh",
+    "DFD0": "Data Flow Diagram mức 0",
+    "DFD1": "Data Flow Diagram mức 1",
+    "UC00": "Use Case Diagram tổng quan",
+    "UC_AI": "Use Case Diagram",
+    "CL01": "Analysis Class Diagram",
+    "ST01": "State Machine Diagram",
+    "DM01": "Class Diagram «ORM Persistable»",
+    "CDM01": "Conceptual ERD",
+    "LDM01": "Logical Data Model, ERD",
+    "ERD": "Physical Data Model, ERD",
+    "CMP": "Component Diagram",
+    "DEP": "Deployment Diagram",
+    "PKG": "Package Diagram",
+    "DCL04": "Design Class Diagram, lát cắt qua các tầng",
+    "DCL": "Design Class Diagram",
+    "UCD": "Use Case Diagram chi tiết",
+    "AD": "Activity Diagram",
+}
+
+
+def kind(code):
+    """Exact code first, then the longest matching prefix."""
+    if code in KINDS:
+        return KINDS[code]
+    if code.startswith("SD"):
+        if code in ("SD01", "SD02"):
+            return "Sequence Diagram (Analysis)"
+        return "Sequence Diagram" if code in ("SD03", "SD04") else "Sequence Diagram (Design)"
+    return next((KINDS[k] for k in sorted(KINDS, key=len, reverse=True) if code.startswith(k)), "")
+
+
 PHASES = [
     ("Yêu cầu", "Khảo sát (A01): bên liên quan {fig:STK01}, quy trình {fig:BP01}, cây vấn đề {fig:PT01}, ngữ cảnh {fig:CTX01}; 24 FR, 12 NFR, 32 use case."),
     ("Phân tích", "Use case {fig:UC00}, đặc tả UC08; activity {fig:AD01}, DFD {fig:DFD0}, sequence BCE {fig:SD01}, class phân tích {fig:CL01}, trạng thái {fig:ST01}."),
