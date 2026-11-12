@@ -84,7 +84,15 @@ UCD4|@box|Shipping Provider|910|519|40|72
 UCD4|@bus|Shipping Provider|820
 UCD4|@link|UC20 Manage Inventory|UC24 Manage Replenishment|T|B|L
 
-UC00|@box|ABC Online Shop|290|30|770|1192
+UC00|@show|UC02 Login|UseCase
+UC00|@show|Staff|Actor
+UC00|@ensure|Customer|UC02 Login|Association
+UC00|@ensure|Staff|UC02 Login|Association
+UC00|@ensure|Staff|Administrator|Generalization
+UC00|@ensure|Staff|Sales Staff|Generalization
+UC00|@ensure|Staff|Warehouse Staff|Generalization
+UC00|@ensure|Staff|Manager|Generalization
+UC00|@box|ABC Online Shop|290|30|770|1392
 UC00|@at|UC04 Browse Products|480|90|200|44
 UC00|@at|UC05 Search Products|480|170|200|44
 UC00|@at|UC01 Register Account|480|250|220|44
@@ -92,35 +100,42 @@ UC00|@at|UC07 Manage Shopping Cart|480|350|240|44
 UC00|@at|UC08 Place Order / Checkout|480|430|260|44
 UC00|@at|UC11 Track Order|480|510|200|44
 UC00|@at|UC13 Submit Review|480|590|200|44
-UC00|@at|UC14 Manage Products|480|690|200|44
-UC00|@at|UC16 Manage Promotions|480|770|220|44
-UC00|@at|UC19 Process Orders|480|870|200|44
-UC00|@at|UC20 Manage Inventory|480|970|220|44
-UC00|@at|UC21 Prepare Shipment|480|1050|220|44
-UC00|@at|UC25 View Management Dashboard|480|1150|280|44
+UC00|@at|UC02 Login|480|690|200|44
+UC00|@at|UC14 Manage Products|480|890|200|44
+UC00|@at|UC16 Manage Promotions|480|970|220|44
+UC00|@at|UC19 Process Orders|480|1070|200|44
+UC00|@at|UC20 Manage Inventory|480|1170|220|44
+UC00|@at|UC21 Prepare Shipment|480|1250|220|44
+UC00|@at|UC25 View Management Dashboard|480|1350|280|44
 UC00|@at|UC09 Make Payment|880|430|200|44
-UC00|@at|UC23 Update Shipment Status|880|950|260|44
-UC00|@at|UC24 Manage Replenishment|880|1090|240|44
+UC00|@at|UC23 Update Shipment Status|880|1170|260|44
+UC00|@at|UC24 Manage Replenishment|880|1310|240|44
 UC00|@box|Visitor|90|134|40|72
 UC00|@bus|Visitor|240
-UC00|@box|Customer|90|434|40|72
+UC00|@box|Customer|90|484|40|72
 UC00|@bus|Customer|240
-UC00|@box|Administrator|90|694|40|72
+UC00|@box|Administrator|90|894|40|72
 UC00|@bus|Administrator|240
-UC00|@box|Sales Staff|90|834|40|72
+UC00|@box|Sales Staff|90|1034|40|72
 UC00|@bus|Sales Staff|240
-UC00|@box|Warehouse Staff|90|974|40|72
+UC00|@box|Warehouse Staff|90|1174|40|72
 UC00|@bus|Warehouse Staff|240
-UC00|@box|Manager|90|1114|40|72
+UC00|@box|Manager|90|1314|40|72
 UC00|@bus|Manager|240
+UC00|@box|Staff|90|754|40|72
 UC00|@box|Payment Provider|1200|394|40|72
 UC00|@bus|Payment Provider|1110
-UC00|@box|Shipping Provider|1200|914|40|72
+UC00|@box|Shipping Provider|1200|1134|40|72
 UC00|@bus|Shipping Provider|1110
-UC00|@box|Supplier|1200|1054|40|72
+UC00|@box|Supplier|1200|1274|40|72
 UC00|@bus|Supplier|1110
 UC00|@link|UC08 Place Order / Checkout|UC09 Make Payment|R|L|R
-UC00|@path|Visitor|Customer|L|L|60,170;60,470
+UC00|@link|Staff|UC02 Login|R|B|R
+UC00|@path|Visitor|Customer|L|L|60,170;60,520
+UC00|@path|Staff|Administrator|L|L|60,790;60,930
+UC00|@path|Staff|Sales Staff|L|L|60,790;60,1070
+UC00|@path|Staff|Warehouse Staff|L|L|60,790;60,1210
+UC00|@path|Staff|Manager|L|L|60,790;60,1350
 
 UC_AI|@at|Ask About My Orders|560|90|200|52
 UC_AI|@at|UC18 Manage Reviews|560|210|200|52
@@ -153,3 +168,78 @@ UC_AI|@path|UC05 Search Products|Search by Image|R|L|770,610;770,770
 UC_AI|@path|UC05 Search Products|Search by Voice|R|L|770,610;770,850
 UC_AI|@link|UC05 Search Products|Search by Keyword|R|L|R
 UC_AI|@path|Visitor|Customer|L|L|120,470;120,90
+
+DM01|@diagram|DM01 Data Model (ORM Persistable Classes)
+DM01|@class|User|1840|528|230|153|0|userId:String;name:String;email:String;passwordHash:String;role:String
+DM01|@class|Customer|1480|528|230|77|0|createdAt:Date
+DM01|@class|Address|1480|284|230|134|0|receiver:String;phone:String;street:String;city:String
+DM01|@class|Category|40|528|230|115|0|categoryId:String;name:String;detailKind:String
+DM01|@class|Product|400|528|230|210|0|productId:String;name:String;brand:String;color:String;price:Decimal;description:String;image:String;status:String
+DM01|@class|ProductDetail|435|284|160|58|1|
+DM01|@class|FootwearDetail|40|40|230|134|0|sizes:String;upperMaterial:String;sole:String;purpose:String
+DM01|@class|ApparelDetail|400|40|230|115|0|sizes:String;material:String;fit:String
+DM01|@class|BagDetail|760|40|230|115|0|capacityL:Decimal;material:String;laptopSleeve:Boolean
+DM01|@class|WatchDetail|1120|40|230|134|0|movement:String;strap:String;waterResistanceM:Integer;batteryDays:Integer
+DM01|@class|StockLevel|400|828|230|115|0|physical:Integer;reserved:Integer;threshold:Integer
+DM01|@class|InventoryEvent|40|828|230|172|0|eventId:String;kind:String;quantity:Integer;reference:String;reason:String;createdAt:Date
+DM01|@class|ReplenishmentRequest|40|284|230|134|0|requestId:String;quantity:Integer;status:String;createdAt:Date
+DM01|@class|Cart|1120|528|230|77|0|cartId:String
+DM01|@class|CartItem|760|528|230|115|0|name:String;cartPrice:Decimal;quantity:Integer
+DM01|@class|Promotion|1480|1410|230|172|0|code:String;percent:Decimal;minTotal:Decimal;startDate:Date;endDate:Date;active:Boolean
+DM01|@class|Order|1120|1110|230|210|0|orderId:String;address:String;discount:Decimal;shippingFee:Decimal;total:Decimal;status:String;createdAt:Date;idempotencyKey:String
+DM01|@class|OrderItem|760|1110|230|115|0|name:String;unitPrice:Decimal;quantity:Integer
+DM01|@class|StatusChange|760|1410|230|153|0|id:Integer;status:String;actor:String;at:Date;note:String
+DM01|@class|Payment|1120|1672|230|191|0|paymentId:String;attemptRef:String;amount:Decimal;currency:String;status:String;providerRef:String;createdAt:Date
+DM01|@class|Shipment|1480|1110|230|115|0|shipmentId:String;carrierRef:String;status:String
+DM01|@class|Milestone|1840|1110|230|134|0|seq:Integer;code:String;at:Date;location:String
+DM01|@class|Review|1120|828|230|153|0|reviewId:String;rating:Integer;text:String;status:String;createdAt:Date
+DM01|@assoc|Product|ProductDetail|described by|1|0..1|1
+DM01|@assoc|Product|Category|belongs to|0..*|1|0
+DM01|@assoc|CartItem|Product|refers to|0..*|1|0
+DM01|@assoc|Cart|CartItem|contains|1|0..*|1
+DM01|@assoc|Customer|Cart|owns|1|0..1|0
+DM01|@assoc|Customer|Address|delivers to|1|0..1|0
+DM01|@assoc|Customer|Order|places|1|0..*|0
+DM01|@assoc|Order|OrderItem|contains|1|1..*|1
+DM01|@assoc|OrderItem|Product|refers to|0..*|1|0
+DM01|@assoc|Order|StatusChange|records|1|1..*|1
+DM01|@assoc|Order|Payment|paid by|1|0..*|0
+DM01|@assoc|Order|Promotion|uses|0..*|0..1|0
+DM01|@assoc|Order|Shipment|shipped as|1|0..1|0
+DM01|@assoc|Shipment|Milestone|tracked by|1|0..*|1
+DM01|@assoc|Product|StockLevel|has|1|0..1|0
+DM01|@assoc|Product|InventoryEvent|explained by|1|0..*|0
+DM01|@assoc|Product|ReplenishmentRequest|replenished by|1|0..*|0
+DM01|@assoc|Review|Product|about|0..*|1|0
+DM01|@assoc|Customer|Review|writes|1|0..*|0
+DM01|@assoc|Review|Order|verified by|0..*|1|0
+DM01|@gen|User|Customer
+DM01|@gen|ProductDetail|FootwearDetail
+DM01|@gen|ProductDetail|ApparelDetail
+DM01|@gen|ProductDetail|BagDetail
+DM01|@gen|ProductDetail|WatchDetail
+DM01|@link|Category|Product|R-17|L-65|R
+DM01|@link|Product|CartItem|R-65|L-17|R
+DM01|@link|CartItem|Cart|R-17|L+2|R
+DM01|@link|Cart|Customer|R+2|L+2|R
+DM01|@link|Customer|User|R+2|L-36|R
+DM01|@link|OrderItem|Order|R-17|L-65|R
+DM01|@link|Order|Shipment|R-65|L-17|R
+DM01|@link|Shipment|Milestone|R-17|L-27|R
+DM01|@link|Product|ProductDetail|T|B|R
+DM01|@link|Product|StockLevel|B|T|R
+DM01|@link|Customer|Address|T|B|R
+DM01|@link|Order|Payment|B|T|R
+DM01|@link|Review|Order|B|T|R
+DM01|@link|Product|Review|R+75|T|R
+DM01|@link|Product|OrderItem|R+95|T|L
+DM01|@link|Product|InventoryEvent|L+85|T|L
+DM01|@link|Product|ReplenishmentRequest|T-95|R|L
+DM01|@link|Customer|Review|B-70|R|L
+DM01|@link|Order|StatusChange|B-70|R|L
+DM01|@link|Order|Promotion|B+70|L|R
+DM01|@path|Customer|Order|B+60|T+70|1655,1065;1305,1065|R
+DM01|@path|ProductDetail|FootwearDetail|T|B|515,229;155,229
+DM01|@path|ProductDetail|BagDetail|T|B|515,229;875,229
+DM01|@path|ProductDetail|WatchDetail|T|B|515,229;1235,229
+DM01|@link|ProductDetail|ApparelDetail|T|B|R

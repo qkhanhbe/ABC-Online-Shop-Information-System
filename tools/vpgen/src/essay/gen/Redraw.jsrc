@@ -48,6 +48,21 @@ public class Redraw {
             String[] p = line.split("\\|", -1);
             spec.computeIfAbsent(p[0], k -> new ArrayList<>()).add(p);
         }
+        for (String c : codes) {                                   // new diagrams named by a @diagram line
+            List<String[]> l = spec.get(c);
+            if (l == null) continue;
+            for (String[] p : l) {
+                if (!"@diagram".equals(p[1])) continue;
+                boolean exists = false;
+                for (IDiagramUIModel d : project.toDiagramArray()) if (d.getName().equals(p[2])) exists = true;
+                if (!exists) {
+                    IDiagramUIModel nd = ApplicationManager.instance().getDiagramManager()
+                        .createDiagram(com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_CLASS_DIAGRAM);
+                    nd.setName(p[2]);
+                    System.out.println("CREATED DIAGRAM " + p[2]);
+                }
+            }
+        }
         for (IDiagramUIModel d : project.toDiagramArray()) {
             String code = d.getName().split(" ")[0];
             boolean hit = false;
@@ -61,6 +76,7 @@ public class Redraw {
             if (code.startsWith("CTX")) context(d, spec.get(code));
             else if (code.startsWith("UC")) useCases(d, spec.get(code));
             else if (code.startsWith("SD")) sequence(d, spec.get(code));
+            else if (code.startsWith("DM")) { dataModel(project, d, spec.get(code)); orthoUseCases(d, spec.get(code)); }
             System.out.println("REDRAWN " + d.getName());
         }
     }
@@ -167,6 +183,19 @@ public class Redraw {
      * CODE|@path|A|B|sideA|sideB|x,y;x,y     connector through explicit bend points
      */
     void orthoUseCases(IDiagramUIModel d, List<String[]> lines) {
+        if (!routeOnly) {
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            for (String[] p : lines) if ("@show".equals(p[1]) && find(d, p[2]) == null) {
+                for (IModelElement m : project.toAllLevelModelElementArray()) {
+                    if (p[2].equals(m.getName()) && p[3].equals(m.getModelType())) {
+                        ApplicationManager.instance().getDiagramManager().createDiagramElement(d, m);
+                        System.out.println("  SHOWN " + p[2]);
+                        break;
+                    }
+                }
+            }
+            for (String[] p : lines) if ("@ensure".equals(p[1])) ensure(d, p[2], p[3], p[4]);
+        }
         for (String[] p : lines) {
             if (routeOnly) break;
             if ("@at".equals(p[1])) {
@@ -268,11 +297,171 @@ public class Redraw {
                     }
                     caption(c, r.x, r.y, r.width, r.height);
                 }
+                if (t.equals("Association") && c.getModelElement() instanceof com.vp.plugin.model.IAssociation) {
+                    String side = "@link".equals(p[1]) ? (p.length > 6 ? p[6] : "R") : (p.length > 7 ? p[7] : "R");
+                    associationLabels(c, drawn, side);
+                }
             }
         }
         for (IConnectorUIModel c : connectors(d)) {
             if (!done.contains(c.getId())) System.out.println("  UNROUTED " + type(c) + " " + name(c.getFromShape()) + " -> " + name(c.getToShape()));
         }
+    }
+
+    /** A relationship between two shapes: reuse the one in the model, otherwise create it; then show it. */
+    void ensure(IDiagramUIModel d, String a, String b, String kind) {
+        IShapeUIModel sa = find(d, a), sb = find(d, b);
+        if (sa == null || sb == null) { System.out.println("  ENSURE missing shape " + a + " / " + b); return; }
+        IModelElement ma = sa.getModelElement(), mb = sb.getModelElement();
+        IModelElement rel = null;
+        boolean swap = false;
+        if ("Generalization".equals(kind)) {
+            for (com.vp.plugin.model.ISimpleRelationship r : ma.toFromRelationshipArray())
+                if ("Generalization".equals(r.getModelType()) && r.getTo() != null && r.getTo().getId().equals(mb.getId())) rel = r;
+        } else {
+            List<com.vp.plugin.model.IRelationshipEnd> ends = new ArrayList<>();
+            for (com.vp.plugin.model.IRelationshipEnd e : ma.toFromRelationshipEndArray()) ends.add(e);
+            for (com.vp.plugin.model.IRelationshipEnd e : ma.toToRelationshipEndArray()) ends.add(e);
+            for (com.vp.plugin.model.IRelationshipEnd e : ends) {
+                com.vp.plugin.model.IEndRelationship r = e.getEndRelationship();
+                if (r == null || !kind.equals(r.getModelType())) continue;
+                com.vp.plugin.model.IRelationshipEnd o = e.getOppositeEnd();
+                if (o != null && o.getModelElement() != null && o.getModelElement().getId().equals(mb.getId())) {
+                    rel = r;
+                    swap = r.getFromEnd().getModelElement().getId().equals(mb.getId());
+                }
+            }
+        }
+        if (rel == null) {
+            com.vp.plugin.model.factory.IModelElementFactory f = com.vp.plugin.model.factory.IModelElementFactory.instance();
+            if ("Generalization".equals(kind)) {
+                com.vp.plugin.model.IGeneralization g = f.createGeneralization();
+                g.setFrom(ma);
+                g.setTo(mb);
+                rel = g;
+            } else {
+                com.vp.plugin.model.IAssociation as = f.createAssociation();
+                as.setFrom(ma);
+                as.setTo(mb);
+                rel = as;
+            }
+            System.out.println("  CREATED " + kind + " " + a + " -> " + b);
+        } else {
+            System.out.println("  REUSED " + kind + " " + a + " -> " + b);
+        }
+        for (IConnectorUIModel c : connectors(d)) if (c.getModelElement() != null && c.getModelElement().getId().equals(rel.getId())) return;
+        ApplicationManager.instance().getDiagramManager().createConnector(d, rel, swap ? sb : sa, swap ? sa : sb, null);
+    }
+
+    static final java.awt.Color ORM_BLUE = new java.awt.Color(122, 207, 245);
+
+    /**
+     * Data model diagram: persistent classes with the ORM Persistable stereotype, built once in package "Data Model (ORM)".
+     *  CODE|@diagram|full name
+     *  CODE|@class|Name|x|y|w|h|abstract(0/1)|attr:Type;attr:Type
+     *  CODE|@assoc|Whole/From|To|name|multFrom|multTo|composite(0/1)
+     *  CODE|@gen|General|Specific
+     */
+    void dataModel(IProject project, IDiagramUIModel d, List<String[]> lines) {
+        if (routeOnly || d.toShapeUIModelArray().length > 0) return;
+        com.vp.plugin.model.factory.IModelElementFactory f = com.vp.plugin.model.factory.IModelElementFactory.instance();
+        com.vp.plugin.DiagramManager dm = ApplicationManager.instance().getDiagramManager();
+        com.vp.plugin.model.IPackage pkg = f.createPackage();
+        pkg.setName("Data Model (ORM)");
+        Map<String, com.vp.plugin.model.IClass> cls = new HashMap<>();
+        Map<String, IShapeUIModel> shp = new HashMap<>();
+        for (String[] p : lines) {
+            if (!"@class".equals(p[1])) continue;
+            com.vp.plugin.model.IClass c = f.createClass();
+            c.setName(p[2]);
+            pkg.addChild(c);
+            c.addStereotype("ORM Persistable");
+            if ("1".equals(p[7])) c.setAbstract(true);
+            if (p.length > 8 && !p[8].isEmpty()) for (String at : p[8].split(";")) {
+                com.vp.plugin.model.IAttribute a = f.createAttribute();
+                a.setName(at.split(":")[0]);
+                a.setType(at.split(":")[1]);
+                a.setVisibility("private");
+                c.addAttribute(a);
+            }
+            IShapeUIModel s = (IShapeUIModel) dm.createDiagramElement(d, c);
+            s.setBounds(i(p[3]), i(p[4]), i(p[5]), i(p[6]));
+            s.setBackground(ORM_BLUE);
+            try { s.getFillColor().setValues(1, ORM_BLUE, ORM_BLUE, 0, 0, true); } catch (Throwable ignored) { }
+            s.setRequestResetCaption(true);         // otherwise the name caption covers the attribute compartment
+            cls.put(p[2], c);
+            shp.put(p[2], s);
+        }
+        for (String[] p : lines) {
+            if ("@assoc".equals(p[1])) {
+                com.vp.plugin.model.IAssociation as = f.createAssociation();
+                as.setFrom(cls.get(p[2]));
+                as.setTo(cls.get(p[3]));
+                as.setName(p[4]);
+                com.vp.plugin.model.IAssociationEnd fe = (com.vp.plugin.model.IAssociationEnd) as.getFromEnd();
+                com.vp.plugin.model.IAssociationEnd te = (com.vp.plugin.model.IAssociationEnd) as.getToEnd();
+                fe.setMultiplicity(p[5]);
+                te.setMultiplicity(p[6]);
+                if ("1".equals(p[7])) fe.setAggregationKind(com.vp.plugin.model.IAssociationEnd.AGGREGATION_KIND_COMPOSITED);
+                dm.createConnector(d, as, shp.get(p[2]), shp.get(p[3]), null);
+            } else if ("@gen".equals(p[1])) {
+                com.vp.plugin.model.IGeneralization g = f.createGeneralization();
+                g.setFrom(cls.get(p[2]));
+                g.setTo(cls.get(p[3]));
+                dm.createConnector(d, g, shp.get(p[2]), shp.get(p[3]), null);
+            }
+        }
+        System.out.println("  DATA MODEL " + cls.size() + " classes");
+    }
+
+    /** Association name above the middle of its longest horizontal segment (beside a vertical one); multiplicities beside each end. */
+    static void associationLabels(IConnectorUIModel c, List<Point> pts, String side) {
+        com.vp.plugin.model.IAssociation as = (com.vp.plugin.model.IAssociation) c.getModelElement();
+        String nm = as.getName() == null ? "" : as.getName();
+        if (!nm.isEmpty()) {
+            int w = 7 * nm.length() + 10, h = 18;
+            Point a0 = null, a1 = null, v0 = null, v1 = null;
+            for (int k = 0; k + 1 < pts.size(); k++) {
+                Point u = pts.get(k), v = pts.get(k + 1);
+                if (u.y == v.y && (a0 == null || Math.abs(u.x - v.x) > Math.abs(a0.x - a1.x))) { a0 = u; a1 = v; }
+                if (u.x == v.x && (v0 == null || Math.abs(u.y - v.y) > Math.abs(v0.y - v1.y))) { v0 = u; v1 = v; }
+            }
+            Rectangle r;
+            boolean useVertical = a0 == null || (v0 != null && Math.abs(a0.x - a1.x) < w + 60 && Math.abs(v0.y - v1.y) > 60);
+            if (!useVertical) r = new Rectangle((a0.x + a1.x) / 2 - w / 2, a0.y + 3, w, h);   // name under the line
+            else r = "L".equals(side) ? new Rectangle(v0.x - 6 - w, (v0.y + v1.y) / 2 - h / 2, w, h)
+                                      : new Rectangle(v0.x + 6, (v0.y + v1.y) / 2 - h / 2, w, h);
+            caption(c, r.x, r.y, r.width, r.height);
+        }
+        if (!(c instanceof com.vp.plugin.diagram.connector.IHasRoleConnectorUIModel)) return;
+        com.vp.plugin.diagram.connector.IHasRoleConnectorUIModel hr = (com.vp.plugin.diagram.connector.IHasRoleConnectorUIModel) c;
+        com.vp.plugin.model.IAssociationEnd fe = (com.vp.plugin.model.IAssociationEnd) as.getFromEnd();
+        com.vp.plugin.model.IAssociationEnd te = (com.vp.plugin.model.IAssociationEnd) as.getToEnd();
+        boolean compA = fe.getAggregationKind() != null && fe.getAggregationKind().toLowerCase().startsWith("compos");
+        hr.setMultiplicityARectangle(multRect(pts.get(0), pts.get(1), fe.getMultiplicity(), compA, side));
+        hr.setMultiplicityBRectangle(multRect(pts.get(pts.size() - 1), pts.get(pts.size() - 2), te.getMultiplicity(), false, side));
+        if (c instanceof com.vp.plugin.diagram.connector.IAssociationUIModel) {
+            com.vp.plugin.diagram.connector.IAssociationUIModel u = (com.vp.plugin.diagram.connector.IAssociationUIModel) c;
+            u.setShowToRoleName(false);
+            u.setShowFromRoleName(false);
+            u.setFromMultiplicityInternalHeight(18);
+            u.setToMultiplicityInternalHeight(18);
+        }
+    }
+
+    /** Multiplicity beside an end: above a horizontal line, on the label side of a vertical one, clear of the diamond. */
+    static Rectangle multRect(Point end, Point next, String text, boolean diamond, String side) {
+        if (text == null || text.isEmpty() || "Unspecified".equals(text)) return new Rectangle(end.x, end.y, 0, 0);
+        int w = 7 * text.length() + 8, h = 18, gap = diamond ? 28 : 5;
+        if (end.y == next.y) {
+            int dir = Integer.signum(next.x - end.x);
+            int x = dir > 0 ? end.x + gap : end.x - gap - w;
+            return new Rectangle(x, end.y - h - 1, w, h);
+        }
+        int dir = Integer.signum(next.y - end.y);
+        int y = dir > 0 ? end.y + gap : end.y - gap - h;
+        // vertical line: the name is on the label side, the multiplicity on the other side
+        return "L".equals(side) ? new Rectangle(end.x + 4, y, w, h) : new Rectangle(end.x - 4 - w, y, w, h);
     }
 
     /** Pin both ends where the route starts and ends, so VP does not move them back to their old place. */
