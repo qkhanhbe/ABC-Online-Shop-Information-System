@@ -222,7 +222,7 @@ CH6 = [("h1", "CHAPTER 6. CONCLUSION AND FUTURE WORK"),
            ["NFR05-NFR07, NFR10 security, audit, integrity, privacy", "Met", "Permission checks, audit_log, constraints, build_db.py block [4]"],
            ["NFR09 maintainability (layers)", "Met", "test_architecture; check_code.py"],
            ["NFR01-NFR03, NFR12 performance, availability, load", "Not measured", "Prototype runs as one process on SQLite"],
-           ["AI-R1 to AI-R9 search, review insights, recommendation", "Met on the test sets", "evaluate.py: 24/26 search, F1 0.96, coverage 15/15"]],
+           ["AI-R1 to AI-R9 search, review insights, recommendation", "Met on the test sets", "evaluate.py: 25/26 search, F1 0.96, coverage 15/15"]],
         [62, 25, 78]),
        ("h2", "6.3. Limitations")] + limits + [
        ("h2", "6.4. Lessons and Next Steps")] + concl[1:3] + [

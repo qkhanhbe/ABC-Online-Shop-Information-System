@@ -179,7 +179,7 @@ CH3 = [
         ["Recommendations", "Click-through and add-to-cart rate of recommended items; items per order", "Business objective (sales)"]], [35, 85, 45]),
     ("h2", "3.x. AI Traceability"),
     ("table", "From problem to AI requirement, component, metric and test", ["Need / problem", "AI requirement", "Component", "Measured by", "Test"], [
-        ["SN01 find products", "AI-R1, AI-R3", "AIC-01..04", "Top-1 success 92.3%", "test_image_and_multimodal_search"],
+        ["SN01 find products", "AI-R1, AI-R3", "AIC-01..04", "Top-1 success 96.2%", "test_image_and_multimodal_search"],
         ["BP04, NFR05 status, privacy", "AI-R2", "AIC-02, OrderDAO", "3/3 order queries", "test_order_questions_only_see_own_orders"],
         ["SN06 controlled reviews", "AI-R4, AI-R5", "AIC-05", "F1 0.96", "test_review_insights_handle_negation_and_noise"],
         ["Sales objective", "AI-R6", "AIC-06", "Coverage 15/15", "test_recommender_never_suggests_..."],

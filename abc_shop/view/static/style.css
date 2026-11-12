@@ -28,17 +28,20 @@ footer { max-width: 1120px; margin: 0 auto; padding: 18px 32px 28px; color: var(
   border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
 /* home: one line that says what the shop does, then the search, then the shelves */
-.hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; align-items: end; margin: 4px 0 22px; }
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; margin: 8px 0 26px; }
+.hero .search { margin: 0; }
 .hero p { margin: 0; color: var(--muted); max-width: 46ch; }
 .hero h1 { font-size: 38px; margin: 0 0 8px; }
-.search { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: var(--card); border: 1px solid var(--line);
-  border-radius: 10px; }
-.search input[name=q] { flex: 1 1 260px; border: 0; background: transparent; font-size: 15px; }
+.search { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px -18px rgba(60, 40, 20, .35); margin-bottom: 18px; }
+.search input[name=q] { flex: 1 1 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent;
+  font-size: 16px; padding: 8px 4px 12px; margin-bottom: 2px; }
+.search .modes { margin-right: auto; }
 .search input[name=q]:focus { outline: none; }
 .search .file { position: relative; overflow: hidden; }
 .search .file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.search .modes { display: flex; gap: 4px; }
-.search label.mode { font-size: 13px; padding: 6px 10px; border-radius: 6px; background: var(--paper); cursor: pointer; }
+.search .modes { display: flex; gap: 4px; background: var(--paper); padding: 3px; border-radius: 8px; }
+.search label.mode { font-size: 13px; padding: 5px 11px; border-radius: 6px; cursor: pointer; color: var(--muted); }
 .search label.mode input { display: none; }
 .search label.mode:has(input:checked) { background: var(--ink); color: var(--paper); }
 
@@ -57,24 +60,28 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
   color: var(--muted); background: var(--card); }
 .tabs a.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
-.card { display: flex; flex-direction: column; gap: 2px; background: var(--card); border: 1px solid var(--line);
-  border-radius: 10px; padding: 12px; text-decoration: none; transition: transform .12s, box-shadow .12s; }
-.card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(60, 40, 20, .08); }
-.card img { width: 100%; aspect-ratio: 1.15; object-fit: contain; background: #fff; border-radius: 6px; margin-bottom: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+.card { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  overflow: hidden; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease, border-color .18s; }
+.card:hover { transform: translateY(-3px); border-color: #d6cbbd; box-shadow: 0 14px 30px -16px rgba(60, 40, 20, .35); }
+.card .ph { display: block; overflow: hidden; background: #e6d9c8; aspect-ratio: 1; }
+.card img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.card:hover img { transform: scale(1.045); }
+.card .info { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 14px; }
 .card .brandline { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .card b { font-weight: 600; }
 .card .row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
 .card .price { font: 600 16px var(--sans); color: var(--ink); }
-.card.small img { aspect-ratio: 1.4; }
+.card.small .ph { aspect-ratio: 4 / 3; }
 .pill { font-size: 12px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
 .pill.in { background: var(--ok-soft); color: var(--ok); } .pill.out { background: var(--bad-soft); color: var(--bad); }
 .pill.low { background: var(--accent-soft); color: var(--accent); }
 
 /* product page */
-.detail { display: grid; grid-template-columns: 360px 1fr; gap: 32px; }
-.detail .photo { background: #fff; border: 1px solid var(--line); border-radius: 12px; display: grid; place-items: center; padding: 24px; }
-.detail .photo img { width: 100%; max-width: 300px; aspect-ratio: 1; object-fit: contain; }
+.detail { display: grid; grid-template-columns: minmax(0, 440px) 1fr; gap: 36px; align-items: start; }
+.detail .photo { background: #e6d9c8; border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  position: sticky; top: 76px; box-shadow: 0 18px 40px -26px rgba(60, 40, 20, .45); }
+.detail .photo img { display: block; width: 100%; height: auto; aspect-ratio: 1; }
 .detail .lead { color: var(--muted); margin: 0 0 14px; }
 .detail .price { font: 600 28px var(--serif); margin: 0 0 6px; }
 .buy { display: flex; gap: 8px; align-items: center; margin: 16px 0 6px; }
@@ -106,6 +113,10 @@ th, td { border-bottom: 1px solid var(--line); padding: 9px 12px; text-align: le
 th { background: #efe9e0; font-weight: 600; font-size: 13px; }
 tr:last-child td { border-bottom: 0; }
 tr.low td { background: #fbefe9; }
+a.thumb { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; }
+a.thumb img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+a.thumb:hover { color: var(--accent); }
+tr:has(a.thumb) td { vertical-align: middle; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .panel { background: var(--card); border: 1px solid var(--line); padding: 14px 18px; border-radius: 10px; }
 .flash { background: var(--ok-soft); color: var(--ok); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; }
@@ -140,6 +151,8 @@ summary { cursor: pointer; color: var(--muted); font-size: 14px; }
   header { flex-direction: column; align-items: flex-start; padding: 12px 16px; }
   main, footer { padding-left: 16px; padding-right: 16px; }
   .hero, .detail, .insight, .summary, .cols { grid-template-columns: 1fr; }
+  .detail .photo { position: static; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   table { display: block; overflow-x: auto; }
 }

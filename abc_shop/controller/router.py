@@ -97,4 +97,5 @@ class WebApp:
         if not os.path.isfile(full):
             return Response("not found", 404, "text/plain")
         with open(full, "rb") as f:
-            return Response(f.read(), 200, mimetypes.guess_type(full)[0] or "application/octet-stream")
+            return Response(f.read(), 200, mimetypes.guess_type(full)[0] or "application/octet-stream",
+                            [("Cache-Control", "max-age=3600")])

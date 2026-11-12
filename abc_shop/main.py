@@ -7,8 +7,11 @@
 """
 import argparse
 import os
+import socket
 import sys
-from wsgiref.simple_server import make_server
+import threading
+from socketserver import ThreadingMixIn
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
 from seed import DB_PATH, seed
 from shop import build_shop
@@ -140,8 +143,40 @@ def serve(port):
     if not os.path.exists(DB_PATH):
         seed()
     app = WebApp(build_shop(DB_PATH))
+    lock = threading.Lock()
+
+    def locked_app(environ, start_response):
+        # Connections are read in parallel threads (an idle browser connection no longer blocks the
+        # others); requests still run one at a time because the services share one SQLite connection.
+        with lock:
+            return app(environ, start_response)
+
+    servers = [make_server("127.0.0.1", port, locked_app, ThreadingWSGIServer, QuietHandler)]
+    try:    # "localhost" resolves to ::1 first on Windows; listening there too avoids a slow fallback
+        servers.append(make_server("::1", port, locked_app, ThreadingWSGIServerV6, QuietHandler))
+    except OSError:
+        pass
+    for s in servers[1:]:
+        threading.Thread(target=s.serve_forever, daemon=True).start()
     print(f"ABC Online Shop on http://localhost:{port}  (Ctrl+C to stop)")
-    make_server("127.0.0.1", port, app).serve_forever()
+    try:
+        servers[0].serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+
+class ThreadingWSGIServer(ThreadingMixIn, WSGIServer):
+    daemon_threads = True
+
+
+class ThreadingWSGIServerV6(ThreadingWSGIServer):
+    address_family = socket.AF_INET6
+
+
+class QuietHandler(WSGIRequestHandler):
+    def log_message(self, format, *args):     # keep the console readable during the demo
+        if not self.path.startswith(("/static/", "/images/")):
+            super().log_message(format, *args)
 
 
 def main(argv=None):

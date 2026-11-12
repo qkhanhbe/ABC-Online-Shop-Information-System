@@ -129,22 +129,22 @@ BLOCKS = [
           "successful only if nothing is returned). A query is successful when the top-1 result is the expected product "
           "or order."),
     ("term", EVAL_SEARCH, "Output of evaluate.py, part 1: multimodal search on 26 test queries", 165),
-    ("p", "The success rate is 24/26 = 92.3% (text 6/7, voice 4/4, image 9/9, multimodal 2/3, order 3/3). The review "
+    ("p", "The success rate is 25/26 = 96.2% (text 6/7, voice 4/4, image 9/9, multimodal 3/3, order 3/3). The review "
           "analyser and the recommender were evaluated on their own test data:"),
     ("term", EVAL_REST, "Output of evaluate.py, parts 2 and 3: review insights and recommender", 150),
     ("table", "Evaluation summary", ["Component", "Metric", "Value"], [
-        ["Search", "Top-1 success rate", "24 / 26 = 92.3%"],
+        ["Search", "Top-1 success rate", "25 / 26 = 96.2%"],
         ["Search", "Image queries / order queries (incl. privacy)", "9 / 9, 3 / 3"],
         ["Review insights", "Aspect detection precision / recall / F1", "0.97 / 0.95 / 0.96"],
         ["Review insights", "Polarity accuracy on detected aspects", "35 / 37 = 0.95"],
-        ["Recommender", "Same-category hit rate of top-3", "28 / 48 = 0.58"],
+        ["Recommender", "Same-category hit rate of top-3", "27 / 48 = 0.56"],
         ["Recommender", "Coverage / out-of-stock recommended", "15 / 15 / 0"]], [40, 80, 45]),
     ("h2", "3.10. Error Analysis"),
     ("bullets", [
-        "<b>Query 18 \"nike\" + white shoe photo.</b> The expected Nike Court Sneakers has the more similar image but is out of stock, so it loses 0.09 business points and Nike Running Shoes wins (0.801). This is the same trade-off as in Assignment 06; it shows that γ must be tuned on real behaviour.",
+        "<b>Query 18 \"nike\" + white shoe photo.</b> In Assignment 06 this query failed: the expected Nike Court Sneakers is out of stock, loses 0.09 business points, and Nike Running Shoes won. For V4 the catalogue and query photos were redrawn with clearer shapes (abc_shop/tools/make_images.py); the court sneakers now match the photo with cosine 0.876 against 0.647 for the running shoes, which outweighs the stock penalty (0.844 against 0.827). The margin is small, so the case still shows that γ can override the visual match and must be tuned on real behaviour.",
         "<b>Query 21 \"white sneakers\".</b> The synonym table maps <i>sneakers</i> to <i>shoes</i>, so the word that identified the court sneakers is lost and Adidas Running Shoes (white, in stock) wins. Mapping to both words, or embedding-based text matching, would keep the specific term. A fix for one error class created another, which is why the test set is run on every change.",
         "<b>Review insights.</b> The five errors are typical lexicon limits: an aspect word used as a reference (\"too expensive for this quality\"), an opinion split from its aspect by a comma (\"shipping took two weeks, very slow\"), two aspects with opposite polarity in one clause, and missing Vietnamese vocabulary. Sarcasm (\"Oh great, another two weeks\") was classified correctly only because the star rating broke the tie.",
-        "<b>Recommender.</b> A hit rate of 0.58 is low only if the goal is \"more of the same\". Many top-3 lists mix a same-category item with a complement bought together (shoes and caps), which is intended by the 0.3 co-purchase weight."]),
+        "<b>Recommender.</b> A hit rate of 0.56 is low only if the goal is \"more of the same\". Many top-3 lists mix a same-category item with a complement bought together (shoes and caps), which is intended by the 0.3 co-purchase weight."]),
     ("h2", "3.11. Risks, Fallbacks and Human Control"),
     ("table", "AI risks and the design response", ["Risk", "Effect", "Response (fallback / control)"], [
         ["Wrong top result", "Customer misses the product", "Show top-5 with scores; keyword search and category browsing always available"],
@@ -171,7 +171,7 @@ BLOCKS = [
     ("h2", "3.13. Chapter Summary"),
     ("p", "Three AI components were analysed like any other requirement: they come from business problems, extend "
           "existing use cases, read the shop's own data, have fallbacks and are measured. The search keeps the "
-          "Assignment 06 design and reaches 92.3% top-1 success on 26 queries; the review analyser reaches an aspect F1 "
+          "Assignment 06 design and reaches 96.2% top-1 success on 26 queries; the review analyser reaches an aspect F1 "
           "of 0.96; the recommender never suggests unavailable or already-bought items. The honest limits (synthetic "
           "images, simulated speech, a lexicon instead of a trained model) are stated together with the production "
           "replacements that the interfaces allow."),

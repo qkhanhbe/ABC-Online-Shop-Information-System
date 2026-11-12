@@ -51,4 +51,4 @@ tests/test_web.py::test_search_shows_the_processing_steps PASSED         [ 95%]
 tests/test_web.py::test_customer_buys_through_the_web PASSED             [ 97%]
 tests/test_web.py::test_roles_are_enforced_on_screens PASSED             [100%]
 
-============================= 45 passed in 6.85s ==============================
+============================= 45 passed in 18.25s =============================

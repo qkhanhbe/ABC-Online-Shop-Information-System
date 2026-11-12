@@ -1,11 +1,11 @@
-"""Capture screenshots of the running web app (server on :8765) with headless Edge."""
+"""Capture screenshots of the running web app (python abc_shop/main.py serve; SHOP_URL overrides the address) with headless Edge."""
 import http.cookiejar
 import os
 import subprocess
 import urllib.parse
 import urllib.request
 
-BASE = "http://127.0.0.1:8765"
+BASE = os.environ.get("SHOP_URL", "http://127.0.0.1:8000")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "demo_results")
 TMP = os.environ.get("TEMP", os.path.dirname(os.path.abspath(__file__)))
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
@@ -22,7 +22,7 @@ def fetch(opener, path, data=None):
 
 
 def shot(html, name, height=1100):
-    html = html.replace('href="/static/', f'href="{BASE}/static/').replace('src="/', f'src="{BASE}/')
+    html = html.replace('href="/static/', f'href="{BASE}/static/').replace('src="/', f'src="{BASE}/').replace("src='/", f"src='{BASE}/")
     path = os.path.join(TMP, name + ".html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)

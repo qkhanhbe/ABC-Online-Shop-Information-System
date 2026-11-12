@@ -32,7 +32,7 @@ def layout(request, title, body):
     heading = "" if title == "Catalogue" else f"<h1>{e(title)}</h1>"
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css"></head>
+<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=4"></head>
 <body><header><a class="brand" href="/">ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
 <main>{note}{heading}{body}</main>
 <footer><span>ABC Online Shop &middot; course essay prototype</span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
@@ -63,9 +63,10 @@ def stock_pill(available):
 
 def product_card(card):
     p = card["product"]
-    return f"""<a class="card" href="/product/{e(p.product_id)}"><img src="/{e(p.image)}" alt="{e(p.name)}">
+    return f"""<a class="card" href="/product/{e(p.product_id)}"><span class="ph"><img src="/{e(p.image)}" alt="{e(p.name)}"
+width="600" height="600" loading="lazy" decoding="async"></span><span class="info">
 <span class="brandline">{e(p.brand)}</span><b>{e(p.name)}</b>
-<span class="row"><span class="price">{money(p.price)}</span>{stock_pill(card['available'])}</span></a>"""
+<span class="row"><span class="price">{money(p.price)}</span>{stock_pill(card['available'])}</span></span></a>"""
 
 
 def home(request, categories, cards, active):
@@ -81,7 +82,8 @@ def home(request, categories, cards, active):
 
 def search_results(request, text, mode, results, trace):
     rows = "".join(
-        f"<tr><td>{i}</td><td><a href='/product/{e(r['product'].product_id)}'>{e(r['product'].name)}</a></td>"
+        f"<tr><td>{i}</td><td><a class='thumb' href='/product/{e(r['product'].product_id)}'><img src='/{e(r['product'].image)}' "
+        f"alt='' width='44' height='44'>{e(r['product'].name)}</a></td>"
         f"<td>{money(r['product'].price)}</td><td>{r['available']}</td><td>{r['text']}</td>"
         f"<td>{r['s_image']:.3f}</td><td><b>{r['score']:.3f}</b></td></tr>"
         for i, r in enumerate(results, 1))
@@ -114,9 +116,10 @@ def product(request, card, reviews, insight, similar, category=None):
         "<p class='panel'>Not enough reviews yet for an AI summary (at least 2 are needed).</p>"
     review_list = "".join(f"<li><span class='stars'>{'&#9733;' * r.rating}{'&#9734;' * (5 - r.rating)}</span>{e(r.text)} "
                           f"<small class='hint'>{e(r.created_at[:10])}</small></li>" for r in reviews) or "<li>No reviews yet.</li>"
-    recs = "".join(f'<a class="card small" href="/product/{e(q.product_id)}"><img src="/{e(q.image)}" alt="{e(q.name)}">'
+    recs = "".join(f'<a class="card small" href="/product/{e(q.product_id)}"><span class="ph"><img src="/{e(q.image)}" '
+                   f'alt="{e(q.name)}" width="600" height="600" loading="lazy" decoding="async"></span><span class="info">'
                    f'<span class="brandline">{e(q.brand)}</span><b>{e(q.name)}</b>'
-                   f'<span class="row"><span class="price">{money(q.price)}</span><span class="hint">match {s:.2f}</span></span></a>'
+                   f'<span class="row"><span class="price">{money(q.price)}</span><span class="hint">match {s:.2f}</span></span></span></a>'
                    for q, s, _ in similar)
     buy = (f"""<form class="buy" method="post" action="/cart/add"><input type="hidden" name="product_id" value="{e(p.product_id)}">
 <input type="number" name="qty" value="1" min="1" max="{card['available']}" aria-label="Quantity"><button>Add to cart</button></form>"""
@@ -125,7 +128,7 @@ def product(request, card, reviews, insight, similar, category=None):
     rows += p.detail.spec_rows() if p.detail else []
     specs = "".join(f"<tr><th>{e(k)}</th><td>{e(v)}</td></tr>" for k, v in rows)
     kind = f" &middot; {e(p.detail.KIND)} details" if p.detail else ""
-    return layout(request, p.name, f"""<div class="detail"><div class="photo"><img src="/{e(p.image)}" alt="{e(p.name)}"></div>
+    return layout(request, p.name, f"""<div class="detail"><div class="photo"><img src="/{e(p.image)}" alt="{e(p.name)}" width="600" height="600"></div>
 <div><p class="price">{money(p.price)}</p><p class="lead">{e(p.description)}</p>{stock_pill(card['available'])}
 <span class="hint">&nbsp;{card['available']} available to order</span>{buy}
 <table class="specs"><caption>Specification{kind}</caption>{specs}</table></div></div>
@@ -168,8 +171,10 @@ def order_history(request, orders, picks):
     rows = "".join(f"<tr><td><a href='/orders/{e(o.order_id)}'>{e(o.order_id)}</a></td><td>{e(o.created_at[:16])}</td>"
                    f"<td>{e(', '.join(i.name for i in o.items))}</td><td>{money(o.calc_total())}</td>"
                    f"<td><span class='status'>{e(o.status)}</span></td></tr>" for o in orders)
-    recs = "".join(f'<a class="card small" href="/product/{e(p.product_id)}"><img src="/{e(p.image)}" alt="">'
-                   f'<b>{e(p.name)}</b><span>{money(p.price)}</span></a>' for p, _ in picks)
+    recs = "".join(f'<a class="card small" href="/product/{e(p.product_id)}"><span class="ph"><img src="/{e(p.image)}" '
+                   f'alt="" width="600" height="600" loading="lazy" decoding="async"></span><span class="info">'
+                   f'<span class="brandline">{e(p.brand)}</span><b>{e(p.name)}</b>'
+                   f'<span class="row"><span class="price">{money(p.price)}</span></span></span></a>' for p, _ in picks)
     return layout(request, "My orders", f"<table><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th>"
                   f"<th>Status</th></tr>{rows}</table><h2>Recommended for you</h2><div class='grid'>{recs}</div>")
 

@@ -21,8 +21,8 @@ FRONT = [
           "objects), with a conceptual, logical and physical data model in which product details depend on the category, "
           "from which a database of 23 tables and 28 Python classes were generated; and a working Python application with a web "
           "interface, a SQLite database, 45 automated tests and an evaluation script. All 35 diagrams are kept in one Visual Paradigm project "
-          "(TieuLuan_KHANHBQ.vpp). On the test sets, the search returns the expected item first for 24 of 26 queries "
-          "(92.3%), the review analyser reaches an aspect F1 of 0.96, and every order-state and stock rule of the "
+          "(TieuLuan_KHANHBQ.vpp). On the test sets, the search returns the expected item first for 25 of 26 queries "
+          "(96.2%), the review analyser reaches an aspect F1 of 0.96, and every order-state and stock rule of the "
           "requirements is checked by a test."),
     ("p", "<i>Keywords: requirements engineering, use case, data flow diagram, UML, data modeling, DAO, MVC, layered "
           "architecture, multimodal search, aspect-based sentiment analysis, recommendation, Python.</i>"),
