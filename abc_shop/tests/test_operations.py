@@ -56,7 +56,7 @@ def test_low_stock_and_replenishment(shop, users):
     low = [p.product_id for p, _ in shop.inventory.low_stock()]
     assert "P05" in low and "P15" in low
     rq = shop.inventory.request_replenishment(users["W01"], "P05", 20)
-    assert rq.startswith("RQ") and shop.dao.inventory.open_replenishments()[0]["product_id"] == "P05"
+    assert rq.request_id.startswith("RQ") and shop.dao.inventory.open_replenishments()[0].product_id == "P05"
 
 
 def test_reviews_only_for_delivered_purchases_and_spam_waits_for_moderation(shop, users):

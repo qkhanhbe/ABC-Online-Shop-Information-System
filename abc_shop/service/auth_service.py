@@ -44,7 +44,7 @@ class AuthService:
         if problems:
             raise ValidationError("; ".join(problems))
         customer = Customer(self.db.next_id("customer", "C"), name.strip(), email,
-                            hash_password(password), "customer", address, self.db.now())
+                            hash_password(password), "customer", self.db.now(), address)
         self.customers.save_user(customer)
         self.audit.record(customer.user_id, "register", "user", customer.user_id)
         return customer

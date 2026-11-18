@@ -3,7 +3,7 @@
 Every stock change is one typed, uniquely referenced InventoryEvent (BR20). Recording the same
 reference twice returns the earlier event and changes nothing (E2 "duplicate reference").
 """
-from model.inventory import InventoryEvent, StockError
+from model.inventory import InventoryEvent, ReplenishmentRequest, StockError
 from service.auth_service import AuthService
 from service.errors import NotFound, ValidationError
 
@@ -77,7 +77,8 @@ class InventoryService:
         AuthService.require(staff, "inventory")
         if quantity <= 0:
             raise ValidationError("quantity must be positive")
-        request_id = self.db.next_id("replenishment", "RQ")
-        self.inventory.add_replenishment(request_id, product_id, quantity, self.db.now())
+        request = ReplenishmentRequest(self.db.next_id("replenishment", "RQ"), product_id, quantity,
+                                       "Requested", self.db.now())
+        self.inventory.add_replenishment(request)
         self.audit.record(staff.user_id, "replenish", "product", product_id, f"qty={quantity}")
-        return request_id
+        return request

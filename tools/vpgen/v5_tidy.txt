@@ -1,0 +1,42 @@
+# V5 tidy-up of TieuLuan_KHANHBQ.vpp (essay.gen mode "tidy"); see Tidy.jsrc
+# diagrams of V4 that V5 replaced
+DELETE CL01 Analysis Class Diagram
+DELETE DM01 Data Model (ORM Persistable Classes)
+DELETE CDM01 Conceptual Data Model
+DELETE LDM01 Logical Data Model
+DELETE ERD01 Physical Data Model - Customers, Carts and Orders
+DELETE ERD02 Physical Data Model - Catalogue, Stock and Reviews
+DELETE DCL01 Design Classes - Customers, Carts and Orders
+DELETE DCL02 Design Classes - Payment, Shipment and Review
+DELETE DCL03 Design Classes - Catalogue and Inventory
+DELETE DCL04 Layer Slice - Add a Product to the Cart
+DELETE DCL05 Data Access Layer
+DELETE PKG01 Layers, Packages and Classes
+DELETE LAY01 Layers - Search Products (UC05)
+DELETE LAY02 Layers - Cart and Checkout (UC07 and UC08)
+# names without commas (generateCode takes a comma-separated list of diagrams)
+RENAME CL01 Analysis Classes - Customers, Catalogue and Orders => CL01 Analysis Classes - Customers Catalogue and Orders
+RENAME CL02 Analysis Classes - Order History, Delivery, Stock and Reviews => CL02 Analysis Classes - Order History Delivery Stock and Reviews
+RENAME DM01 Data Model Classes - Customers, Catalogue and Orders => DM01 Data Model Classes - Customers Catalogue and Orders
+RENAME DM02 Data Model Classes - Order History, Delivery, Stock and Reviews => DM02 Data Model Classes - Order History Delivery Stock and Reviews
+RENAME DCL01 Design Classes (model) - Customers, Catalogue and Orders => DCL01 Design Classes (model) - Customers Catalogue and Orders
+RENAME DCL02 Design Classes (model) - Order History, Delivery, Stock and Reviews => DCL02 Design Classes (model) - Order History Delivery Stock and Reviews
+RENAME DCL05 Design Classes (ai) - Search, Review Insights and Recommendations => DCL05 Design Classes (ai) - Search Review Insights and Recommendations
+RENAME PKG02 Layers, Packages and Classes (Design) => PKG01 Layers and Packages (Design)
+# V4 packages whose classes no diagram shows any more
+PRUNE model (V4)
+PRUNE dao (V4)
+PRUNE service (V4)
+PRUNE controller (V4)
+PRUNE view (V4)
+PRUNE ai (V4)
+PRUNE Data Model (ORM)
+PRUNE Package
+PRUNE product
+PRUNE inventory
+PRUNE order
+PRUNE cart
+PRUNE customer
+PRUNE payment
+PRUNE shipment
+PRUNE review

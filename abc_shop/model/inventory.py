@@ -69,3 +69,13 @@ class StockLevel:
             raise StockError("resulting balance would be negative")
         self.physical, self.reserved = physical, reserved
         return self
+
+
+@dataclass
+class ReplenishmentRequest:
+    """UC24: a request to the supplier for more units of one product."""
+    request_id: str
+    product_id: str
+    quantity: int
+    status: str = "Requested"
+    created_at: str = ""

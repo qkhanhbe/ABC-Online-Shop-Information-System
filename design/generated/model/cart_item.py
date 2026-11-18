@@ -1,0 +1,14 @@
+from __future__ import annotations
+
+
+
+class CartItem:
+
+    def __init__(self, product_id: str | None = None, name: str | None = None, cart_price: float | None = None, quantity: int | None = None) -> None:
+        self.product_id: str | None = product_id
+        self.name: str | None = name
+        self.cart_price: float | None = cart_price
+        self.quantity: int | None = quantity
+
+    def sub_total(self) -> float:
+        raise NotImplementedError

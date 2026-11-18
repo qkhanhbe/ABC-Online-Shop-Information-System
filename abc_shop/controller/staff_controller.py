@@ -52,7 +52,7 @@ class StaffController:
         product_id = request.get("product_id")
         if request.get("kind") == "REPLENISH":
             rq = self.inventory_service.request_replenishment(user, product_id, int(request.get("qty")))
-            return Response.redirect("/staff/inventory", f"Replenishment {rq} requested.", request)
+            return Response.redirect("/staff/inventory", f"Replenishment {rq.request_id} requested.", request)
         result = self.inventory_service.manual_event(user, product_id, request.get("kind"),
                                                      int(request.get("qty")), request.get("reference"),
                                                      request.get("reason"))

@@ -19,11 +19,11 @@ tests/test_architecture.py::test_dependencies_only_point_downwards[ai] PASSED [ 
 tests/test_architecture.py::test_dependencies_only_point_downwards[controller] PASSED [ 26%]
 tests/test_architecture.py::test_dependencies_only_point_downwards[view] PASSED [ 28%]
 tests/test_architecture.py::test_services_never_import_a_storage_implementation PASSED [ 31%]
-tests/test_catalogue.py::test_each_product_loads_the_detail_kind_of_its_category PASSED [ 33%]
-tests/test_catalogue.py::test_product_page_shows_the_group_specific_attributes PASSED [ 35%]
-tests/test_catalogue.py::test_service_rejects_a_detail_of_the_wrong_group PASSED [ 37%]
-tests/test_catalogue.py::test_database_trigger_rejects_a_detail_of_the_wrong_group PASSED [ 40%]
-tests/test_catalogue.py::test_search_uses_the_detail_attributes PASSED   [ 42%]
+tests/test_catalogue.py::test_each_product_is_of_the_kind_of_its_category PASSED [ 33%]
+tests/test_catalogue.py::test_product_page_shows_the_attributes_of_the_kind PASSED [ 35%]
+tests/test_catalogue.py::test_service_rejects_a_product_of_the_wrong_kind PASSED [ 37%]
+tests/test_catalogue.py::test_database_trigger_rejects_a_kind_row_of_the_wrong_kind PASSED [ 40%]
+tests/test_catalogue.py::test_search_uses_the_attributes_of_the_kind PASSED [ 42%]
 tests/test_checkout.py::test_successful_checkout_reserves_stock_pays_and_clears_cart PASSED [ 44%]
 tests/test_checkout.py::test_promotion_and_shipping_are_part_of_the_authoritative_total PASSED [ 46%]
 tests/test_checkout.py::test_repeated_submission_returns_the_same_order PASSED [ 48%]
@@ -51,4 +51,4 @@ tests/test_web.py::test_search_shows_the_processing_steps PASSED         [ 95%]
 tests/test_web.py::test_customer_buys_through_the_web PASSED             [ 97%]
 tests/test_web.py::test_roles_are_enforced_on_screens PASSED             [100%]
 
-============================= 45 passed in 18.25s =============================
+============================= 45 passed in 16.96s =============================

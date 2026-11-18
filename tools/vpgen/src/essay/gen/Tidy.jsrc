@@ -1,0 +1,88 @@
+package essay.gen;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.IInteractionLifeLine;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * V5 tidy-up, driven by a spec file (tools/vpgen/v5_tidy.txt):
+ *   DELETE name          remove a diagram that V5 replaced
+ *   RENAME old => new    rename a diagram (names without commas, because generateCode takes a comma list)
+ *   PRUNE package        delete the elements of a root package that no diagram shows any more
+ */
+public class Tidy {
+    final Set<String> used = new HashSet<>();
+
+    public void run(IProject project, String specFile) throws Exception {
+        List<String> lines = Files.readAllLines(Paths.get(specFile), StandardCharsets.UTF_8);
+        for (String raw : lines) {
+            String line = raw.trim();
+            if (line.isEmpty() || line.startsWith("#")) continue;
+            if (line.startsWith("DELETE ")) {
+                String name = line.substring(7).trim();
+                for (IDiagramUIModel d : project.toDiagramArray()) {
+                    if (d.getName().equals(name)) {
+                        d.delete();
+                        System.out.println("TIDY deleted diagram " + name);
+                    }
+                }
+            } else if (line.startsWith("RENAME ")) {
+                String[] p = line.substring(7).split("=>");
+                for (IDiagramUIModel d : project.toDiagramArray()) {
+                    if (d.getName().equals(p[0].trim())) {
+                        d.setName(p[1].trim());
+                        System.out.println("TIDY renamed " + p[0].trim() + " -> " + p[1].trim());
+                    }
+                }
+            }
+        }
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            for (IDiagramElement e : d.toDiagramElementArray()) {
+                IModelElement m = e.getModelElement();
+                if (m == null) continue;
+                used.add(m.getId());
+                if (m instanceof IInteractionLifeLine) {
+                    Object base = ((IInteractionLifeLine) m).getBaseClassifier();
+                    if (base instanceof IModelElement) used.add(((IModelElement) base).getId());
+                }
+            }
+        }
+        for (String raw : lines) {
+            String line = raw.trim();
+            if (!line.startsWith("PRUNE ")) continue;
+            String name = line.substring(6).trim();
+            for (IModelElement p : project.toModelElementArray("Package")) {
+                if (name.equals(p.getName()) && (p.getParent() == null || p.getParent() instanceof IProject)) prune(p);
+            }
+        }
+        for (IModelElement t : project.toModelElementArray("DBTable")) {
+            if (!used.contains(t.getId())) {
+                System.out.println("TIDY delete unused table " + t.getName());
+                t.delete();
+            }
+        }
+        for (IDiagramUIModel d : project.toDiagramArray()) System.out.println("DIAGRAM " + d.getName());
+    }
+
+    boolean prune(IModelElement m) {
+        boolean keep = used.contains(m.getId());
+        if ("Package".equals(m.getModelType())) {
+            for (IModelElement c : m.toChildArray()) {
+                if (!prune(c)) keep = true;
+            }
+        }
+        if (keep) return false;
+        System.out.println("TIDY delete " + m.getModelType() + " " + m.getName());
+        m.delete();
+        return true;
+    }
+}

@@ -4,7 +4,7 @@ Each class maps rows to model objects and back; none of them contains a business
 """
 from model.cart import Cart, CartItem
 from model.customer import Address, Customer, User
-from model.inventory import InventoryEvent, StockLevel
+from model.inventory import InventoryEvent, ReplenishmentRequest, StockLevel
 from model.order import Order, OrderItem, StatusChange
 from model.payment import Payment
 from model.product import KINDS, Bag, Category, Product, Promotion, kind_fields
@@ -23,11 +23,12 @@ class SqliteCustomerDAO(interfaces.CustomerDAO):
         if row is None:
             return None
         if row["role"] != "customer":
-            return User(row["user_id"], row["name"], row["email"], row["password_hash"], row["role"])
+            return User(row["user_id"], row["name"], row["email"], row["password_hash"], row["role"],
+                        row["created_at"])
         a = self.db.query_one("SELECT * FROM Address WHERE customer_id = ?", (row["user_id"],))
         address = Address(a["receiver"], a["phone"], a["street"], a["city"]) if a else None
         return Customer(row["user_id"], row["name"], row["email"], row["password_hash"],
-                        "customer", address, row["created_at"])
+                        "customer", row["created_at"], address)
 
     def get_user(self, user_id):
         return self._to_user(self.db.query_one("SELECT * FROM User WHERE user_id = ?", (user_id,)))
@@ -167,15 +168,16 @@ class SqliteInventoryDAO(interfaces.InventoryDAO):
                              "ORDER BY created_at DESC, event_id DESC LIMIT ?", (product_id, limit))
         return [self._to_event(r) for r in rows]
 
-    def add_replenishment(self, request_id, product_id, quantity, at):
-        self.db.execute("INSERT INTO ReplenishmentRequest(request_id, product_id, quantity, "
-                        "status, created_at) VALUES (?, ?, ?, 'Requested', ?)",
-                        (request_id, product_id, quantity, at))
-        return request_id
+    def add_replenishment(self, request):
+        self.db.execute("INSERT INTO ReplenishmentRequest(request_id, product_id, quantity, status, created_at) "
+                        "VALUES (?, ?, ?, ?, ?)", (request.request_id, request.product_id, request.quantity,
+                                                     request.status, request.created_at))
+        return request
 
     def open_replenishments(self):
-        return [dict(r) for r in self.db.query(
-            "SELECT * FROM ReplenishmentRequest WHERE status = 'Requested' ORDER BY request_id")]
+        return [ReplenishmentRequest(r["request_id"], r["product_id"], r["quantity"], r["status"], r["created_at"])
+                for r in self.db.query("SELECT * FROM ReplenishmentRequest WHERE status = 'Requested' "
+                                       "ORDER BY request_id")]
 
 
 class SqliteCartDAO(interfaces.CartDAO):

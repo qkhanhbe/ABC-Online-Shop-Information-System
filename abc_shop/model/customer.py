@@ -39,6 +39,7 @@ class User:
     email: str
     password_hash: str
     role: str = "customer"
+    created_at: str = ""              # every account has one (column User.created_at)
 
     def can(self, permission):
         return permission in PERMISSIONS.get(self.role, set())
@@ -47,7 +48,6 @@ class User:
 @dataclass
 class Customer(User):
     address: Optional[Address] = None
-    created_at: str = ""
 
     def update_profile(self, name=None, address=None):
         if name:

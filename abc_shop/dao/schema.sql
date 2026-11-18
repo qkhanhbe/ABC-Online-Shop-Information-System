@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS Milestone (
     at           TEXT NOT NULL,
     location     TEXT NOT NULL DEFAULT '',
     shipment_id  TEXT NOT NULL,
-    CONSTRAINT pk_Milestone PRIMARY KEY (shipment_id, seq),
+    CONSTRAINT pk_Milestone PRIMARY KEY (seq, shipment_id),
     CONSTRAINT fk_Milestone_Shipment FOREIGN KEY (shipment_id) REFERENCES Shipment (shipment_id)
 );
 
