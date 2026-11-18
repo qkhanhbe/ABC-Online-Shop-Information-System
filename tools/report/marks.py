@@ -53,6 +53,35 @@ def first_ink(img):
     return box[0], box[1]
 
 
+def fit_offset(img, shapes, dx0, dy0, window=90, step=2):
+    """The offset from model to image coordinates. The first estimate (first ink against the left-/top-most
+    coordinate) is off when a label lies outside every shape, so the offset is searched near it: the one where the
+    borders of the shapes fall on the most dark pixels of the image."""
+    import numpy as np
+    dark = np.asarray(img.convert("L")) < 110
+    h, w = dark.shape
+    xs, ys = [], []
+    for x, y, sw, sh in shapes.values():
+        for t in range(0, sw, step):                  # top and bottom border
+            xs += [x + t, x + t]
+            ys += [y, y + sh - 1]
+        for t in range(0, sh, step):                  # left and right border
+            xs += [x, x + sw - 1]
+            ys += [y + t, y + t]
+    xs, ys = np.array(xs), np.array(ys)
+    best, at = -1, (dx0, dy0)
+    for dy in range(dy0 - window, dy0 + window + 1):
+        yy = ys + dy
+        okay = (yy >= 0) & (yy < h)
+        for dx in range(dx0 - window, dx0 + window + 1):
+            xx = xs + dx
+            ok = okay & (xx >= 0) & (xx < w)
+            score = int(dark[yy[ok], xx[ok]].sum())
+            if score > best:
+                best, at = score, (dx, dy)
+    return at
+
+
 def font(size):
     for f in ("arialbd.ttf", "segoeuib.ttf"):
         try:
@@ -69,11 +98,12 @@ def annotate(code, marks, pad=6):
     img = Image.open(src).convert("RGB")
     shapes, connectors, mx, my = geometry(code)
     ix, iy = first_ink(img)
+    dx, dy = fit_offset(img, shapes, ix - mx, iy - my)
     M = 40                                            # white margin, so frames and badges near the edge stay visible
     framed = Image.new("RGB", (img.width + 2 * M, img.height + 2 * M), "white")
     framed.paste(img, (M, M))
     img = framed
-    ox, oy = ix - mx + M, iy - my + M
+    ox, oy = dx + M, dy + M
     d = ImageDraw.Draw(img)
     scale = max(1, img.width // 900)
     width = 3 * scale

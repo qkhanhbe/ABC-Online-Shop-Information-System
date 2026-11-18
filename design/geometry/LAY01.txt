@@ -1,30 +1,30 @@
 Geometry of 'LAY01 Layers - Search Products (UC05)' (ClassDiagram):
-  Package: model 40,1363 464x106 caption 0,20 464x86
-    Class: Product 364,1407 110x36 caption 0,0 110x19
-    Class: StockLevel 194,1407 140x36 caption 0,0 140x19
-    Class: Order 64,1407 100x36 caption 0,0 100x19
-  Package: dao 40,816 2293x457 caption 0,20 2293x437
-    Interface: ProductDAO 70,860 502x160 caption 0,0 502x38
-    Interface: InventoryDAO 632,860 546x179 caption 0,0 546x38
-    Interface: OrderDAO 1907,860 373x160 caption 0,0 373x38
-    Class: VectorIndex 1238,908 609x84 caption 0,0 609x19
-    Class: ImageStorage 1416,1159 381x84 caption 0,0 381x19
-  Package: ai 40,307 1854x419 caption 0,20 1854x399
-    Class: SearchService 1031,367 482x122 caption 0,0 482x19
-    Class: QueryService 70,351 564x141 caption 0,0 564x19
-    Class: RankingService 885,612 452x84 caption 0,0 452x19
-    Class: ImageService 1573,351 291x46 caption 0,0 291x19
-    Class: SpeechService 694,351 277x84 caption 0,0 277x19
-  Package: controller 40,40 467x177 caption 0,20 467x157
-    Class: ShopController 70,84 407x103 caption 0,0 407x19
-  Usage: ShopController -> QueryService points (273,187) (273,351) caption 276,257 92x24 text "<<use>>"
-  Usage: ShopController -> SearchService points (477,156) (1015,156) (1015,382) (1031,382) caption 700,159 92x24 text "<<use>>"
-  Usage: ShopController -> ImageService points (477,144) (1557,144) (1557,359) (1573,359) caption 971,117 92x24 text "<<use>>"
-  Usage: ShopController -> SpeechService points (477,168) (678,168) (678,361) (694,361) caption 531,171 92x24 text "<<use>>"
-  Usage: ShopController -> ImageStorage points (70,168) (40,168) (40,1169) (1416,1169) caption 682,1172 92x24 text "<<use>>"
-  Usage: SearchService -> RankingService points (1272,489) (1272,612) caption 1177,538 92x24 text "<<use>>"
-  Usage: SearchService -> ProductDAO points (1031,454) (648,454) (648,846) (588,846) (588,880) (572,880) caption 553,638 92x24 text "<<use>>"
-  Usage: SearchService -> InventoryDAO points (1031,466) (868,466) (868,860) caption 773,651 92x24 text "<<use>>"
-  Usage: SearchService -> OrderDAO points (1513,466) (1891,466) (1891,880) (1907,880) caption 1796,661 92x24 text "<<use>>"
-  Usage: SearchService -> VectorIndex points (1375,489) (1375,908) caption 1378,686 92x24 text "<<use>>"
-  Usage: VectorIndex -> ImageStorage points (1542,992) (1542,1159) caption 1447,1063 92x24 text "<<use>>"
+  Class: Order 64,1407 100x36 caption 0,0 100x19
+  Class: StockLevel 194,1407 140x36 caption 0,0 140x19
+  Class: Product 364,1407 110x36 caption 0,0 110x19
+  Package: model 40,1363 464x106 caption 0,0 464x19
+  Class: ImageStorage 1416,1159 381x84 caption 0,0 381x19
+  Class: VectorIndex 1238,908 609x84 caption 0,0 609x19
+  Class: OrderDAO 1907,860 373x160 caption 0,0 373x38
+  Class: InventoryDAO 632,860 546x179 caption 0,0 546x38
+  Class: ProductDAO 70,860 502x160 caption 0,0 502x38
+  Package: dao 40,816 2293x457 caption 0,0 2293x19
+  Class: SpeechService 694,351 277x84 caption 0,0 277x19
+  Class: ImageService 1573,351 291x46 caption 0,0 291x19
+  Class: RankingService 885,612 452x84 caption 0,0 452x19
+  Class: QueryService 70,351 564x141 caption 0,0 564x19
+  Class: SearchService 1031,367 482x122 caption 0,0 482x19
+  Package: ai 40,307 1854x419 caption 0,0 1854x19
+  Class: ShopController 70,84 407x103 caption 0,0 407x19
+  Package: controller 40,40 467x177 caption 0,0 467x19
+  Usage: ShopController -> QueryService points (273,187) (273,351)
+  Usage: ShopController -> SearchService points (477,156) (1015,156) (1015,382) (1031,382)
+  Usage: ShopController -> ImageService points (477,144) (1557,144) (1557,359) (1573,359)
+  Usage: ShopController -> SpeechService points (477,168) (678,168) (678,361) (694,361)
+  Usage: ShopController -> ImageStorage points (70,168) (40,168) (40,1169) (1416,1169)
+  Usage: SearchService -> RankingService points (1272,489) (1272,612)
+  Usage: SearchService -> ProductDAO points (1031,454) (648,454) (648,846) (588,846) (588,880) (572,880)
+  Usage: SearchService -> InventoryDAO points (1031,466) (868,466) (868,860)
+  Usage: SearchService -> OrderDAO points (1513,466) (1891,466) (1891,880) (1907,880)
+  Usage: SearchService -> VectorIndex points (1375,489) (1375,908)
+  Usage: VectorIndex -> ImageStorage points (1542,992) (1542,1159)

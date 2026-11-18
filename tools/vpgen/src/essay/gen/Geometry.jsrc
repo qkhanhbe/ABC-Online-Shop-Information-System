@@ -1,0 +1,58 @@
+package essay.gen;
+
+import java.awt.Point;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+
+import com.vp.plugin.diagram.IConnectorUIModel;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.model.IClass;
+import com.vp.plugin.model.IModelElement;
+
+/**
+ * Writes the geometry of a diagram in the text format of the MCP tool getDiagramGeometry, which the red callouts of
+ * the report read (tools/report/marks.py). It runs in the same session as the image export, so the callouts and the
+ * picture describe the same state: Visual Paradigm fits the classes again whenever a project is opened, and a
+ * geometry read later from another session no longer matches an image exported from the polished state.
+ */
+public class Geometry {
+
+    static void write(IDiagramUIModel d, File file) {
+        StringBuilder sb = new StringBuilder("Geometry of '" + d.getName() + "' (" + d.getType() + "):\n");
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            IModelElement m = e.getModelElement();
+            if (m == null) continue;
+            if (e instanceof IConnectorUIModel) {
+                IConnectorUIModel c = (IConnectorUIModel) e;
+                IDiagramElement a = c.getFromShape(), b = c.getToShape();
+                if (a == null || b == null || a.getModelElement() == null || b.getModelElement() == null) continue;
+                Point[] pts = c.getPoints();
+                if (pts == null || pts.length == 0) continue;
+                String name = m.getName() == null || m.getName().isEmpty() ? "" : " '" + m.getName() + "'";
+                sb.append("  ").append(m.getModelType()).append(name).append(": ").append(a.getModelElement().getName())
+                  .append(" -> ").append(b.getModelElement().getName()).append(" points");
+                for (Point p : pts) sb.append(" (").append(p.x).append(',').append(p.y).append(')');
+                sb.append('\n');
+            } else if (e instanceof IShapeUIModel) {
+                IShapeUIModel s = (IShapeUIModel) e;
+                String name = m.getName() == null ? "" : m.getName();
+                int header = 19;
+                if (m instanceof IClass && ((IClass) m).stereotypeCount() > 0) header = 38;
+                sb.append("  ").append(m.getModelType()).append(": ").append(name).append(' ').append(s.getX()).append(',')
+                  .append(s.getY()).append(' ').append(s.getWidth()).append('x').append(s.getHeight())
+                  .append(" caption 0,0 ").append(s.getWidth()).append('x').append(header).append('\n');
+            }
+        }
+        file.getParentFile().mkdirs();
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            w.write(sb.toString());
+        } catch (Exception ex) {
+            System.out.println("GEOMETRY cannot write " + file + ": " + ex);
+        }
+    }
+}

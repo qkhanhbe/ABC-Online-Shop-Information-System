@@ -1,47 +1,47 @@
 Geometry of 'DCL01 Design Class Diagram (model)' (ClassDiagram):
+  Generalization: User -> Customer points (290,225) (290,590)
+  Generalization: Product -> Footwear points (2681,614) (2681,615) (2811,614)
+  Generalization: Product -> Apparel points (2652,764) (2652,968) (2849,968) (2849,1025)
+  Generalization: Product -> Bag points (2681,737) (2821,737) (2821,1428)
+  Generalization: Product -> Watch points (2640,764) (2792,764) (2792,1784) (2811,1784) (2811,1801)
+  Association 'delivers to': Customer -> Address points (290,639) (290,991)
+  Association 'owns': Customer -> Cart points (498,598) (625,598) (625,217) (1035,217)
+  Association 'contains': Cart -> CartItem points (1454,142) (2057,142)
+  Association 'refers to': CartItem -> Product points (2170,204) (2170,438) (2434,438) (2434,464)
+  Association 'belongs to': Product -> Category points (2651,464) (2651,190) (2840,190) (2840,185)
+  Association 'places': Customer -> Order points (498,614) (650,614)
+  Association 'contains': Order -> OrderItem points (1839,614) (2057,614)
+  Association 'refers to': OrderItem -> Product points (2197,615) (2414,615)
+  Association 'paid by': Order -> Payment points (650,749) (551,749) (551,1381) (541,1381)
+  Association 'uses': Order -> Promotion points (1839,738) (1839,1398) (1949,1398)
   Class: Review 2471,40 150x205 caption 0,0 150x19
-  Class: ReplenishmentRequest 2421,1791 205x124 caption 0,0 206x19
-  Class: InventoryEvent 2461,1391 151x161 caption 0,0 152x19
-  Class: StockLevel 2421,984 251x167 caption 0,0 252x19
-  Class: Milestone 1184,1418 121x104 caption 0,0 122x19
-  Class: StatusChange 2041,1014 134x104 caption 0,0 133x19
-  Class: Shipment 1091,991 307x148 caption 0,0 306x19
-  Class: Payment 40,1361 501x221 caption 0,0 502x19
+  Association 'shipped as': Order -> Shipment points (1242,774) (1244,774) (1244,991)
+  Class: ReplenishmentRequest 2421,1791 205x122 caption 0,0 205x19
+  Association 'records': Order -> StatusChange points (1839,749) (2029,749) (2029,1028) (2055,1028)
+  Class: InventoryEvent 2461,1391 151x160 caption 0,0 151x19
+  Association 'tracked by': Shipment -> Milestone points (1244,1139) (1244,1418)
+  Class: StockLevel 2421,984 250x167 caption 0,0 250x19
+  Association 'has': Product -> StockLevel points (2547,764) (2545,764) (2545,984)
+  Class: Milestone 1184,1418 121x102 caption 0,0 121x19
+  Association 'explained by': Product -> InventoryEvent points (2434,764) (2434,964) (2398,964) (2398,1370) (2484,1370) (2484,1391)
+  Class: StatusChange 2041,1014 132x104 caption 0,0 132x19
+  Association 'replenished by': Product -> ReplenishmentRequest points (2414,735) (2388,735) (2388,1767) (2459,1767) (2459,1791)
+  Class: Shipment 1091,991 307x147 caption 0,0 307x19
+  Association 'about': Review -> Product points (2545,244) (2547,244) (2547,464)
+  Class: Payment 40,1361 501x220 caption 0,0 501x19
+  Association 'writes': Customer -> Review points (472,590) (472,251) (2490,251) (2490,244)
   Class: OrderItem 2057,550 140x130 caption 0,0 140x19
+  Association 'verified by': Review -> Order points (2471,217) (2202,217) (2202,474) (1839,474)
   Class: Order 650,454 1190x320 caption 0,0 1190x19
-  Class: Promotion 1950,1378 354x185 caption 0,0 353x19
-  Class: Watch 2791,1801 208x104 caption 0,0 208x19
-  Class: Bag 2808,1428 174x84 caption 0,0 175x19
-  Class: Apparel 2834,1025 121x84 caption 0,0 122x19
-  Class: Footwear 2811,561 168x104 caption 0,0 168x19
-  Class: Product 2414,464 267x300 caption 0,0 266x19
-  Class: Category 2821,100 147x84 caption 0,0 146x19
+  Class: Promotion 1950,1378 354x184 caption 0,0 354x19
+  Class: Watch 2791,1801 207x102 caption 0,0 207x19
+  Class: Bag 2808,1428 172x82 caption 0,0 172x19
+  Class: Apparel 2834,1025 121x82 caption 0,0 121x19
+  Class: Footwear 2811,561 167x104 caption 0,0 167x19
+  Class: Product 2414,464 267x300 caption 0,0 267x19
+  Class: Category 2821,100 147x84 caption 0,0 147x19
   Class: CartItem 2057,74 140x130 caption 0,0 140x19
   Class: Cart 1034,40 420x205 caption 0,0 420x19
-  Class: Address 204,991 171x148 caption 0,0 173x19
-  Class: Customer 81,590 417x50 caption 0,0 418x19
-  Class: User 168,58 241x167 caption 0,0 243x19
-  Generalization: User -> Customer points (290,225) (290,590) caption 300,427 20x0 text ""
-  Generalization: Product -> Footwear points (2681,614) (2681,615) (2811,614) caption 2755,635 20x0 text ""
-  Generalization: Product -> Apparel points (2652,764) (2652,968) (2849,968) (2849,1025) caption 2687,988 20x0 text ""
-  Generalization: Product -> Bag points (2681,737) (2821,737) (2821,1428) caption 2831,1032 20x0 text ""
-  Generalization: Product -> Watch points (2640,764) (2792,764) (2792,1784) (2811,1784) (2811,1801) caption 2802,1235 20x0 text ""
-  Association 'delivers to': Customer -> Address points (290,639) (290,991) caption 174,805 119x25 text "delivers to" mult 270,638 16x20 mult 252,970 40x20
-  Association 'owns': Customer -> Cart points (498,598) (625,598) (625,217) (1035,217) caption 804,188 63x25 text "owns" mult 497,574 16x20 mult 997,194 40x20
-  Association 'contains': Cart -> CartItem points (1454,142) (2057,142) caption 1711,118 92x25 text "contains" mult 1457,120 16x20 mult 2021,120 40x20
-  Association 'refers to': CartItem -> Product points (2170,204) (2170,438) (2434,438) (2434,464) caption 2252,420 101x25 text "refers to" mult 2131,201 40x20 mult 2432,441 16x20
-  Association 'belongs to': Product -> Category points (2651,464) (2651,190) (2840,190) (2840,185) caption 2655,320 110x25 text "belongs to" mult 2641,441 40x20 mult 2838,182 16x20
-  Association 'places': Customer -> Order points (498,614) (650,614) caption 538,617 74x25 text "places" mult 497,610 16x20 mult 612,611 40x20
-  Association 'contains': Order -> OrderItem points (1839,614) (2057,614) caption 1903,587 92x25 text "contains" mult 1840,590 16x20 mult 2021,591 40x20
-  Association 'refers to': OrderItem -> Product points (2197,615) (2414,615) caption 2255,592 101x25 text "refers to" mult 2191,592 40x20 mult 2397,592 16x20
-  Association 'paid by': Order -> Payment points (650,749) (551,749) (551,1381) (541,1381) caption 558,1054 83x25 text "paid by" mult 630,748 16x20 mult 532,1378 40x20
-  Association 'uses': Order -> Promotion points (1839,738) (1839,1398) (1949,1398) caption 1784,1062 59x25 text "uses" mult 1831,754 40x20 mult 1912,1375 40x20
-  Association 'shipped as': Order -> Shipment points (1242,774) (1244,774) (1244,991) caption 1188,817 110x25 text "shipped as" mult 1221,770 16x20 mult 1204,970 40x20
-  Association 'records': Order -> StatusChange points (1839,749) (2029,749) (2029,1028) (2055,1028) caption 2040,877 83x25 text "records" mult 1845,728 16x20 mult 2018,1025 40x20
-  Association 'tracked by': Shipment -> Milestone points (1244,1139) (1244,1418) caption 1133,1265 110x25 text "tracked by" mult 1221,1137 16x20 mult 1205,1395 40x20
-  Association 'has': Product -> StockLevel points (2547,764) (2545,764) (2545,984) caption 2551,862 50x25 text "has" mult 2527,760 16x20 mult 2527,960 16x20
-  Association 'explained by': Product -> InventoryEvent points (2434,764) (2434,964) (2398,964) (2398,1370) (2484,1370) (2484,1391) caption 2407,1160 128x25 text "explained by" mult 2431,760 16x20 mult 2475,1368 40x20
-  Association 'replenished by': Product -> ReplenishmentRequest points (2414,735) (2388,735) (2388,1767) (2459,1767) (2459,1791) caption 2247,1240 146x25 text "replenished by" mult 2397,734 16x20 mult 2452,1770 40x20
-  Association 'about': Review -> Product points (2545,244) (2547,244) (2547,464) caption 2553,342 66x25 text "about" mult 2540,240 40x20 mult 2544,441 16x20
-  Association 'writes': Customer -> Review points (472,590) (472,251) (2490,251) (2490,244) caption 1445,260 74x25 text "writes" mult 451,568 16x20 mult 2482,241 40x20
-  Association 'verified by': Review -> Order points (2471,217) (2202,217) (2202,474) (1839,474) caption 1967,477 119x25 text "verified by" mult 2434,192 40x20 mult 1840,471 16x20
+  Class: Address 204,991 171x147 caption 0,0 171x19
+  Class: Customer 81,590 417x50 caption 0,0 417x19
+  Class: User 168,58 240x167 caption 0,0 240x19

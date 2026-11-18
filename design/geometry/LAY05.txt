@@ -1,24 +1,24 @@
 Geometry of 'LAY05 Layers - Recommendation (UC33 and UC34)' (ClassDiagram):
-  Package: model 40,1380 464x106 caption 0,20 464x86
-    Class: Product 364,1424 110x36 caption 0,0 110x19
-    Class: Order 234,1424 100x36 caption 0,0 100x19
-    Class: StockLevel 64,1424 140x36 caption 0,0 140x19
-  Package: dao 40,993 1601x297 caption 0,20 1601x277
-    Interface: ProductDAO 676,1081 502x160 caption 0,0 502x38
-    Interface: InventoryDAO 70,1081 546x179 caption 0,0 546x38
-    Interface: OrderDAO 1238,1081 373x160 caption 0,0 373x38
-  Package: service 40,650 580x253 caption 0,20 580x233
-    Class: CatalogService 70,694 520x179 caption 0,0 520x19
-  Package: ai 40,402 466x158 caption 0,20 466x138
-    Class: RecommenderService 70,446 406x84 caption 0,0 406x19
-  Package: controller 40,40 909x272 caption 0,20 909x252
-    Class: ShopController 70,179 407x103 caption 0,0 407x19
-    Class: OrderController 537,84 382x198 caption 0,0 382x19
-  Usage: ShopController -> RecommenderService points (274,282) (274,446) caption 277,352 92x24 text "<<use>>"
-  Usage: ShopController -> CatalogService points (477,263) (510,263) (510,694) caption 513,466 92x24 text "<<use>>"
-  Usage: OrderController -> RecommenderService points (537,164) (54,164) (54,456) (70,456) caption 250,137 92x24 text "<<use>>"
-  Usage: RecommenderService -> ProductDAO points (476,516) (696,516) (696,1081) caption 699,786 92x24 text "<<use>>"
-  Usage: RecommenderService -> InventoryDAO points (70,516) (40,516) (40,1101) (70,1101) caption 43,874 92x24 text "<<use>>"
-  Usage: RecommenderService -> OrderDAO points (476,504) (1222,504) (1222,1101) (1238,1101) caption 803,477 92x24 text "<<use>>"
-  Usage: CatalogService -> ProductDAO points (590,846) (660,846) (660,1101) (676,1101) caption 565,961 92x24 text "<<use>>"
-  Usage: CatalogService -> InventoryDAO points (330,873) (330,1081) caption 333,965 92x24 text "<<use>>"
+  Class: StockLevel 64,1424 140x36 caption 0,0 140x19
+  Class: Order 234,1424 100x36 caption 0,0 100x19
+  Class: Product 364,1424 110x36 caption 0,0 110x19
+  Package: model 40,1380 464x106 caption 0,0 464x19
+  Class: OrderDAO 1238,1081 373x160 caption 0,0 373x38
+  Class: InventoryDAO 70,1081 546x179 caption 0,0 546x38
+  Class: ProductDAO 676,1081 502x160 caption 0,0 502x38
+  Package: dao 40,993 1601x297 caption 0,0 1601x19
+  Class: CatalogService 70,694 520x179 caption 0,0 520x19
+  Package: service 40,650 580x253 caption 0,0 580x19
+  Class: RecommenderService 70,446 406x84 caption 0,0 406x19
+  Package: ai 40,402 466x158 caption 0,0 466x19
+  Class: OrderController 537,84 382x198 caption 0,0 382x19
+  Class: ShopController 70,179 407x103 caption 0,0 407x19
+  Package: controller 40,40 909x272 caption 0,0 909x19
+  Usage: ShopController -> RecommenderService points (274,282) (274,446)
+  Usage: ShopController -> CatalogService points (477,263) (510,263) (510,694)
+  Usage: OrderController -> RecommenderService points (537,164) (54,164) (54,456) (70,456)
+  Usage: RecommenderService -> ProductDAO points (476,516) (696,516) (696,1081)
+  Usage: RecommenderService -> InventoryDAO points (70,516) (40,516) (40,1101) (70,1101)
+  Usage: RecommenderService -> OrderDAO points (476,504) (1222,504) (1222,1101) (1238,1101)
+  Usage: CatalogService -> ProductDAO points (590,846) (660,846) (660,1101) (676,1101)
+  Usage: CatalogService -> InventoryDAO points (330,873) (330,1081)

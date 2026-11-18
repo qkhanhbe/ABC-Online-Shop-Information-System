@@ -131,6 +131,7 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
                 if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
                 try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
                 Polish.export(d, dir);
+                Geometry.write(d, new File(new File(dir, "geometry"), d.getName().split(" ")[0] + ".txt"));
                 System.out.println("EXPORTED " + d.getName());
             }
             return;
@@ -205,6 +206,7 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
                 if (com.vp.plugin.diagram.IDiagramTypeConstants.DIAGRAM_TYPE_DATA_FLOW_DIAGRAM.equals(d.getType())) continue;
                 try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
                 Polish.export(d, dir);
+                Geometry.write(d, new File(new File(dir, "geometry"), d.getName().split(" ")[0] + ".txt"));
                 System.out.println("EXPORTED " + d.getName());
             }
             return;

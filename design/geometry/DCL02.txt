@@ -11,34 +11,34 @@ Geometry of 'DCL02 Design Class Diagram (dao)' (ClassDiagram):
   Class: SqliteInventoryDAO 1070,329 546x160 caption 0,0 546x19
   Class: SqliteProductDAO 508,329 502x141 caption 0,0 502x19
   Class: SqliteCustomerDAO 198,329 250x103 caption 0,0 250x19
-  Interface: AuditDAO 1844,1139 612x84 caption 0,0 612x38
-  Interface: ReviewDAO 1266,1139 518x122 caption 0,0 518x38
-  Interface: ShipmentDAO 861,1139 345x103 caption 0,0 345x38
-  Interface: PaymentDAO 473,1139 328x103 caption 0,0 328x38
-  Interface: OrderDAO 40,1139 373x160 caption 0,0 373x38
-  Interface: PromotionDAO 1961,40 367x103 caption 0,0 367x38
-  Interface: CartDAO 1645,40 256x84 caption 0,0 256x38
-  Interface: InventoryDAO 1039,40 546x179 caption 0,0 546x38
-  Interface: ProductDAO 477,40 502x160 caption 0,0 502x38
-  Interface: CustomerDAO 167,40 250x122 caption 0,0 250x38
+  Class: AuditDAO 1844,1139 612x84 caption 0,0 612x38
+  Class: ReviewDAO 1266,1139 518x122 caption 0,0 518x38
+  Class: ShipmentDAO 861,1139 345x103 caption 0,0 345x38
+  Class: PaymentDAO 473,1139 328x103 caption 0,0 328x38
+  Class: OrderDAO 40,1139 373x160 caption 0,0 373x38
+  Class: PromotionDAO 1961,40 367x103 caption 0,0 367x38
+  Class: CartDAO 1645,40 256x84 caption 0,0 256x38
+  Class: InventoryDAO 1039,40 546x179 caption 0,0 546x38
+  Class: ProductDAO 477,40 502x160 caption 0,0 502x38
+  Class: CustomerDAO 167,40 250x122 caption 0,0 250x38
   Class: Database 925,599 418x179 caption 0,0 418x19
-  Realization: CustomerDAO -> SqliteCustomerDAO points (292,162) (292,329) caption 302,265 20x0 text ""
-  Realization: ProductDAO -> SqliteProductDAO points (728,200) (728,329) caption 738,284 20x0 text ""
-  Realization: InventoryDAO -> SqliteInventoryDAO points (1312,219) (1312,329) caption 1322,294 20x0 text ""
-  Realization: CartDAO -> SqliteCartDAO points (1773,124) (1773,329) caption 1783,246 20x0 text ""
-  Realization: PromotionDAO -> SqlitePromotionDAO points (2144,143) (2144,329) caption 2154,256 20x0 text ""
-  Realization: OrderDAO -> SqliteOrderDAO points (226,1139) (226,1029) caption 236,1104 20x0 text ""
-  Realization: PaymentDAO -> SqlitePaymentDAO points (641,1139) (641,972) caption 651,1076 20x0 text ""
-  Realization: ShipmentDAO -> SqliteShipmentDAO points (1033,1139) (1033,972) caption 1043,1076 20x0 text ""
-  Realization: ReviewDAO -> SqliteReviewDAO points (1530,1139) (1530,991) caption 1540,1085 20x0 text ""
-  Realization: AuditDAO -> SqliteAuditDAO points (2152,1139) (2152,953) caption 2162,1066 20x0 text ""
-  Usage: SqliteCustomerDAO -> Database points (448,413) (494,413) (494,585) (909,585) (909,619) (925,619) caption 655,558 92x24 text "<<use>>"
-  Usage: SqliteProductDAO -> Database points (967,470) (967,599) caption 970,522 92x24 text "<<use>>"
-  Usage: SqliteInventoryDAO -> Database points (1206,489) (1206,599) caption 1111,532 92x24 text "<<use>>"
-  Usage: SqliteCartDAO -> Database points (1676,385) (1630,385) (1630,561) (1359,561) (1359,619) (1343,619) caption 1449,534 92x24 text "<<use>>"
-  Usage: SqlitePromotionDAO -> Database points (1992,399) (1946,399) (1946,573) (1371,573) (1371,631) (1343,631) caption 1643,546 92x24 text "<<use>>"
-  Usage: SqliteOrderDAO -> Database points (413,905) (459,905) (459,739) (925,739) caption 646,712 92x24 text "<<use>>"
-  Usage: SqlitePaymentDAO -> Database points (801,898) (847,898) (847,751) (925,751) caption 752,813 92x24 text "<<use>>"
-  Usage: SqliteShipmentDAO -> Database points (1033,888) (1033,778) caption 1036,821 92x24 text "<<use>>"
-  Usage: SqliteReviewDAO -> Database points (1266,900) (1245,900) (1245,778) caption 1248,827 92x24 text "<<use>>"
-  Usage: SqliteAuditDAO -> Database points (1844,896) (1798,896) (1798,751) (1343,751) caption 1525,754 92x24 text "<<use>>"
+  Realization: CustomerDAO -> SqliteCustomerDAO points (292,162) (292,329)
+  Realization: ProductDAO -> SqliteProductDAO points (728,200) (728,329)
+  Realization: InventoryDAO -> SqliteInventoryDAO points (1312,219) (1312,329)
+  Realization: CartDAO -> SqliteCartDAO points (1773,124) (1773,329)
+  Realization: PromotionDAO -> SqlitePromotionDAO points (2144,143) (2144,329)
+  Realization: OrderDAO -> SqliteOrderDAO points (226,1139) (226,1029)
+  Realization: PaymentDAO -> SqlitePaymentDAO points (641,1139) (641,972)
+  Realization: ShipmentDAO -> SqliteShipmentDAO points (1033,1139) (1033,972)
+  Realization: ReviewDAO -> SqliteReviewDAO points (1530,1139) (1530,991)
+  Realization: AuditDAO -> SqliteAuditDAO points (2152,1139) (2152,953)
+  Usage: SqliteCustomerDAO -> Database points (448,413) (494,413) (494,585) (909,585) (909,619) (925,619)
+  Usage: SqliteProductDAO -> Database points (967,470) (967,599)
+  Usage: SqliteInventoryDAO -> Database points (1206,489) (1206,599)
+  Usage: SqliteCartDAO -> Database points (1676,385) (1630,385) (1630,561) (1359,561) (1359,619) (1343,619)
+  Usage: SqlitePromotionDAO -> Database points (1992,399) (1946,399) (1946,573) (1371,573) (1371,631) (1343,631)
+  Usage: SqliteOrderDAO -> Database points (413,905) (459,905) (459,739) (925,739)
+  Usage: SqlitePaymentDAO -> Database points (801,898) (847,898) (847,751) (925,751)
+  Usage: SqliteShipmentDAO -> Database points (1033,888) (1033,778)
+  Usage: SqliteReviewDAO -> Database points (1266,900) (1245,900) (1245,778)
+  Usage: SqliteAuditDAO -> Database points (1844,896) (1798,896) (1798,751) (1343,751)

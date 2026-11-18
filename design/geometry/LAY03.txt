@@ -1,17 +1,17 @@
 Geometry of 'LAY03 Layers - Account (UC01 and UC02)' (ClassDiagram):
-  Package: model 40,936 444x106 caption 0,20 444x86
-    Class: User 354,980 100x36 caption 0,0 100x19
-    Class: Customer 204,980 120x36 caption 0,0 120x19
-    Class: Address 64,980 110x36 caption 0,0 110x19
-  Package: dao 40,593 1460x253 caption 0,20 1460x233
-    Interface: CustomerDAO 548,637 250x122 caption 0,0 250x38
-    Interface: AuditDAO 858,637 612x84 caption 0,0 612x38
-    Class: Database 70,637 418x179 caption 0,0 418x19
-  Package: service 40,326 715x177 caption 0,20 715x157
-    Class: AuthService 70,370 655x103 caption 0,0 655x19
-  Package: controller 40,40 372x196 caption 0,20 372x176
-    Class: AccountController 70,84 312x122 caption 0,0 312x19
-  Usage: AccountController -> AuthService points (238,206) (238,370) caption 143,276 92x24 text "<<use>>"
-  Usage: AuthService -> CustomerDAO points (636,473) (636,637) caption 541,543 92x24 text "<<use>>"
-  Usage: AuthService -> AuditDAO points (725,454) (842,454) (842,647) (858,647) caption 845,538 92x24 text "<<use>>"
-  Usage: AuthService -> Database points (390,473) (390,637) caption 295,543 92x24 text "<<use>>"
+  Class: Address 64,980 110x36 caption 0,0 110x19
+  Class: Customer 204,980 120x36 caption 0,0 120x19
+  Class: User 354,980 100x36 caption 0,0 100x19
+  Package: model 40,936 444x106 caption 0,0 444x19
+  Class: Database 70,637 418x179 caption 0,0 418x19
+  Class: AuditDAO 858,637 612x84 caption 0,0 612x38
+  Class: CustomerDAO 548,637 250x122 caption 0,0 250x38
+  Package: dao 40,593 1460x253 caption 0,0 1460x19
+  Class: AuthService 70,370 655x103 caption 0,0 655x19
+  Package: service 40,326 715x177 caption 0,0 715x19
+  Class: AccountController 70,84 312x122 caption 0,0 312x19
+  Package: controller 40,40 372x196 caption 0,0 372x19
+  Usage: AccountController -> AuthService points (238,206) (238,370)
+  Usage: AuthService -> CustomerDAO points (636,473) (636,637)
+  Usage: AuthService -> AuditDAO points (725,454) (842,454) (842,647) (858,647)
+  Usage: AuthService -> Database points (390,473) (390,637)
