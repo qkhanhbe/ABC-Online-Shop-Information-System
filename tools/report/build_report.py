@@ -66,7 +66,7 @@ class Doc(BaseDocTemplate):
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="f")
         lw, lh = landscape(A4)
         frame_l = Frame(20 * mm, 18 * mm, lw - 40 * mm, lh - 36 * mm, id="fl")
-        self.addPageTemplates([PageTemplate("cover", [frame], onPage=lambda c, d: None),
+        self.addPageTemplates([PageTemplate("cover", [frame], onPage=draw_cover),
                                PageTemplate("normal", [frame], onPage=self.decorate),
                                PageTemplate("landscape", [frame_l], onPage=self.decorate_l, pagesize=landscape(A4))])
 
@@ -294,27 +294,42 @@ def render(blocks):
     return story
 
 
+LOGO = os.path.join(HERE, "ptit_logo.png")
+
+
+def draw_cover(canvas, doc):
+    """The cover in the layout of the reference essay: institute and faculty, the PTIT logo, the course, the title,
+    the scope, the version, the student block and the place and date, all in Times New Roman, black, centred.
+    Each y is the bottom of the line in points from the top of the A4 page."""
+    W, H = A4
+    canvas.saveState()
+
+    def centred(text, font, size, bottom):
+        canvas.setFont(font, size)
+        canvas.drawCentredString(W / 2, H - bottom + 0.216 * size, text)
+
+    centred("POSTS AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY", "TNR-B", 13, 66)
+    centred("FACULTY OF INFORMATION TECHNOLOGY 1", "TNR-B", 13, 82)
+    canvas.drawImage(LOGO, W / 2 - 35.5, H - 216, width=71, height=91, mask="auto")
+    centred("INFORMATION SYSTEM ANALYSIS AND DESIGN", "TNR-B", 17.2, 310)
+    centred("ABC ONLINE SHOP", "TNR-B", 25.9, 387)
+    centred("Requirements, AI Integration Analysis, Data Model, Design, and Implementation", "TNR", 14.3, 430)
+    centred("Footwear, Apparel, Bags and Watches Online Retail Specialization", "TNR", 13, 462)
+    centred("Version 5", "TNR-B", 14.3, 503)
+    rows = [("Student", "Bế Quốc Khánh"), ("Student ID", "B23DCCE049"), ("Class", "04"),
+            ("Lecturer", "PGS.TS. Trần Đình Quế")]
+    canvas.setFont("TNR", 13)
+    for i, (label, value) in enumerate(rows):
+        y = H - (568 + 18 * i) + 0.216 * 13
+        canvas.drawString(201, y, label)
+        canvas.drawString(268, y, value)
+    centred("Hanoi, November 2026", "TNR", 13, 788)
+    canvas.restoreState()
+
+
 def cover():
-    s = []
     c1 = ParagraphStyle("c1", fontName="TNR-B", fontSize=14, leading=18, alignment=TA_CENTER)
-    c2 = ParagraphStyle("c2", fontName="TNR", fontSize=13, leading=17, alignment=TA_CENTER)
-    ct = ParagraphStyle("ct", fontName="TNR-B", fontSize=24, leading=30, alignment=TA_CENTER, textColor=colors.HexColor("#1F3864"))
-    cs = ParagraphStyle("cs", fontName="TNR-I", fontSize=14, leading=19, alignment=TA_CENTER)
-    s += [Paragraph("POSTS AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY", c1),
-          Paragraph("Faculty of Information Technology 1", c2), Spacer(1, 2 * mm),
-          Paragraph("Course: Information System Analysis and Design", c2), Spacer(1, 30 * mm),
-          Paragraph("COURSE ESSAY &mdash; VERSION 5.0 (FINAL)", ParagraphStyle("ce", parent=c1, fontSize=15)), Spacer(1, 8 * mm),
-          Paragraph("ABC ONLINE SHOP:<br/>FROM REQUIREMENTS TO CODE", ct), Spacer(1, 6 * mm),
-          Paragraph("Requirements, analysis, AI integration, design, implementation and demonstration "
-                    "of an e-commerce information system", cs), Spacer(1, 26 * mm)]
-    info = [["Student:", "Bế Quốc Khánh (KHANHBQ)"], ["Student ID:", "B23DCCE049"], ["Class:", "04"],
-            ["Lecturer:", "PGS.TS. Trần Đình Quế"], ["Version:", "V5 (final)"],
-            ["Submitted:", "Report, Visual Paradigm project, database, source code, demo, defence guide"]]
-    st = ParagraphStyle("i", fontName="TNR", fontSize=12.5, leading=17)
-    sb = ParagraphStyle("ib", fontName="TNR-B", fontSize=12.5, leading=17)
-    t = Table([[Paragraph(a, sb), Paragraph(b, st)] for a, b in info], colWidths=[32 * mm, 95 * mm], hAlign="CENTER")
-    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
-    s += [t, Spacer(1, 40 * mm), Paragraph("Hanoi, November 2026", c2), PageBreak()]
+    s = [Spacer(1, 1), PageBreak()]                       # the cover itself is drawn by draw_cover
     dots = ParagraphStyle("dots", fontName="TNR", fontSize=12, leading=24)
     s += [Paragraph("INSTRUCTOR'S COMMENTS", ParagraphStyle("ic", parent=c1, fontSize=15)), Spacer(1, 8 * mm)]
     s += [Paragraph("." * 150, dots) for _ in range(16)]
