@@ -2,14 +2,12 @@
 
 Each class maps rows to model objects and back; none of them contains a business rule.
 """
-import dataclasses
-
 from model.cart import Cart, CartItem
 from model.customer import Address, Customer, User
 from model.inventory import InventoryEvent, StockLevel
 from model.order import Order, OrderItem, StatusChange
 from model.payment import Payment
-from model.product import DETAIL_TYPES, Category, Product, Promotion
+from model.product import KINDS, Bag, Category, Product, Promotion, kind_fields
 from model.review import Review
 from model.shipment import Milestone, Shipment
 
@@ -26,41 +24,44 @@ class SqliteCustomerDAO(interfaces.CustomerDAO):
             return None
         if row["role"] != "customer":
             return User(row["user_id"], row["name"], row["email"], row["password_hash"], row["role"])
-        a = self.db.query_one("SELECT * FROM address WHERE customer_id = ?", (row["user_id"],))
+        a = self.db.query_one("SELECT * FROM Address WHERE customer_id = ?", (row["user_id"],))
         address = Address(a["receiver"], a["phone"], a["street"], a["city"]) if a else None
         return Customer(row["user_id"], row["name"], row["email"], row["password_hash"],
                         "customer", address, row["created_at"])
 
     def get_user(self, user_id):
-        return self._to_user(self.db.query_one("SELECT * FROM users WHERE user_id = ?", (user_id,)))
+        return self._to_user(self.db.query_one("SELECT * FROM User WHERE user_id = ?", (user_id,)))
 
     def find_by_email(self, email):
-        return self._to_user(self.db.query_one("SELECT * FROM users WHERE email = ?",
+        return self._to_user(self.db.query_one("SELECT * FROM User WHERE email = ?",
                                                (email.strip().lower(),)))
 
     def save_user(self, user):
         with self.db.transaction():
             self.db.execute(
-                "INSERT INTO users(user_id, name, email, password_hash, role, created_at) "
+                "INSERT INTO User(user_id, name, email, password_hash, role, created_at) "
                 "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET "
                 "name = excluded.name, email = excluded.email, password_hash = excluded.password_hash",
                 (user.user_id, user.name, user.email.lower(), user.password_hash, user.role,
                  getattr(user, "created_at", "") or self.db.now()))
+            if user.role == "customer":          # table per subclass: a Customer row shares the User key
+                self.db.execute("INSERT OR IGNORE INTO Customer(user_id) VALUES (?)", (user.user_id,))
             address = getattr(user, "address", None)
             if address is not None:
                 self.db.execute(
-                    "INSERT OR REPLACE INTO address(customer_id, receiver, phone, street, city) "
+                    "INSERT OR REPLACE INTO Address(customer_id, receiver, phone, street, city) "
                     "VALUES (?, ?, ?, ?, ?)",
                     (user.user_id, address.receiver, address.phone, address.street, address.city))
         return user
 
     def list_customers(self):
-        rows = self.db.query("SELECT * FROM users WHERE role = 'customer' ORDER BY user_id")
+        rows = self.db.query("SELECT u.* FROM User u JOIN Customer c ON c.user_id = u.user_id ORDER BY u.user_id")
         return [self._to_user(r) for r in rows]
 
 
 class SqliteProductDAO(interfaces.ProductDAO):
-    """Common columns in product; group columns in <kind>_detail, chosen by category.detail_kind."""
+    """Common columns in Product; the columns of a kind in the table of that kind (Footwear, Apparel, Bag,
+    Watch), which shares the product key (table per subclass). The category says which kind a product is."""
 
     def __init__(self, db):
         self.db = db
@@ -68,25 +69,20 @@ class SqliteProductDAO(interfaces.ProductDAO):
     def _to_product(self, row):
         if row is None:
             return None
-        product = Product(row["product_id"], row["name"], row["category_id"], row["brand"],
-                          row["color"], row["price"], row["description"], row["image"], row["status"])
-        product.detail = self._load_detail(row["detail_kind"], row["product_id"])
-        return product
-
-    def _load_detail(self, kind, product_id):
-        cls = DETAIL_TYPES.get(kind)
-        if cls is None:
-            return None
-        row = self.db.query_one(f"SELECT * FROM {kind}_detail WHERE product_id = ?", (product_id,))
-        if row is None:
-            return None
-        values = {f.name: row[f.name] for f in dataclasses.fields(cls)}
-        if kind == "bag":
+        common = (row["product_id"], row["name"], row["category_id"], row["brand"], row["color"], row["price"],
+                  row["description"], row["image"], row["status"])
+        cls = KINDS.get(row["detail_kind"])
+        kind_row = cls and self.db.query_one(f"SELECT * FROM {cls.__name__} WHERE product_id = ?",
+                                             (row["product_id"],))
+        if not kind_row:
+            return Product(*common)
+        values = {name: kind_row[name] for name in kind_fields(cls)}
+        if cls is Bag:
             values["laptop_sleeve"] = bool(values["laptop_sleeve"])
-        return cls(**values)
+        return cls(*common, **values)
 
-    _SELECT = ("SELECT p.*, c.detail_kind FROM product p "
-               "JOIN category c ON c.category_id = p.category_id")
+    _SELECT = ("SELECT p.*, c.detail_kind FROM Product p "
+               "JOIN Category c ON c.category_id = p.category_id")
 
     def get_product(self, product_id):
         return self._to_product(self.db.query_one(self._SELECT + " WHERE p.product_id = ?", (product_id,)))
@@ -103,32 +99,31 @@ class SqliteProductDAO(interfaces.ProductDAO):
     def save_product(self, p):
         with self.db.transaction():
             self.db.execute(
-                "INSERT INTO product(product_id, name, category_id, brand, color, price, description, image, "
+                "INSERT INTO Product(product_id, name, category_id, brand, color, price, description, image, "
                 "status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(product_id) DO UPDATE SET "
                 "name = excluded.name, category_id = excluded.category_id, brand = excluded.brand, "
                 "color = excluded.color, price = excluded.price, description = excluded.description, "
                 "image = excluded.image, status = excluded.status",
                 (p.product_id, p.name, p.category_id, p.brand, p.color, p.price, p.description,
                  p.image, p.status))
-            if p.detail is not None:
-                d = p.detail
-                cols = [f.name for f in dataclasses.fields(d)]
+            if type(p) in KINDS.values():
+                cols = ["product_id"] + kind_fields(type(p))
                 self.db.execute(
-                    f"INSERT OR REPLACE INTO {d.KIND}_detail({', '.join(cols)}) "
+                    f"INSERT OR REPLACE INTO {type(p).__name__}({', '.join(cols)}) "
                     f"VALUES ({', '.join('?' for _ in cols)})",
-                    tuple(int(v) if isinstance(v, bool) else v for v in (getattr(d, c) for c in cols)))
+                    tuple(int(v) if isinstance(v, bool) else v for v in (getattr(p, c) for c in cols)))
         return p
 
     def get_category(self, category_id):
-        r = self.db.query_one("SELECT * FROM category WHERE category_id = ?", (category_id,))
+        r = self.db.query_one("SELECT * FROM Category WHERE category_id = ?", (category_id,))
         return Category(r["category_id"], r["name"], r["detail_kind"]) if r else None
 
     def list_categories(self):
         return [Category(r["category_id"], r["name"], r["detail_kind"])
-                for r in self.db.query("SELECT * FROM category ORDER BY name")]
+                for r in self.db.query("SELECT * FROM Category ORDER BY name")]
 
     def save_category(self, c):
-        self.db.execute("INSERT OR REPLACE INTO category(category_id, name, detail_kind) VALUES (?, ?, ?)",
+        self.db.execute("INSERT OR REPLACE INTO Category(category_id, name, detail_kind) VALUES (?, ?, ?)",
                         (c.category_id, c.name, c.detail_kind))
         return c
 
@@ -139,14 +134,14 @@ class SqliteInventoryDAO(interfaces.InventoryDAO):
         self.db = db
 
     def get_stock(self, product_id):
-        r = self.db.query_one("SELECT * FROM stock_level WHERE product_id = ?", (product_id,))
+        r = self.db.query_one("SELECT * FROM StockLevel WHERE product_id = ?", (product_id,))
         if r is None:
             return StockLevel(product_id, 0, 0)
         return StockLevel(r["product_id"], r["physical"], r["reserved"], r["threshold"])
 
     def save_stock(self, s):
         self.db.execute(
-            "INSERT OR REPLACE INTO stock_level(product_id, physical, reserved, threshold) "
+            "INSERT OR REPLACE INTO StockLevel(product_id, physical, reserved, threshold) "
             "VALUES (?, ?, ?, ?)", (s.product_id, s.physical, s.reserved, s.threshold))
         return s
 
@@ -156,31 +151,31 @@ class SqliteInventoryDAO(interfaces.InventoryDAO):
                               r["reference"], r["reason"], r["created_at"])
 
     def find_event(self, product_id, kind, reference):
-        r = self.db.query_one("SELECT * FROM inventory_event WHERE product_id = ? AND kind = ? "
+        r = self.db.query_one("SELECT * FROM InventoryEvent WHERE product_id = ? AND kind = ? "
                               "AND reference = ?", (product_id, kind, reference))
         return self._to_event(r) if r else None
 
     def add_event(self, e):
         self.db.execute(
-            "INSERT INTO inventory_event(event_id, product_id, kind, quantity, reference, reason, "
+            "INSERT INTO InventoryEvent(event_id, product_id, kind, quantity, reference, reason, "
             "created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             (e.event_id, e.product_id, e.kind, e.quantity, e.reference, e.reason, e.created_at))
         return e
 
     def events_for(self, product_id, limit=10):
-        rows = self.db.query("SELECT * FROM inventory_event WHERE product_id = ? "
+        rows = self.db.query("SELECT * FROM InventoryEvent WHERE product_id = ? "
                              "ORDER BY created_at DESC, event_id DESC LIMIT ?", (product_id, limit))
         return [self._to_event(r) for r in rows]
 
     def add_replenishment(self, request_id, product_id, quantity, at):
-        self.db.execute("INSERT INTO replenishment_request(request_id, product_id, quantity, "
+        self.db.execute("INSERT INTO ReplenishmentRequest(request_id, product_id, quantity, "
                         "status, created_at) VALUES (?, ?, ?, 'Requested', ?)",
                         (request_id, product_id, quantity, at))
         return request_id
 
     def open_replenishments(self):
         return [dict(r) for r in self.db.query(
-            "SELECT * FROM replenishment_request WHERE status = 'Requested' ORDER BY request_id")]
+            "SELECT * FROM ReplenishmentRequest WHERE status = 'Requested' ORDER BY request_id")]
 
 
 class SqliteCartDAO(interfaces.CartDAO):
@@ -190,22 +185,22 @@ class SqliteCartDAO(interfaces.CartDAO):
 
     def get_cart(self, customer_id):
         """The cart is created on first use: every customer has exactly one cart."""
-        r = self.db.query_one("SELECT * FROM cart WHERE customer_id = ?", (customer_id,))
+        r = self.db.query_one("SELECT * FROM Cart WHERE customer_id = ?", (customer_id,))
         if r is None:
             cart_id = "CART-" + customer_id
-            self.db.execute("INSERT INTO cart(cart_id, customer_id) VALUES (?, ?)",
+            self.db.execute("INSERT INTO Cart(cart_id, customer_id) VALUES (?, ?)",
                             (cart_id, customer_id))
             return Cart(cart_id, customer_id)
-        rows = self.db.query("SELECT * FROM cart_item WHERE cart_id = ? ORDER BY rowid",
+        rows = self.db.query("SELECT * FROM CartItem WHERE cart_id = ? ORDER BY rowid",
                              (r["cart_id"],))
         items = [CartItem(i["product_id"], i["name"], i["cart_price"], i["quantity"]) for i in rows]
         return Cart(r["cart_id"], customer_id, items)
 
     def update_cart(self, cart):
         with self.db.transaction():
-            self.db.execute("DELETE FROM cart_item WHERE cart_id = ?", (cart.cart_id,))
+            self.db.execute("DELETE FROM CartItem WHERE cart_id = ?", (cart.cart_id,))
             for line in cart.items:
-                self.db.execute("INSERT INTO cart_item(cart_id, product_id, name, cart_price, "
+                self.db.execute("INSERT INTO CartItem(cart_id, product_id, name, cart_price, "
                                 "quantity) VALUES (?, ?, ?, ?, ?)",
                                 (cart.cart_id, line.product_id, line.name, line.cart_price,
                                  line.quantity))
@@ -223,17 +218,17 @@ class SqlitePromotionDAO(interfaces.PromotionDAO):
                          bool(r["active"]))
 
     def get_promotion(self, code):
-        r = self.db.query_one("SELECT * FROM promotion WHERE code = ?", (code.strip().upper(),))
+        r = self.db.query_one("SELECT * FROM Promotion WHERE code = ?", (code.strip().upper(),))
         return self._to_promotion(r) if r else None
 
     def save_promotion(self, p):
-        self.db.execute("INSERT OR REPLACE INTO promotion(code, percent, min_total, start_date, "
+        self.db.execute("INSERT OR REPLACE INTO Promotion(code, percent, min_total, start_date, "
                         "end_date, active) VALUES (?, ?, ?, ?, ?, ?)",
-                        (p.code.upper(), p.percent, p.min_total, p.start, p.end, int(p.active)))
+                        (p.code.upper(), p.percent, p.min_total, p.start_date, p.end_date, int(p.active)))
         return p
 
     def list_promotions(self):
-        return [self._to_promotion(r) for r in self.db.query("SELECT * FROM promotion")]
+        return [self._to_promotion(r) for r in self.db.query("SELECT * FROM Promotion")]
 
 
 class SqliteOrderDAO(interfaces.OrderDAO):
@@ -245,31 +240,31 @@ class SqliteOrderDAO(interfaces.OrderDAO):
         if r is None:
             return None
         items = [OrderItem(i["product_id"], i["name"], i["unit_price"], i["quantity"])
-                 for i in self.db.query("SELECT * FROM order_item WHERE order_id = ? ORDER BY rowid",
+                 for i in self.db.query("SELECT * FROM OrderItem WHERE order_id = ? ORDER BY rowid",
                                         (r["order_id"],))]
         history = [StatusChange(h["status"], h["actor"], h["at"], h["note"])
-                   for h in self.db.query("SELECT * FROM order_status_history WHERE order_id = ? "
+                   for h in self.db.query("SELECT * FROM StatusChange WHERE order_id = ? "
                                           "ORDER BY id", (r["order_id"],))]
         return Order(r["order_id"], r["customer_id"], r["address"], items, r["discount"],
-                     r["shipping_fee"], r["status"], r["created_at"], r["promo_code"],
+                     r["shipping_fee"], r["status"], r["created_at"], r["promo_code"] or "",
                      r["idempotency_key"] or "", history)
 
     def get_order(self, order_id):
         return self._to_order(self.db.query_one(
-            "SELECT * FROM customer_order WHERE order_id = ?", (order_id.upper(),)))
+            "SELECT * FROM Orders WHERE order_id = ?", (order_id.upper(),)))
 
     def find_by_idempotency_key(self, key):
         return self._to_order(self.db.query_one(
-            "SELECT * FROM customer_order WHERE idempotency_key = ?", (key,)))
+            "SELECT * FROM Orders WHERE idempotency_key = ?", (key,)))
 
     def find_by_customer(self, customer_id):
-        rows = self.db.query("SELECT * FROM customer_order WHERE customer_id = ? "
+        rows = self.db.query("SELECT * FROM Orders WHERE customer_id = ? "
                              "ORDER BY created_at DESC, order_id DESC", (customer_id,))
         return [self._to_order(r) for r in rows]
 
     def find_by_status(self, *statuses):
         marks = ",".join("?" * len(statuses))
-        rows = self.db.query(f"SELECT * FROM customer_order WHERE status IN ({marks}) "
+        rows = self.db.query(f"SELECT * FROM Orders WHERE status IN ({marks}) "
                              "ORDER BY created_at, order_id", statuses)
         return [self._to_order(r) for r in rows]
 
@@ -277,27 +272,27 @@ class SqliteOrderDAO(interfaces.OrderDAO):
         """Insert or update; status history rows are appended, never rewritten."""
         with self.db.transaction():
             self.db.execute(
-                "INSERT INTO customer_order(order_id, customer_id, address, discount, shipping_fee, "
+                "INSERT INTO Orders(order_id, customer_id, address, discount, shipping_fee, "
                 "total, status, created_at, promo_code, idempotency_key) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(order_id) DO UPDATE SET "
                 "status = excluded.status",
                 (o.order_id, o.customer_id, o.address, o.discount, o.shipping_fee, o.calc_total(),
-                 o.status, o.created_at, o.promo_code, o.idempotency_key or None))
-            if not self.db.query_one("SELECT 1 FROM order_item WHERE order_id = ?", (o.order_id,)):
+                 o.status, o.created_at, o.promo_code or None, o.idempotency_key or None))
+            if not self.db.query_one("SELECT 1 FROM OrderItem WHERE order_id = ?", (o.order_id,)):
                 for i in o.items:
-                    self.db.execute("INSERT INTO order_item(order_id, product_id, name, unit_price, "
+                    self.db.execute("INSERT INTO OrderItem(order_id, product_id, name, unit_price, "
                                     "quantity) VALUES (?, ?, ?, ?, ?)",
                                     (o.order_id, i.product_id, i.name, i.unit_price, i.quantity))
-            stored = self.db.query_one("SELECT COUNT(*) AS n FROM order_status_history "
+            stored = self.db.query_one("SELECT COUNT(*) AS n FROM StatusChange "
                                        "WHERE order_id = ?", (o.order_id,))["n"]
             for h in o.history[stored:]:
-                self.db.execute("INSERT INTO order_status_history(order_id, status, actor, at, note) "
+                self.db.execute("INSERT INTO StatusChange(order_id, status, actor, at, note) "
                                 "VALUES (?, ?, ?, ?, ?)", (o.order_id, h.status, h.actor, h.at, h.note))
         return o
 
     def list_orders(self):
         return [self._to_order(r) for r in self.db.query(
-            "SELECT * FROM customer_order ORDER BY created_at, order_id")]
+            "SELECT * FROM Orders ORDER BY created_at, order_id")]
 
 
 class SqlitePaymentDAO(interfaces.PaymentDAO):
@@ -311,15 +306,15 @@ class SqlitePaymentDAO(interfaces.PaymentDAO):
                        r["status"], r["provider_ref"], r["created_at"])
 
     def get_by_attempt(self, attempt_ref):
-        r = self.db.query_one("SELECT * FROM payment WHERE attempt_ref = ?", (attempt_ref,))
+        r = self.db.query_one("SELECT * FROM Payment WHERE attempt_ref = ?", (attempt_ref,))
         return self._to_payment(r) if r else None
 
     def for_order(self, order_id):
         return [self._to_payment(r) for r in self.db.query(
-            "SELECT * FROM payment WHERE order_id = ? ORDER BY payment_id", (order_id,))]
+            "SELECT * FROM Payment WHERE order_id = ? ORDER BY payment_id", (order_id,))]
 
     def save_payment(self, p):
-        self.db.execute("INSERT OR REPLACE INTO payment(payment_id, order_id, attempt_ref, amount, "
+        self.db.execute("INSERT OR REPLACE INTO Payment(payment_id, order_id, attempt_ref, amount, "
                         "currency, status, provider_ref, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                         (p.payment_id, p.order_id, p.attempt_ref, p.amount, p.currency, p.status,
                          p.provider_ref, p.created_at))
@@ -335,25 +330,25 @@ class SqliteShipmentDAO(interfaces.ShipmentDAO):
         if r is None:
             return None
         milestones = [Milestone(m["seq"], m["code"], m["at"], m["location"])
-                      for m in self.db.query("SELECT * FROM shipment_milestone WHERE shipment_id = ? "
+                      for m in self.db.query("SELECT * FROM Milestone WHERE shipment_id = ? "
                                              "ORDER BY seq", (r["shipment_id"],))]
         return Shipment(r["shipment_id"], r["order_id"], r["carrier_ref"], r["status"], milestones)
 
     def get_by_order(self, order_id):
         return self._to_shipment(self.db.query_one(
-            "SELECT * FROM shipment WHERE order_id = ?", (order_id,)))
+            "SELECT * FROM Shipment WHERE order_id = ?", (order_id,)))
 
     def get_by_carrier_ref(self, carrier_ref):
         return self._to_shipment(self.db.query_one(
-            "SELECT * FROM shipment WHERE carrier_ref = ?", (carrier_ref,)))
+            "SELECT * FROM Shipment WHERE carrier_ref = ?", (carrier_ref,)))
 
     def save_shipment(self, s):
         with self.db.transaction():
-            self.db.execute("INSERT OR REPLACE INTO shipment(shipment_id, order_id, carrier_ref, "
+            self.db.execute("INSERT OR REPLACE INTO Shipment(shipment_id, order_id, carrier_ref, "
                             "status) VALUES (?, ?, ?, ?)",
                             (s.shipment_id, s.order_id, s.carrier_ref, s.status))
             for m in s.milestones:
-                self.db.execute("INSERT OR IGNORE INTO shipment_milestone(shipment_id, seq, code, at, "
+                self.db.execute("INSERT OR IGNORE INTO Milestone(shipment_id, seq, code, at, "
                                 "location) VALUES (?, ?, ?, ?, ?)",
                                 (s.shipment_id, m.seq, m.code, m.at, m.location))
         return s
@@ -371,15 +366,15 @@ class SqliteReviewDAO(interfaces.ReviewDAO):
 
     def for_product(self, product_id, status="published"):
         return [self._to_review(r) for r in self.db.query(
-            "SELECT * FROM review WHERE product_id = ? AND status = ? ORDER BY created_at DESC",
+            "SELECT * FROM Review WHERE product_id = ? AND status = ? ORDER BY created_at DESC",
             (product_id, status))]
 
     def exists(self, customer_id, product_id, order_id):
-        return self.db.query_one("SELECT 1 FROM review WHERE customer_id = ? AND product_id = ? "
+        return self.db.query_one("SELECT 1 FROM Review WHERE customer_id = ? AND product_id = ? "
                                  "AND order_id = ?", (customer_id, product_id, order_id)) is not None
 
     def save_review(self, r):
-        self.db.execute("INSERT OR REPLACE INTO review(review_id, product_id, customer_id, order_id, "
+        self.db.execute("INSERT OR REPLACE INTO Review(review_id, product_id, customer_id, order_id, "
                         "rating, text, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                         (r.review_id, r.product_id, r.customer_id, r.order_id, r.rating, r.text,
                          r.status, r.created_at))
@@ -387,9 +382,9 @@ class SqliteReviewDAO(interfaces.ReviewDAO):
 
     def list_reviews(self, status=None):
         if status:
-            rows = self.db.query("SELECT * FROM review WHERE status = ? ORDER BY review_id", (status,))
+            rows = self.db.query("SELECT * FROM Review WHERE status = ? ORDER BY review_id", (status,))
         else:
-            rows = self.db.query("SELECT * FROM review ORDER BY review_id")
+            rows = self.db.query("SELECT * FROM Review ORDER BY review_id")
         return [self._to_review(r) for r in rows]
 
 

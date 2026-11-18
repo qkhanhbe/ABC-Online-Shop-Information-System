@@ -1,6 +1,7 @@
 """Service layer: UC04 Browse Products, UC06 View Product Details, UC14 Manage Products,
 UC16 Manage Promotions (Administrator, audited - NFR06)."""
-from model.product import Product
+import dataclasses
+
 from service.auth_service import AuthService
 from service.errors import NotFound, ValidationError
 
@@ -42,9 +43,9 @@ class CatalogService:
         category = self.products.get_category(product.category_id)
         if category is None:
             raise ValidationError(f"unknown category {product.category_id}")
-        if product.detail is not None and product.detail.KIND != category.detail_kind:   # BR-CAT-01
-            raise ValidationError(f"{category.name} products need {category.detail_kind} details, "
-                                  f"not {product.detail.KIND} details")
+        if product.KIND != category.detail_kind:                                         # BR-CAT-01
+            raise ValidationError(f"{category.name} products are of the kind {category.detail_kind}, "
+                                  f"not {product.KIND or 'plain product'}")
         old = self.products.get_product(product.product_id)
         with self.db.transaction():
             self.products.save_product(product)
@@ -58,7 +59,7 @@ class CatalogService:
         product = self.products.get_product(product_id)
         if product is None:
             raise NotFound("product not found")
-        updated = Product(**{**product.__dict__})
+        updated = dataclasses.replace(product)             # a copy of the same kind
         updated.update_price(new_price)
         return self.save_product(admin, updated)
 
@@ -76,5 +77,5 @@ class CatalogService:
         AuthService.require(admin, "promotions")
         self.promotions.save_promotion(promotion)
         self.audit.record(admin.user_id, "save_promotion", "promotion", promotion.code,
-                          f"{promotion.percent}% {promotion.start}..{promotion.end}")
+                          f"{promotion.percent}% {promotion.start_date}..{promotion.end_date}")
         return promotion

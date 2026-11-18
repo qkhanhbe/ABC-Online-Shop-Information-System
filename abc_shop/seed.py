@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 from model.customer import Address
 from model.inventory import StockLevel
-from model.product import DETAIL_TYPES, Category, Product, Promotion
+from model.product import KINDS, Category, Promotion
 from shop import build_shop
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -80,10 +80,9 @@ def load_catalogue(shop, data, clock):
             shop.dao.products.save_category(Category(c["id"], c["name"], c["detail_kind"]))
             kinds[c["id"]] = c["detail_kind"]
         for p in data["products"]:
-            detail = DETAIL_TYPES[kinds[p["category"]]](p["id"], **p["detail"])
-            shop.dao.products.save_product(Product(p["id"], p["name"], p["category"], p["brand"],
-                                                    p["color"], p["price"], p["description"],
-                                                    p["image"], detail=detail))
+            kind = KINDS[kinds[p["category"]]]                 # the category names the kind (BR-CAT-01)
+            shop.dao.products.save_product(kind(p["id"], p["name"], p["category"], p["brand"], p["color"],
+                                                p["price"], p["description"], p["image"], **p["detail"]))
             shop.dao.inventory.save_stock(StockLevel(p["id"], 0, 0, 3))
     for p in data["products"]:
         if p["stock"]:

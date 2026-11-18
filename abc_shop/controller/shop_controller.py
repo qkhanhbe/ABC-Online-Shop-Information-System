@@ -1,5 +1,6 @@
 """Presentation layer: UC04 Browse Products, UC05 Search Products (text / voice / image /
 text + image, Chapter 3), UC06 View Product Details with review insights and recommendations."""
+import json
 import os
 from controller.http import Response
 from view import templates
@@ -69,6 +70,12 @@ class ShopController:
         results = self.search_service.search(query)
         trace.append(f"SearchService.retrieve + RankingService.rank -> {len(results)} result(s)")
         return Response(templates.search_results(request, text, query["type"], results, trace))
+
+    def credits(self, request):
+        """Authors and licences of the product photos (Creative Commons attribution)."""
+        path = self.storage.path("images/credits.json")
+        rows = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else []
+        return Response(templates.credits(request, rows))
 
     def product(self, request, product_id):
         card = self.catalog.product_detail(product_id)

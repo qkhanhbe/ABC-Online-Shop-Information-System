@@ -34,6 +34,7 @@ class WebApp:
             ("GET", r"/search", store.search),
             ("POST", r"/search", store.search),
             ("GET", r"/product/(?P<product_id>\w+)", store.product),
+            ("GET", r"/credits", store.credits),
             ("GET", r"/login", account.login_form),
             ("POST", r"/login", account.login),
             ("GET", r"/logout", account.logout),

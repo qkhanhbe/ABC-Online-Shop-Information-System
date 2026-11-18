@@ -32,10 +32,10 @@ def layout(request, title, body):
     heading = "" if title == "Catalogue" else f"<h1>{e(title)}</h1>"
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=5"></head>
-<body><header><a class="brand" href="/">ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
+<title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=6"></head>
+<body><header><a class="brand" href="/"><span class="mark">A</span>ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
 <main>{note}{heading}{body}</main>
-<footer><span>ABC Online Shop &middot; course essay prototype</span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
+<footer><span>ABC Online Shop &middot; course essay prototype &middot; <a href="/credits">Photo credits</a></span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
 </body></html>"""
 
 
@@ -104,9 +104,12 @@ def home(request, categories, cards, active):
     tabs += [f'<a href="/?category={e(c.category_id)}"{" class=on" if c.category_id == active else ""}>'
              f'{e(c.name)}</a>' for c in categories]
     grid = "".join(product_card(c) for c in cards) or '<p class="panel">No product in this category yet.</p>'
-    hero = ("<section class='hero'><div><h1>Shoes, bags, shirts, caps and watches.</h1>"
-            "<p>Search the way you would ask a shop assistant: in words, by a voice transcript or with a photo. "
-            "Prices and stock come straight from the shop's records.</p></div>" + search_box() + "</section>")
+    hero = ("<section class='hero'><div class='hero-text'><span class='kicker'>New season &middot; free delivery over $100</span>"
+            "<h1>Shoes, bags, shirts, caps and watches.</h1>"
+            "<p>Search the way you would ask a shop assistant: type it, say it, or show a photo. "
+            "Prices and stock come straight from the shop's records.</p>"
+            "<div class='ways'><span>&#9000; Words</span><span>&#127908; Voice</span><span>&#128247; Photo</span></div></div>"
+            + search_box() + "</section>")
     return layout(request, "Catalogue", hero + f'<div class="tabs">{"".join(tabs)}</div><div class="grid">{grid}</div>')
 
 
@@ -155,9 +158,9 @@ def product(request, card, reviews, insight, similar, category=None):
 <input type="number" name="qty" value="1" min="1" max="{card['available']}" aria-label="Quantity"><button>Add to cart</button></form>"""
            if card["available"] > 0 else "")
     rows = [("Brand", p.brand), ("Colour", p.color), ("Category", category.name if category else p.category_id)]
-    rows += p.detail.spec_rows() if p.detail else []
+    rows += p.spec_rows()                                   # the attributes of the product's kind
     specs = "".join(f"<tr><th>{e(k)}</th><td>{e(v)}</td></tr>" for k, v in rows)
-    kind = f" &middot; {e(p.detail.KIND)} details" if p.detail else ""
+    kind = f" &middot; {e(p.KIND)}" if p.KIND else ""
     return layout(request, p.name, f"""<div class="detail"><div class="photo"><img src="/{e(p.image)}" alt="{e(p.name)}" width="600" height="600"></div>
 <div><p class="price">{money(p.price)}</p><p class="lead">{e(p.description)}</p>{stock_pill(card['available'])}
 <span class="hint">&nbsp;{card['available']} available to order</span>{buy}
@@ -306,3 +309,13 @@ def reports(request, dash, sales, stock, exceptions):
 <div><h2>Orders by status</h2><table>{status}</table><h2>Sales by category</h2><table>{cats}</table></div></div>
 <div class="cols"><div><h2>Low stock (UC27)</h2><table><tr><th>ID</th><th>Product</th><th>Available</th></tr>{low}</table></div>
 <div><h2>Exceptions (UC28)</h2><table><tr><th>Order</th><th>Status</th><th>Last note</th></tr>{exc}</table></div></div>""")
+
+
+def credits(request, rows):
+    body = "".join(f"<tr><td><img src='/images/{e(r['file'])}' alt='' width='56' height='56' style='border-radius:8px;object-fit:cover'></td>"
+                   f"<td>{e(r['product'])}</td><td><a href='{e(r['page'])}'>{e(r['title'])}</a></td>"
+                   f"<td>{e(r['artist'])}</td><td>{e(r['license'])}</td></tr>" for r in rows)
+    return layout(request, "Photo credits",
+                  "<p class='hint'>The product photos come from Wikimedia Commons under the licences below; they were "
+                  "cropped and resized for the catalogue. Brands and products in the photos belong to their owners.</p>"
+                  f"<table class='credits'><tr><th></th><th>Product</th><th>Photo</th><th>Author</th><th>Licence</th></tr>{body}</table>")

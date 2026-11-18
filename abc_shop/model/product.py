@@ -1,10 +1,11 @@
-"""Model: catalogue (Category, Product, product details) and promotion rules.
+"""Model: catalogue (Category, Product and its four kinds) and promotion rules.
 
 A product only shows facts that come from one controlled source (BP01): the price and status
 are kept here, the available quantity comes from StockLevel (inventory.py).
-Attributes shared by every product live in Product; attributes that only one product group has
-live in a detail object of that group. The category names the group (detail_kind), so a product
-has exactly one detail of the right kind (BR-CAT-01).
+Attributes shared by every product live in Product; each kind of product (Footwear, Apparel, Bag,
+Watch) is a subclass that adds the attributes of its kind and is stored in a table of its own that
+shares the product's key (table per subclass). The category names the kind (detail_kind), so a
+product is always of the kind of its category (BR-CAT-01).
 """
 from dataclasses import dataclass, fields
 from datetime import date
@@ -19,18 +20,30 @@ class Category:
 
 
 @dataclass
-class ProductDetail:
-    """Group-specific attributes of one product (abstract: use one of the subclasses)."""
+class Product:
+    """A listing. Attributes every product has live here; each kind of product is a subclass that adds the
+    attributes of its kind (BR-CAT-01: the category names the kind)."""
     product_id: str
+    name: str
+    category_id: str
+    brand: str
+    color: str
+    price: float
+    description: str = ""
+    image: str = ""
+    status: str = "active"          # active | unpublished
 
     KIND = ""
     LABELS = {}
 
+    def is_active(self):
+        return self.status == "active"
+
     def spec_rows(self):
-        """(label, value) pairs for the product page, in declaration order."""
+        """(label, value) pairs of the attributes of the kind, for the product page; a plain Product has none."""
         rows = []
         for f in fields(self):
-            if f.name == "product_id":
+            if f.name in _COMMON:
                 continue
             value = getattr(self, f.name)
             if value is None:
@@ -43,7 +56,7 @@ class ProductDetail:
         return rows
 
     def search_terms(self):
-        """Words for keyword search: the values, and the label of a feature the product has."""
+        """Words of the kind for keyword search: the values, and the label of a feature the product has."""
         words = []
         for label, value in self.spec_rows():
             if value == "yes":
@@ -52,9 +65,22 @@ class ProductDetail:
                 words.append(value)
         return " ".join(words)
 
+    def search_text(self):
+        """Text used by keyword search and by the recommender."""
+        return (f"{self.name} {self.category_id} {self.color} {self.brand} {self.description} "
+                f"{self.search_terms()}").strip()
+
+    def update_price(self, new_price):
+        if new_price <= 0:
+            raise ValueError("price must be positive")
+        self.price = round(float(new_price), 2)
+
+
+_COMMON = {f.name for f in fields(Product)}
+
 
 @dataclass
-class FootwearDetail(ProductDetail):
+class Footwear(Product):
     sizes: str = ""
     upper_material: str = ""
     sole: str = ""
@@ -65,7 +91,7 @@ class FootwearDetail(ProductDetail):
 
 
 @dataclass
-class ApparelDetail(ProductDetail):
+class Apparel(Product):
     sizes: str = ""
     material: str = ""
     fit: str = ""
@@ -75,7 +101,7 @@ class ApparelDetail(ProductDetail):
 
 
 @dataclass
-class BagDetail(ProductDetail):
+class Bag(Product):
     capacity_l: float = 0.0
     material: str = ""
     laptop_sleeve: bool = False
@@ -85,7 +111,7 @@ class BagDetail(ProductDetail):
 
 
 @dataclass
-class WatchDetail(ProductDetail):
+class Watch(Product):
     movement: str = ""
     strap: str = ""
     water_resistance_m: int = 0
@@ -96,34 +122,12 @@ class WatchDetail(ProductDetail):
               "battery_days": "Battery (days)"}
 
 
-DETAIL_TYPES = {cls.KIND: cls for cls in (FootwearDetail, ApparelDetail, BagDetail, WatchDetail)}
+KINDS = {cls.KIND: cls for cls in (Footwear, Apparel, Bag, Watch)}
 
 
-@dataclass
-class Product:
-    product_id: str
-    name: str
-    category_id: str
-    brand: str
-    color: str
-    price: float
-    description: str = ""
-    image: str = ""
-    status: str = "active"          # active | unpublished
-    detail: Optional[ProductDetail] = None
-
-    def is_active(self):
-        return self.status == "active"
-
-    def search_text(self):
-        """Text used by keyword search and by the recommender."""
-        extra = self.detail.search_terms() if self.detail else ""
-        return f"{self.name} {self.category_id} {self.color} {self.brand} {self.description} {extra}".strip()
-
-    def update_price(self, new_price):
-        if new_price <= 0:
-            raise ValueError("price must be positive")
-        self.price = round(float(new_price), 2)
+def kind_fields(cls):
+    """The attributes a kind adds to Product: the columns of its own table besides the shared key."""
+    return [f.name for f in fields(cls) if f.name not in _COMMON]
 
 
 @dataclass
@@ -131,13 +135,13 @@ class Promotion:
     code: str
     percent: float                  # 10 -> 10 % off the subtotal
     min_total: float
-    start: str                      # ISO dates, inclusive
-    end: str
+    start_date: str                 # ISO dates, inclusive
+    end_date: str
     active: bool = True
 
     def is_valid(self, subtotal, today=None):
         today = today or date.today().isoformat()
-        return (self.active and self.start <= today <= self.end
+        return (self.active and self.start_date <= today <= self.end_date
                 and subtotal >= self.min_total)
 
     def discount_for(self, subtotal, today=None):
