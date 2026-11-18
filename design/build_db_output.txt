@@ -1,6 +1,6 @@
 > python design/build_db.py
 
-[1] create_tables.sql (generateSql, SQLite, from ERD01) executed: 22 tables, 24 foreign keys
+[1] create_tables.sql (generateSql, SQLite, from the data model DM01) executed: 22 tables, 24 foreign keys
     Address, Apparel, Bag, Cart, CartItem, Category, Customer, Footwear
     InventoryEvent, Milestone, OrderItem, Orders, Payment, Product, Promotion, ReplenishmentRequest
     Review, Shipment, StatusChange, StockLevel, User, Watch
@@ -15,7 +15,7 @@
     a bag: P03 Black Leather Bag (category kind bag), its own row in Bag: capacity 12.0 l
 
 [4] Statements that break a rule
-    generated database (keys from the ERD):
+    generated database (keys from the data model):
     rejected  order line for a product that does not exist         FOREIGN KEY constraint failed
     rejected  Bag row for a product that does not exist            FOREIGN KEY constraint failed
     rejected  second stock level for the same product              UNIQUE constraint failed: StockLevel.product_id

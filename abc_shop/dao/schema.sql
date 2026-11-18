@@ -1,7 +1,7 @@
 -- Physical data model of ABC Online Shop (SQLite).
--- Tables, columns, primary keys and foreign keys are the ones of ERD01, which syncClassesToErd generated from
--- the data model classes (DM01, DM02); design/create_tables.sql is the DDL generateSql wrote from it.
--- Added here by hand, because the ERD does not carry them: NOT NULL, CHECK, UNIQUE, DEFAULT, ON DELETE CASCADE,
+-- Tables, columns, primary keys and foreign keys are the ones of the data model DM01, which syncClassesToErd
+-- generated from the class diagram with multiplicity, labels and ORM (ORM01); design/create_tables.sql is the DDL generateSql wrote from it.
+-- Added here by hand, because the data model does not carry them: NOT NULL, CHECK, UNIQUE, DEFAULT, ON DELETE CASCADE,
 -- the triggers of BR-CAT-01 and the two technical tables sequence and audit_log.
 PRAGMA foreign_keys = ON;
 

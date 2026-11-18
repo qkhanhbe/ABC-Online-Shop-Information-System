@@ -1,0 +1,47 @@
+Geometry of 'ORM01 Class Diagram with Multiplicity and Labels (ORM)' (ClassDiagram):
+  Generalization: User -> Customer points (320,200) (320,472) (166,472) (166,488)
+  Generalization: Product -> Footwear points (1481,608) (1481,846)
+  Generalization: Product -> Apparel points (1497,608) (1497,832) (1726,832) (1726,856)
+  Generalization: Product -> Bag points (1521,608) (2020,608) (2020,856)
+  Generalization: Product -> Watch points (1533,608) (1533,820) (1986,820) (1986,984) (2305,984) (2305,968)
+  Association 'delivers to': Customer -> Address points (114,488) (114,181)
+  Association 'owns': Customer -> Cart points (189,496) (570,496) (570,143) (602,143)
+  Association 'contains': Cart -> CartItem points (751,116) (880,116)
+  Association 'refers to': CartItem -> Product points (1029,152) (1125,152) (1125,430) (1407,430)
+  Association 'belongs to': Product -> Category points (1481,410) (1481,171)
+  Association 'places': Customer -> Order points (189,509) (584,509)
+  Association 'contains': Order -> OrderItem points (770,505) (880,505)
+  Association 'refers to': OrderItem -> Product points (1029,505) (1407,505)
+  Association 'paid by': Order -> Payment points (584,586) (206,586) (206,838) (190,838)
+  Association 'uses': Order -> Promotion points (770,586) (1123,586) (1123,847) (1139,847)
+  Association 'shipped as': Order -> Shipment points (676,608) (676,856)
+  Association 'records': Order -> StatusChange points (604,608) (604,830) (438,830) (438,846)
+  Association 'tracked by': Shipment -> Milestone points (752,907) (880,907)
+  Association 'has': Product -> StockLevel points (1556,509) (1708,509)
+  Association 'explained by': Product -> InventoryEvent points (1556,569) (2007,569)
+  Association 'replenished by': Product -> ReplenishmentRequest points (1533,410) (1533,197) (1696,197) (1696,181)
+  Association 'about': Review -> Product points (1265,190) (1265,394) (1425,394) (1425,410)
+  Association 'writes': Customer -> Review points (154,488) (154,214) (1169,214) (1169,190)
+  Association 'verified by': Review -> Order points (1157,190) (1157,442) (770,442)
+  Class: Review 1139,49 149x141 caption 0,0 149x38
+  Class: ReplenishmentRequest 1656,59 206x122 caption 0,0 206x38
+  Class: InventoryEvent 2006,429 152x160 caption 0,0 152x38
+  Class: StockLevel 1708,457 149x103 caption 0,0 149x38
+  Class: Milestone 880,846 149x122 caption 0,0 149x38
+  Class: StatusChange 312,846 149x122 caption 0,0 149x38
+  Class: Shipment 601,856 151x103 caption 0,0 151x38
+  Class: Payment 40,818 150x179 caption 0,0 150x38
+  Class: OrderItem 880,457 149x103 caption 0,0 149x38
+  Class: Order 584,410 186x198 caption 0,0 186x38
+  Class: Promotion 1139,827 149x160 caption 0,0 149x38
+  Class: Watch 2285,846 208x122 caption 0,0 208x38
+  Class: Bag 2000,856 175x103 caption 0,0 175x38
+  Class: Apparel 1708,856 149x103 caption 0,0 149x38
+  Class: Footwear 1398,846 168x122 caption 0,0 168x38
+  Class: Product 1407,410 149x198 caption 0,0 149x38
+  Class: Category 1407,68 149x103 caption 0,0 149x38
+  Class: CartItem 880,68 149x103 caption 0,0 149x38
+  Class: Cart 602,87 149x65 caption 0,0 149x38
+  Class: Address 40,59 149x122 caption 0,0 149x38
+  Class: Customer 40,488 149x42 caption 0,0 149x38
+  Class: User 300,40 174x160 caption 0,0 174x38

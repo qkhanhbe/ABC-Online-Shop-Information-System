@@ -246,7 +246,6 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            project.setName("TieuLuan_KHANHBQ");
             ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[1].trim()));
             System.out.println("SAVED " + pp[1].trim());
             return;

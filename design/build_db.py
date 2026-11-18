@@ -1,6 +1,6 @@
 """Build the database from the DDL generated from the data model (Chapter 4) and check it.
 
-Chain: data model classes DM01 + DM02 (<<ORM Persistable>>) --syncClassesToErd--> ERD01 --generateSql-->
+Chain: class diagram ORM01 (<<ORM Persistable>>) --syncClassesToErd--> data model DM01 --generateSql-->
 design/create_tables.sql. This script
   [1] runs create_tables.sql on an empty SQLite file,
   [2] compares its tables, columns, primary keys and foreign keys with abc_shop/dao/schema.sql and lists what
@@ -60,7 +60,7 @@ def main():
     gen.executescript(script)
     g = shape(gen)
     fks = sum(len(v[2]) for v in g.values())
-    print(f"[1] create_tables.sql (generateSql, SQLite, from ERD01) executed: {len(g)} tables, {fks} foreign keys")
+    print(f"[1] create_tables.sql (generateSql, SQLite, from the data model DM01) executed: {len(g)} tables, {fks} foreign keys")
     names = sorted(g)
     for i in range(0, len(names), 8):
         print("    " + ", ".join(names[i:i + 8]))
@@ -120,7 +120,7 @@ def main():
         ("review of an order that does not exist",
          "INSERT INTO Review VALUES ('R-X', 5, 'x', 'published', '2026-11-01', 'P01', 'C001', 'O999')"),
     ]
-    print("    generated database (keys from the ERD):")
+    print("    generated database (keys from the data model):")
     k = sum(attempt(conn, label, sql) for label, sql in keyed)
     conn.close()
     app = sqlite3.connect(":memory:")

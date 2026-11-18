@@ -23,7 +23,7 @@ public class V5Org {
         {"2 Analysis", "CL01", "AD01", "AD02", "AD03", "AD05", "AD06", "AD07", "AD08", "CTX01", "DFD0", "DFD1",
          "SD01", "SD02", "ST01"},
         {"3 AI Search", "UC_AI", "CMP01", "SD03", "SD04", "AD04"},
-        {"4 Data Model", "DM01", "ERD01"},
+        {"4 Data Model", "ORM01", "DM01"},
         {"5 Design", "DCL01", "DCL02", "DCL03", "DCL04", "DCL05", "PKG01", "LAY01", "LAY02", "LAY03", "LAY04", "LAY05",
          "SD05", "SD06", "SD07", "SD08", "SD09", "CMP02", "DEP01"},
     };

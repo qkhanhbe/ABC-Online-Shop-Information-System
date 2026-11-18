@@ -29,7 +29,7 @@ public class V5Show {
             String n = d.getName();
             try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
             if (n.startsWith("LAY0")) System.out.println("V5SHOW collapsed " + collapseModel(d) + " on " + n);
-            if (n.startsWith("CL01 ") || n.startsWith("DM01 ") || n.startsWith("DCL0") || n.startsWith("LAY0"))
+            if (n.startsWith("CL01 ") || n.startsWith("ORM01 ") || n.startsWith("DCL0") || n.startsWith("LAY0"))
                 System.out.println("V5SHOW widened " + widen(d) + " on " + n);
         }
     }

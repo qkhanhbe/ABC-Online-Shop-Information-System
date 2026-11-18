@@ -1,7 +1,7 @@
 """One class diagram per phase, laid out wide (three rows) for a landscape page:
 
   CL01  analysis classes: attribute names only (no type, no identifier, no method)
-  DM01  data model classes: + identifier, types, <<ORM Persistable>>, association names and multiplicities
+  ORM01 (was DM01) persistent classes: + identifier, types, <<ORM Persistable>>, association names and multiplicities
   DCL01 design classes (package model): + the methods of the code
 The classes of part 2 (CL02, DM02, DCL02) are added to part 1; the eight associations drawn only on part 2 are
 removed from the model and drawn again on part 1, so no association exists twice. Part 2 diagrams are deleted
@@ -23,7 +23,7 @@ PHASES = {
     "design": ("DCL01 Design Classes (model) - Customers Catalogue and Orders",
                "DCL02 Design Classes (model) - Order History Delivery Stock and Reviews", "model"),
 }
-CURRENT = {"analysis": "CL01 Analysis Class Diagram", "datamodel": "DM01 Data Model Class Diagram (ORM)",
+CURRENT = {"analysis": "CL01 Analysis Class Diagram", "datamodel": "ORM01 Class Diagram with Multiplicity and Labels (ORM)",
            "design": "DCL01 Design Class Diagram (model)"}
 NAV = {("Cart", "CartItem"): "items", ("Order", "OrderItem"): "items", ("Order", "StatusChange"): "history",
        ("Shipment", "Milestone"): "milestones", ("Customer", "Address"): "address"}
@@ -61,7 +61,7 @@ def sizes(d, rename=None):
 
 
 def arrange(d, gap_x=110, gap_y=210, rename=None, cells=None):
-    """Place the classes (or the tables of an ERD; rename maps a table name to its class) on the CELLS grid."""
+    """Place the classes (or the tables of the data model; rename maps a table name to its class) on the CELLS grid."""
     CELLS = cells or globals()["CELLS"]
     real = {v: k for k, v in (rename or {}).items()}
     size = sizes(d, rename)

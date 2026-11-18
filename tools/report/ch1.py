@@ -16,7 +16,7 @@ FRONT = [
           "subclasses of Product and every class carries its responsibilities as operations, with eight activity diagrams "
           "and the context diagram; three AI components (multimodal search with real offline speech recognition, "
           "aspect-based review insights and a stock-aware recommender); a data model of persistent classes from which "
-          "Visual Paradigm generated the ERD (22 tables, 24 foreign keys) and the SQL script through the tools of its MCP "
+          "Visual Paradigm generated the data model (22 tables, 24 foreign keys) and the SQL script through the tools of its MCP "
           "plugin; six design class diagrams in five packages, two layer diagrams and two design sequence diagrams, from which "
           "74 Python classes were generated and found, member by member, in the running application; and a Python web "
           "application on SQLite with 45 automated tests. All 44 diagrams are kept in one Visual Paradigm project "
@@ -28,7 +28,7 @@ FRONT = [
     ("table", "Abbreviations used in the essay", ["Abbreviation", "Meaning"], [
         ["ABSA", "Aspect-based sentiment analysis"], ["AI", "Artificial intelligence"],
         ["BCE", "Boundary, control, entity (analysis object stereotypes)"], ["BP", "Business problem (Assignment 01)"],
-        ["DAO", "Data access object"], ["DFD", "Data flow diagram"], ["ERD", "Entity relationship diagram"],
+        ["DAO", "Data access object"], ["DFD", "Data flow diagram"],
         ["FR / NFR", "Functional / non-functional requirement"], ["MoSCoW", "Must, Should, Could, Won't (prioritisation)"],
         ["MVC", "Model, view, controller"], ["SN", "Stakeholder need"], ["TF-IDF", "Term frequency, inverse document frequency"],
         ["UC", "Use case"], ["UML", "Unified Modeling Language"], ["VP", "Visual Paradigm, the modeling tool of all diagrams"],
