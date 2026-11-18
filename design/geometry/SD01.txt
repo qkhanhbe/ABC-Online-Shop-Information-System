@@ -1,0 +1,36 @@
+Geometry of 'SD01 Place Order (Analysis)' (InteractionDiagram):
+  Activation: Activation 110,133 10x641
+  Activation: Activation 310,133 10x641
+  Lifeline: Customer 70,40 90x790 caption 70,40 90x19
+  Lifeline: CheckoutForm 260,40 110x790 caption 261,75 109x19
+  Activation: Activation 606,172 10x561
+  Activation: Activation 932,216 10x55
+  Lifeline: CheckoutController 546,40 130x790 caption 540,75 142x19
+  Activation: Activation 1082,300 10x25
+  Activation: Activation 1232,387 10x22
+  Activation: Activation 1082,426 10x23
+  Activation: Activation 1382,469 10x138
+  Lifeline: StockLevel 1042,40 90x790 caption 1045,75 84x19
+  Lifeline: PaymentGateway 1327,40 120x790 caption 1323,75 127x19
+  Activation: Activation 1558,508 10x58
+  Activation: Activation 1232,636 10x25
+  Lifeline: Payment Provider 1503,40 120x790 caption 1501,40 120x19
+  Activation: Activation 932,678 10x23
+  Lifeline: Order 1197,40 80x790 caption 1213,75 49x19
+  Lifeline: Cart 897,40 80x790 caption 918,75 39x19
+  Message 'checkout(promoCode)': Customer -> CheckoutForm points (115,140) (315,140) caption 122,120 186x18 text "checkout(promoCode)"
+  Message 'placeOrder(customer, promoCode)': CheckoutForm -> CheckoutController points (315,182) (611,182) caption 322,162 282x18 text "placeOrder(customer, promoCode)"
+  Message 'validate()': CheckoutController -> Cart points (611,224) (937,224) caption 717,204 114x18 text "validate()"
+  Message 'problems': Cart -> CheckoutController points (937,266) (611,266) caption 725,246 98x18 text "problems"
+  Message 'checkAvailable(qty)': CheckoutController -> StockLevel points (611,308) (1087,308) caption 756,288 186x18 text "checkAvailable(qty)"
+  Message 'applyPromotion(), calcTotal()': CheckoutController -> CheckoutController points (611,350) (671,350) (671,364) (611,364) caption 677,346 266x18 text "applyPromotion(), calcTotal()"
+  Message 'createFromCart(cart)': CheckoutController -> Order points (611,392) (1237,392) caption 827,372 194x18 text "createFromCart(cart)"
+  Message 'reserve(order)': CheckoutController -> StockLevel points (611,434) (1087,434) caption 776,414 146x18 text "reserve(order)"
+  Message 'authorize(ref, amount)': CheckoutController -> PaymentGateway points (611,476) (1387,476) caption 894,456 210x18 text "authorize(ref, amount)"
+  Message 'payment request': PaymentGateway -> Payment Provider points (1387,518) (1563,518) caption 1394,498 162x18 text "payment request"
+  Message 'signed result': Payment Provider -> PaymentGateway points (1563,560) (1387,560) caption 1402,540 146x18 text "signed result"
+  Message 'Succeeded': PaymentGateway -> CheckoutController points (1387,602) (611,602) caption 942,582 114x18 text "Succeeded"
+  Message 'changeStatus(Paid/Confirmed)': CheckoutController -> Order points (611,644) (1237,644) caption 791,624 266x18 text "changeStatus(Paid/Confirmed)"
+  Message 'clear()': CheckoutController -> Cart points (611,686) (937,686) caption 725,666 98x18 text "clear()"
+  Message 'order confirmation': CheckoutController -> CheckoutForm points (611,728) (315,728) caption 370,708 186x18 text "order confirmation"
+  Message 'show order O017': CheckoutForm -> Customer points (315,770) (115,770) caption 134,750 162x18 text "show order O017"

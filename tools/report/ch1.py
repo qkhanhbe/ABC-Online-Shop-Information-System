@@ -5,25 +5,23 @@ D = os.path.join(ROOT, "diagrams")
 
 FRONT = [
     ("h1x", "ABSTRACT"),
-    ("p", "This essay is the final version (V4) of the course essay. It follows one information system, the "
-          "<b>ABC Online Shop</b>, from requirement determination through requirements analysis, artificial intelligence in "
-          "e-commerce and system design to a working, demonstrated implementation. "
-          "The material was built up during the semester. Assignment 01 investigated the shop and its problems, "
-          "Assignment 02 turned them into a requirements baseline with 32 use cases, Assignment 03 and Test 01 practised "
-          "the data-flow, interaction, class and data models, and Assignment 06 produced a three-layer multimodal search "
-          "prototype. The essay joins these pieces into one path from a business problem to a running program and explains "
-          "the decision taken at each joint."),
-    ("p", "The main results are: a requirements baseline of 7 business problems, 14 stakeholder needs, 24 functional and "
-          "12 non-functional requirements traced to 32 use cases; an analysis model with activity, data-flow, sequence, "
-          "class, state and entity-relationship diagrams; three AI components (multimodal search, aspect-based review "
-          "insights and a stock-aware recommender) analysed as ordinary requirements with their own risks and fallbacks; "
-          "an updated analysis class model and a layered design (typed design classes, six packages, data access "
-          "objects), with a conceptual, logical and physical data model in which product details depend on the category, "
-          "from which a database of 23 tables and 28 Python classes were generated; and a working Python application with a web "
-          "interface, a SQLite database, 45 automated tests and an evaluation script. All 38 diagrams are kept in one Visual Paradigm project "
+    ("p", "This essay is the final version (V5) of the course essay. It follows one information system, the "
+          "<b>ABC Online Shop</b>, from requirement determination and analysis through artificial intelligence in "
+          "e-commerce, the data model and the design to a working, demonstrated implementation. The material was built up "
+          "during the semester: Assignment 01 investigated the shop and its problems, Assignment 02 turned them into a "
+          "requirements baseline with 32 use cases, Assignment 03 and Test 01 practised the analysis and data models, and "
+          "Assignment 06 produced a three-layer multimodal search prototype."),
+    ("p", "The main results are: a requirements baseline of 14 stakeholder needs, 24 functional and 12 non-functional "
+          "requirements traced to 32 use cases; an analysis model of 22 classes in which the four kinds of product are "
+          "subclasses of Product and every class carries its responsibilities as operations, with eight activity diagrams "
+          "and the context diagram; three AI components (multimodal search with real offline speech recognition, "
+          "aspect-based review insights and a stock-aware recommender); a data model of persistent classes from which "
+          "Visual Paradigm generated the ERD (22 tables, 24 foreign keys) and the SQL script through the tools of its MCP "
+          "plugin; six design class diagrams in five packages, two layer diagrams and two design sequence diagrams, from which "
+          "74 Python classes were generated and found, member by member, in the running application; and a Python web "
+          "application on SQLite with 45 automated tests. All 44 diagrams are kept in one Visual Paradigm project "
           "(TieuLuan_KHANHBQ.vpp). On the test sets, the search returns the expected item first for 25 of 26 queries "
-          "(96.2%), the review analyser reaches an aspect F1 of 0.96, and every order-state and stock rule of the "
-          "requirements is checked by a test."),
+          "(96.2%) and the review analyser reaches an aspect F1 of 0.96."),
     ("p", "<i>Keywords: requirements engineering, use case, data flow diagram, UML, data modeling, DAO, MVC, layered "
           "architecture, multimodal search, aspect-based sentiment analysis, recommendation, Python.</i>"),
     ("h2", "Abbreviations"),

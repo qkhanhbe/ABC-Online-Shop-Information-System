@@ -1,0 +1,43 @@
+Geometry of 'AD05 Search Products (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane 40,40 903x1612
+    ActivityPartition: Customer 40,40 306x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 40,64 306x1588
+      InitialNode: Start 181,94 24x24 caption 211,98 52x16
+      ActivityAction: Type words, speak or upload a photo 64,198 258x40 caption 0,0 258x40
+      ActivityAction: Open a product 136,1476 114x40 caption 0,0 114x40
+      ActivityFinalNode: End 180,1596 26x26 caption 212,1601 47x16
+    ActivityPartition: System 346,40 597x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 346,64 597x1588
+      DecisionNode: Kind of input? 628,318 32x32 caption 650,300 115x16
+      ActivityAction: Transcribe the recording (Whisper) 399,476 244x40 caption 0,0 244x40
+      ActivityAction: Encode the photo as a vector 683,476 206x40 caption 0,0 206x40
+      MergeNode: Input ready 628,596 32x32
+      DecisionNode: About an order? 628,708 32x32 caption 650,690 129x16
+      ActivityAction: Find the customer's own orders 382,852 222x40 caption 0,0 222x40
+      ActivityAction: Read terms, synonyms and price limit 644,852 263x40 caption 0,0 263x40
+      ActivityAction: Retrieve candidates by keyword and vector 495,972 298x40 caption 0,0 298x40
+      ActivityAction: Rank by text, image and stock 539,1092 211x40 caption 0,0 211x40
+      DecisionNode: Any result? 628,1212 32x32 caption 650,1194 98x16
+      ActivityAction: Suggest fewer words or another photo 370,1356 267x40 caption 0,0 267x40
+      ActivityAction: Show ranked products with scores 677,1356 242x40 caption 0,0 242x40
+      ActivityFinalNode: End 545,1596 26x26 caption 577,1601 47x16
+      ActivityFinalNode: End 664,1596 26x26 caption 696,1601 47x16
+  ControlFlow: Start -> Type words, speak or upload a photo points (193,118) (193,198) caption 203,178 20x0 text ""
+  ControlFlow: Type words, speak or upload a photo -> Kind of input? points (322,224) (644,224) (644,318) caption 540,244 20x0 text ""
+  ControlFlow: Kind of input? -> Transcribe the recording (Whisper) points (628,334) (617,334) (617,476) caption 552,317 73x14 text "[voice]" TRUNCATED needs 63x22
+  ControlFlow: Kind of input? -> Encode the photo as a vector points (660,334) (697,334) (697,476) caption 663,317 76x14 text "[photo]" TRUNCATED needs 66x22
+  ControlFlow: Kind of input? -> Input ready points (644,350) (644,462) (657,462) (657,580) (644,580) (644,596) caption 694,583 60x14 text "[text]" TRUNCATED needs 50x22
+  ControlFlow: Transcribe the recording (Whisper) -> Input ready points (605,516) (605,612) (628,612) caption 615,595 20x0 text ""
+  ControlFlow: Encode the photo as a vector -> Input ready points (683,502) (676,502) (676,612) (660,612) caption 686,581 20x0 text ""
+  ControlFlow: Input ready -> About an order? points (644,628) (644,708) caption 654,688 20x0 text ""
+  ControlFlow: About an order? -> Find the customer's own orders points (628,724) (620,724) (620,866) (604,866) caption 566,707 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Find the customer's own orders -> End points (480,892) (480,1342) (663,1342) (663,1568) (558,1568) (558,1596) caption 536,1362 20x0 text ""
+  ControlFlow: About an order? -> Read terms, synonyms and price limit points (660,724) (682,724) (682,852) caption 663,707 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Read terms, synonyms and price limit -> Retrieve candidates by keyword and vector points (775,892) (775,972) caption 785,952 20x0 text ""
+  ControlFlow: Retrieve candidates by keyword and vector -> Rank by text, image and stock points (644,1012) (644,1092) caption 654,1072 20x0 text ""
+  ControlFlow: Rank by text, image and stock -> Any result? points (644,1132) (644,1212) caption 654,1192 20x0 text ""
+  ControlFlow: Any result? -> Suggest fewer words or another photo points (628,1228) (612,1228) (612,1356) caption 574,1211 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Suggest fewer words or another photo -> End points (612,1396) (612,1580) (677,1580) (677,1596) caption 622,1548 20x0 text ""
+  ControlFlow: Any result? -> Show ranked products with scores points (660,1228) (691,1228) (691,1356) caption 663,1211 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Show ranked products with scores -> Open a product points (677,1382) (651,1382) (651,1490) (250,1490) caption 528,1510 20x0 text ""
+  ControlFlow: Open a product -> End points (193,1516) (193,1596) caption 203,1576 20x0 text ""

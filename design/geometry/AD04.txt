@@ -1,0 +1,31 @@
+Geometry of 'AD04 Review Insight Pipeline' (ActivityDiagram):
+  InitialNode: (InitialNode) 316,74 26x26 caption 348,79 20x16
+  ActivityAction: Load published reviews of the product 188,180 280x50 caption 0,0 280x50
+  DecisionNode: (DecisionNode) 273,310 110x70 caption 334,292 20x16
+  ActivityAction: Skip, count as noise 64,622 220x50 caption 0,0 220x50
+  ActivityAction: Split into clauses (. , but however) 344,492 280x50 caption 0,0 280x50
+  ActivityAction: Detect aspects: quality, price, delivery, service 344,622 280x50 caption 0,0 280x50
+  ActivityAction: Score polarity with negation window (3 words) 344,752 280x50 caption 0,0 280x50
+  ActivityAction: Use star rating when a clause has no opinion word 344,882 280x50 caption 0,0 280x50
+  MergeNode: (MergeNode) 304,1012 50x40
+  DecisionNode: (DecisionNode) 273,1132 110x70 caption 334,1114 20x16
+  ActivityAction: Show 'Not enough reviews' (fallback) 56,1314 230x50 caption 0,0 230x50
+  ActivityAction: Aggregate +/- per aspect, keep evidence 346,1314 280x50 caption 0,0 280x50
+  ActivityAction: Label: Mostly positive / Mixed / Mostly negative 346,1444 280x50 caption 0,0 280x50
+  ActivityFinalNode: (ActivityFinalNode) 472,1574 28x28 caption 506,1580 20x16
+  ActivityFinalNode: (ActivityFinalNode) 157,1574 28x28 caption 191,1580 20x16
+  ControlFlow: (InitialNode) -> Load published reviews of the product points (329,100) (329,180) caption 339,160 20x0 text ""
+  ControlFlow: Load published reviews of the product -> (DecisionNode) points (328,230) (328,310) caption 338,290 20x0 text ""
+  ControlFlow: (DecisionNode) -> Skip, count as noise points (278,348) (258,348) (258,622) caption 181,351 74x14 text "[noise]"
+  ControlFlow: (DecisionNode) -> Split into clauses (. , but however) points (378,348) (394,348) (394,492) caption 397,351 104x14 text "[not noise]"
+  ControlFlow: Split into clauses (. , but however) -> Detect aspects: quality, price, delivery, service points (488,542) (488,622) caption 498,602 20x0 text ""
+  ControlFlow: Detect aspects: quality, price, delivery, service -> Score polarity with negation window (3 words) points (488,672) (488,752) caption 498,732 20x0 text ""
+  ControlFlow: Score polarity with negation window (3 words) -> Use star rating when a clause has no opinion word points (488,802) (488,882) caption 498,862 20x0 text ""
+  ControlFlow: Use star rating when a clause has no opinion word -> (MergeNode) points (370,932) (370,1030) (352,1030) caption 380,1010 20x0 text ""
+  ControlFlow: Skip, count as noise -> (MergeNode) points (270,672) (270,1030) (307,1030) caption 280,889 20x0 text ""
+  ControlFlow: (MergeNode) -> (DecisionNode) points (328,1051) (328,1132) caption 338,1111 20x0 text ""
+  ControlFlow: (DecisionNode) -> Show 'Not enough reviews' (fallback) points (278,1170) (262,1170) (262,1314) caption 145,1173 114x14 text "[< 2 usable]"
+  ControlFlow: Show 'Not enough reviews' (fallback) -> (ActivityFinalNode) points (171,1364) (171,1574) caption 181,1489 20x0 text ""
+  ControlFlow: (DecisionNode) -> Aggregate +/- per aspect, keep evidence points (378,1170) (396,1170) (396,1314) caption 399,1173 125x14 text "[>= 2 usable]"
+  ControlFlow: Aggregate +/- per aspect, keep evidence -> Label: Mostly positive / Mixed / Mostly negative points (490,1364) (490,1444) caption 500,1424 20x0 text ""
+  ControlFlow: Label: Mostly positive / Mixed / Mostly negative -> (ActivityFinalNode) points (486,1494) (486,1574) caption 496,1554 20x0 text ""

@@ -24,12 +24,12 @@ R = os.path.join(ROOT, "demo_results")
 
 
 def fig(code, caption, width=160):
-    path = next(os.path.join(D, f) for f in sorted(os.listdir(D)) if f.startswith(code + " "))
+    path = next((os.path.join(D, f) for f in sorted(os.listdir(D)) if f.startswith(code + " ")), os.path.join(D, code + " (V4).png"))
     return ("fig", path, caption + f" - VP diagram \"{os.path.basename(path)[:-4]}\"", width)
 
 
 def figl(code, caption):
-    path = next(os.path.join(D, f) for f in sorted(os.listdir(D)) if f.startswith(code + " "))
+    path = next((os.path.join(D, f) for f in sorted(os.listdir(D)) if f.startswith(code + " ")), os.path.join(D, code + " (V4).png"))
     return ("figl", path, caption + f" - VP diagram \"{os.path.basename(path)[:-4]}\"")
 
 
@@ -139,9 +139,13 @@ analysis = after(analysis, "fig", os.path.join(D, "CL01"), [
           "brand, colour, price, description, image and status. What only one group of products has lives in a detail "
           "class: sizes, upper material, sole and purpose for footwear; sizes, material and fit for apparel; capacity, "
           "material and laptop sleeve for bags; movement, strap, water resistance and battery life for watches. "
-          "ProductDetail is abstract, so a product is always described by exactly one concrete kind, and "
-          "Category.detailKind says which kind its products use. A new product group means a new detail class and a "
-          "new category, not a new column that is empty for all other products.")], skip=1)
+          "In the analysis model these groups are subclasses of Product: a pair of running shoes <i>is a</i> "
+          "product, so FootwearProduct, ApparelProduct, BagProduct and WatchProduct inherit everything Product has and add only "
+          "their own attributes. The generalization is complete and disjoint: every product is exactly one of the four "
+          "kinds, and its category says which. A new product group means a new subclass and a new category, not a new "
+          "column that is empty for all other products. The design (Section 4.3) keeps the meaning but changes the "
+          "form: the inheritance becomes a composition Product ◆ ProductDetail with one detail class per kind, because the "
+          "kind of a product follows from its category and its attributes are stored in a separate table per kind.")], skip=1)
 CH2 += analysis
 CH2 += [b for b in extras.CH2 if True]
 CH2 = [b for b in CH2]
@@ -175,7 +179,8 @@ c4 = c4[:i] + [
     ("p", "Four decisions of this model carry into the database. Compositions mark the parts that cannot exist without "
           "their whole: Product ◆ ProductDetail, Cart ◆ CartItem, Order ◆ OrderItem, Order ◆ StatusChange and "
           "Shipment ◆ Milestone; their keys later contain the key of the whole. Customer is a subclass of User, and the "
-          "abstract ProductDetail has the four kinds FootwearDetail, ApparelDetail, BagDetail and WatchDetail, with "
+          "abstract ProductDetail has the four kinds FootwearDetail, ApparelDetail, BagDetail and WatchDetail (the "
+          "subclasses of Product in the analysis model, turned into parts of Product for storage), with "
           "Category.detailKind naming the kind. Order keeps its own copies of what must not change afterwards (the "
           "address, and the name and unit price of every OrderItem). And InventoryEvent is linked to Product (explained by), "
           "because every stock movement is a fact about one product; StockLevel holds only the current figures. The "

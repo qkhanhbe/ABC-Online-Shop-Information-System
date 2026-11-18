@@ -1,0 +1,33 @@
+Geometry of 'SD06 Track Order (Design)' (InteractionDiagram):
+  Activation: Activation 95,124 10x600
+  Activation: Activation 431,124 10x600
+  Lifeline: Customer 60,40 80x738 caption 60,40 80x19
+  Lifeline: WebApp 391,40 90x738 caption 403,75 67x19
+  Activation: Activation 671,165 10x518
+  Activation: Activation 999,207 10x56
+  Lifeline: OrderController 616,40 120x738 caption 619,75 115x19
+  Lifeline: AuthService 954,40 100x738 caption 958,75 92x19
+  Activation: Activation 1149,291 10x266
+  Activation: Activation 1499,377 10x54
+  Lifeline: OrderService 1099,40 110x738 caption 1105,75 98x19
+  Lifeline: OrderDAO 1459,40 90x738 caption 1465,75 79x19
+  Activation: Activation 1649,459 10x56
+  Activation: Activation 1799,585 10x56
+  Lifeline: ShipmentDAO 1604,40 100x738 caption 1602,75 105x19
+  Lifeline: templates 1759,40 90x738 caption 1767,75 75x19
+  NOTE: (NOTE) 998,794 900x96 caption 0,0 885x0
+  Message 'GET /orders/O011': Customer -> WebApp points (100,130) (436,130) caption 187,110 162x18 text "GET /orders/O011"
+  Message 'track(request, order_id)': WebApp -> OrderController points (436,172) (676,172) caption 443,152 226x18 text "track(request, order_id)"
+  Message 'require(request.user, "own_orders")': OrderController -> AuthService points (676,214) (1004,214) caption 683,194 314x18 text "require(request.user, "own_orders")"
+  Message 'customer': AuthService -> OrderController points (1004,256) (676,256) caption 791,236 98x18 text "customer"
+  Message 'track(customer.user_id, order_id)': OrderController -> OrderService points (676,298) (1154,298) caption 766,278 298x18 text "track(customer.user_id, order_id)"
+  Message 'own_order(customer_id, order_id)': OrderService -> OrderService points (1154,340) (1227,340) (1227,354) (1154,354) caption 1233,336 290x18 text "own_order(customer_id, order_id)"
+  Message 'get_order(order_id)': OrderService -> OrderDAO points (1154,382) (1504,382) caption 1236,362 186x18 text "get_order(order_id)"
+  Message 'order': OrderDAO -> OrderService points (1504,424) (1154,424) caption 1292,404 74x18 text "order"
+  Message 'get_by_order(order.order_id)': OrderService -> ShipmentDAO points (1154,466) (1654,466) caption 1275,446 258x18 text "get_by_order(order.order_id)"
+  Message 'shipment or None': ShipmentDAO -> OrderService points (1654,508) (1154,508) caption 1319,488 170x18 text "shipment or None"
+  Message '{order, status, carrier_ref, timeline, last_update}': OrderService -> OrderController points (1154,550) (676,550) caption 690,530 450x18 text "{order, status, carrier_ref, timeline, last_update}"
+  Message 'track(request, tracking)': OrderController -> templates points (676,592) (1804,592) caption 1123,572 234x18 text "track(request, tracking)"
+  Message 'html': templates -> OrderController points (1804,634) (676,634) caption 1203,614 74x18 text "html"
+  Message 'Response(html)': OrderController -> WebApp points (676,676) (436,676) caption 479,656 154x18 text "Response(html)"
+  Message '200 order page with status timeline': WebApp -> Customer points (436,718) (100,718) caption 107,698 322x18 text "200 order page with status timeline"

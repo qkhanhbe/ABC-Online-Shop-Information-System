@@ -1,0 +1,9 @@
+Geometry of 'DCL05 Design Classes (ai) - Search Review Insights and Recommendations' (ClassDiagram):
+  Class: ReviewInsightService 667,485 351x141 caption 0,0 351x19
+  Class: RecommenderService 201,485 406x84 caption 0,0 406x19
+  Class: SpeechService 903,291 277x84 caption 0,0 277x19
+  Class: ImageService 552,291 291x46 caption 0,0 291x19
+  Class: RankingService 40,291 452x84 caption 0,0 452x19
+  Class: QueryService 599,40 564x141 caption 0,0 564x19
+  Class: SearchService 57,40 482x122 caption 0,0 482x19
+  Usage: SearchService -> RankingService points (298,162) (298,291) caption 203,214 92x24 text "<<use>>"

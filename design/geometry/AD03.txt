@@ -1,0 +1,33 @@
+Geometry of 'AD03 Manage Inventory' (ActivityDiagram):
+  InitialNode: (InitialNode) 395,74 26x26 caption 427,79 20x16
+  ActivityAction: Warehouse Staff: select product and event type 268,180 280x50 caption 0,0 280x50
+  ActivityAction: System: show physical, reserved, available, recent events 268,310 280x50 caption 0,0 280x50
+  ActivityAction: Warehouse Staff: enter quantity, reference, reason 268,440 280x50 caption 0,0 280x50
+  DecisionNode: (DecisionNode) 353,570 110x70 caption 414,552 20x16
+  ActivityAction: Return earlier event, no change 56,778 250x50 caption 0,0 250x50
+  ActivityFinalNode: (ActivityFinalNode) 167,1626 28x28 caption 201,1632 20x16
+  DecisionNode: (DecisionNode) 473,752 110x70 caption 534,734 20x16
+  ActivityAction: Reject event and explain 241,934 250x50 caption 0,0 250x50
+  ActivityFinalNode: (ActivityFinalNode) 352,1626 28x28 caption 386,1632 20x16
+  ActivityAction: System: record event, recalculate stock atomically 551,934 280x50 caption 0,0 280x50
+  DecisionNode: (DecisionNode) 636,1064 110x70 caption 697,1046 20x16
+  ActivityAction: Flag low stock, offer UC24 replenishment 485,1246 260x50 caption 0,0 260x50
+  MergeNode: (MergeNode) 666,1376 50x40
+  ActivityAction: System: display new balance and event id 551,1496 280x50 caption 0,0 280x50
+  ActivityFinalNode: (ActivityFinalNode) 677,1626 28x28 caption 711,1632 20x16
+  ControlFlow: (InitialNode) -> Warehouse Staff: select product and event type points (408,100) (408,180) caption 418,160 20x0 text ""
+  ControlFlow: Warehouse Staff: select product and event type -> System: show physical, reserved, available, recent events points (408,230) (408,310) caption 418,290 20x0 text ""
+  ControlFlow: System: show physical, reserved, available, recent events -> Warehouse Staff: enter quantity, reference, reason points (408,360) (408,440) caption 418,420 20x0 text ""
+  ControlFlow: Warehouse Staff: enter quantity, reference, reason -> (DecisionNode) points (408,490) (408,570) caption 418,550 20x0 text ""
+  ControlFlow: (DecisionNode) -> Return earlier event, no change points (358,608) (322,608) (322,792) (306,792) caption 216,611 103x14 text "[duplicate]"
+  ControlFlow: Return earlier event, no change -> (ActivityFinalNode) points (181,828) (181,1626) caption 191,1247 20x0 text ""
+  ControlFlow: (DecisionNode) -> (DecisionNode) points (418,634) (418,778) (487,778) caption 421,643 145x14 text "[new reference]"
+  ControlFlow: (DecisionNode) -> Reject event and explain points (478,790) (459,790) (459,934) caption 332,793 124x14 text "[balance < 0]"
+  ControlFlow: Reject event and explain -> (ActivityFinalNode) points (366,984) (366,1626) caption 376,1325 20x0 text ""
+  ControlFlow: (DecisionNode) -> System: record event, recalculate stock atomically points (565,798) (565,934) caption 568,825 118x14 text "[balance ok]"
+  ControlFlow: System: record event, recalculate stock atomically -> (DecisionNode) points (691,984) (691,1064) caption 701,1044 20x0 text ""
+  ControlFlow: (DecisionNode) -> Flag low stock, offer UC24 replenishment points (691,1134) (691,1246) caption 583,1137 105x14 text "[low stock]"
+  ControlFlow: Flag low stock, offer UC24 replenishment -> (MergeNode) points (691,1296) (691,1376) caption 701,1356 20x0 text ""
+  ControlFlow: (DecisionNode) -> (MergeNode) points (741,1102) (759,1102) (759,1394) (714,1394) caption 762,1105 97x14 text "[stock ok]"
+  ControlFlow: (MergeNode) -> System: display new balance and event id points (691,1416) (691,1496) caption 701,1476 20x0 text ""
+  ControlFlow: System: display new balance and event id -> (ActivityFinalNode) points (691,1546) (691,1626) caption 701,1606 20x0 text ""

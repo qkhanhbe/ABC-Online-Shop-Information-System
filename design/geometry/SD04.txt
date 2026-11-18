@@ -1,0 +1,28 @@
+Geometry of 'SD04 Image Search' (InteractionDiagram):
+  Activation: Activation 110,124 10x516
+  Activation: Activation 406,124 10x516
+  Lifeline: Customer 70,40 90x654 caption 70,40 90x19
+  Lifeline: ShopController 351,40 120x654 caption 355,75 112x19
+  Activation: Activation 598,165 10x56
+  Activation: Activation 748,249 10x55
+  Lifeline: ImageStorage 548,40 110x654 caption 552,75 103x19
+  Lifeline: ImageService 698,40 110x654 caption 703,75 100x19
+  Activation: Activation 898,334 10x265
+  Activation: Activation 1176,375 10x56
+  Lifeline: SearchService 848,40 110x654 caption 850,75 107x19
+  Lifeline: VectorIndex 1131,40 100x654 caption 1136,75 90x19
+  Activation: Activation 1326,503 10x55
+  Lifeline: RankingService 1271,40 120x654 caption 1274,75 115x19
+  Message 'search(photo)': Customer -> ShopController points (115,130) (411,130) caption 194,110 138x18 text "search(photo)"
+  Message 'save_upload(photo)': ShopController -> ImageStorage points (411,172) (603,172) caption 418,152 178x18 text "save_upload(photo)"
+  Message 'path': ImageStorage -> ShopController points (603,214) (411,214) caption 474,194 66x18 text "path"
+  Message 'encode(path)': ShopController -> ImageService points (411,256) (753,256) caption 517,236 130x18 text "encode(path)"
+  Message 'z (128-d)': ImageService -> ShopController points (753,298) (411,298) caption 529,278 106x18 text "z (128-d)"
+  Message 'search(image_query(z))': ShopController -> SearchService points (411,340) (903,340) caption 552,320 210x18 text "search(image_query(z))"
+  Message 'search(z, k=5)': SearchService -> VectorIndex points (903,382) (1181,382) caption 969,362 146x18 text "search(z, k=5)"
+  Message '[(id, cosine)]': VectorIndex -> SearchService points (1181,424) (903,424) caption 969,404 146x18 text "[(id, cosine)]"
+  Message 'add stock, price filter': SearchService -> SearchService points (903,466) (960,466) (960,481) (903,481) caption 966,462 218x18 text "add stock, price filter"
+  Message 'rank(candidates, query)': SearchService -> RankingService points (903,508) (1331,508) caption 1004,488 226x18 text "rank(candidates, query)"
+  Message 'ranked results': RankingService -> SearchService points (1331,550) (903,550) caption 1040,530 154x18 text "ranked results"
+  Message 'top-5 results': SearchService -> ShopController points (903,592) (411,592) caption 584,572 146x18 text "top-5 results"
+  Message 'search_results(results, trace)': ShopController -> Customer points (411,634) (115,634) caption 122,614 282x18 text "search_results(results, trace)"

@@ -1,4 +1,4 @@
-"""Builds Tieuluan_V4_04_10_KhanhBQ_049.pdf (A6 report style: Times New Roman, light-blue tables).
+"""Builds Tieuluan_V5_04_10_KhanhBQ_049.pdf (A6 report style: Times New Roman, light-blue tables).
 
 Content lives in chapters.py as lists of blocks:
   ("h1", title) ("h2", title) ("h3", title) ("p", html) ("bullets", [html]) ("code", text)
@@ -23,7 +23,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-OUT = os.path.join(ROOT, "Tieuluan_V4_04_10_KhanhBQ_049.pdf")
+OUT = os.path.join(ROOT, "Tieuluan_V5_04_10_KhanhBQ_049.pdf")
 FONTS = r"C:\Windows\Fonts"
 
 pdfmetrics.registerFont(TTFont("TNR", os.path.join(FONTS, "times.ttf")))
@@ -48,6 +48,7 @@ CAP = ParagraphStyle("cap", fontName="TNR-I", fontSize=11, leading=13.5, alignme
 TCAP = ParagraphStyle("tcap", fontName="TNR-I", fontSize=11, leading=13.5, alignment=TA_CENTER, spaceBefore=4, spaceAfter=3)
 CELL = ParagraphStyle("cell", fontName="TNR", fontSize=10.5, leading=12.8, alignment=TA_LEFT)
 CELLH = ParagraphStyle("cellh", parent=CELL, fontName="TNR")
+NOTE = ParagraphStyle("note", fontName="TNR", fontSize=11, leading=14.5, leftIndent=8, spaceAfter=2)
 CODE = ParagraphStyle("code", fontName="CN", fontSize=8.6, leading=10.4, leftIndent=18, spaceBefore=2, spaceAfter=8)
 EQ = ParagraphStyle("eq", fontName="TNR-I", fontSize=12, leading=16, alignment=TA_CENTER, spaceBefore=2, spaceAfter=6)
 TOC1 = ParagraphStyle("toc1", fontName="TNR-B", fontSize=12, leading=16, leftIndent=0)
@@ -242,6 +243,40 @@ def render(blocks):
             end._figl_end = True
             story += [
                       Paragraph(f"Figure {len(FIG_LIST)}. {b[2]}", CAP), end, PageBreak()]
+        elif kind == "figm":                                  # figure with red numbered callouts and their notes
+            from reportlab.platypus import NextPageTemplate
+            path, caption, width_mm, notes, landscape = b[1], b[2], b[3], b[4], b[5]
+            note_par = [Paragraph(f'<font backColor="#C00000" color="white"><b>&nbsp;{i}&nbsp;</b></font>&nbsp; {t}', NOTE)
+                        for i, t in enumerate(notes, 1)]
+            with Image.open(path) as im:
+                ratio = im.size[0] / im.size[1]
+            if not landscape or ratio < 1.3:                 # square or tall diagrams fit a portrait page better
+                FIG_LIST.append(caption)
+                with Image.open(path) as im:
+                    w, h = im.size
+                width = 165 * mm
+                height = width * h / w
+                max_h = (222 - 9 * len(notes)) * mm
+                if height > max_h:
+                    width, height = width * max_h / height, max_h
+                img = RLImage(path, width=width, height=height)
+                img.hAlign = "CENTER"
+                story += [KeepTogether([img, Paragraph(f"Figure {len(FIG_LIST)}. {caption}", CAP)] + note_par),
+                          Spacer(1, 4)]
+                continue
+            FIG_LIST.append(caption)
+            with Image.open(path) as im:
+                w, h = im.size
+            max_h = (150 - 7 * len(notes)) * mm
+            width = 255 * mm
+            height = width * h / w
+            if height > max_h:
+                width, height = width * max_h / height, max_h
+            img = RLImage(path, width=width, height=height)
+            img.hAlign = "CENTER"
+            end = NextPageTemplate("normal")
+            story += [NextPageTemplate("landscape"), PageBreak(), img,
+                      Paragraph(f"Figure {len(FIG_LIST)}. {caption}", CAP)] + note_par + [end, PageBreak()]
         elif kind == "term":
             text = open(b[1], encoding="utf-8").read() if os.path.isfile(b[1]) else b[1]
             name = "term_%d.png" % (len(FIG_LIST) + 1)
@@ -264,12 +299,12 @@ def cover():
     s += [Paragraph("POSTS AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY", c1),
           Paragraph("Faculty of Information Technology 1", c2), Spacer(1, 2 * mm),
           Paragraph("Course: Information System Analysis and Design", c2), Spacer(1, 30 * mm),
-          Paragraph("COURSE ESSAY &mdash; VERSION 4.0 (FINAL)", ParagraphStyle("ce", parent=c1, fontSize=15)), Spacer(1, 8 * mm),
+          Paragraph("COURSE ESSAY &mdash; VERSION 5.0 (FINAL)", ParagraphStyle("ce", parent=c1, fontSize=15)), Spacer(1, 8 * mm),
           Paragraph("ABC ONLINE SHOP:<br/>FROM REQUIREMENTS TO CODE", ct), Spacer(1, 6 * mm),
           Paragraph("Requirements, analysis, AI integration, design, implementation and demonstration "
                     "of an e-commerce information system", cs), Spacer(1, 26 * mm)]
     info = [["Student:", "Bế Quốc Khánh (KHANHBQ)"], ["Student ID:", "B23DCCE049"], ["Class:", "04"],
-            ["Lecturer:", "PGS.TS. Trần Đình Quế"], ["Version:", "V4 (final)"],
+            ["Lecturer:", "PGS.TS. Trần Đình Quế"], ["Version:", "V5 (final)"],
             ["Submitted:", "Report, Visual Paradigm project, database, source code, demo, defence guide"]]
     st = ParagraphStyle("i", fontName="TNR", fontSize=12.5, leading=17)
     sb = ParagraphStyle("ib", fontName="TNR-B", fontSize=12.5, leading=17)

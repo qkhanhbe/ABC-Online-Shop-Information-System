@@ -76,7 +76,7 @@ public class Redraw {
             if (code.startsWith("CTX")) context(d, spec.get(code));
             else if (code.startsWith("UC")) useCases(d, spec.get(code));
             else if (code.startsWith("SD")) sequence(d, spec.get(code));
-            else if (code.startsWith("DCL0")) orthoUseCases(d, spec.get(code));
+            else if (code.startsWith("DCL0") || code.equals("CL01")) orthoUseCases(d, spec.get(code));
             else if (code.startsWith("DM")) { dataModel(project, d, spec.get(code)); orthoUseCases(d, spec.get(code)); }
             System.out.println("REDRAWN " + d.getName());
         }
@@ -184,6 +184,8 @@ public class Redraw {
      * CODE|@path|A|B|sideA|sideB|x,y;x,y     connector through explicit bend points
      */
     void orthoUseCases(IDiagramUIModel d, List<String[]> lines) {
+        ratioPins = false;
+        for (String[] p : lines) if ("@pin".equals(p[1]) && "ratio".equals(p[2])) ratioPins = true;
         if (!routeOnly) {
             IProject project = ApplicationManager.instance().getProjectManager().getProject();
             for (String[] p : lines) if ("@show".equals(p[1]) && find(d, p[2]) == null) {
@@ -194,6 +196,23 @@ public class Redraw {
                         break;
                     }
                 }
+            }
+            for (String[] p : lines) if ("@rename".equals(p[1])) {        // rename a model element shown here
+                IShapeUIModel sh = find(d, p[2]);
+                if (sh != null) { sh.getModelElement().setName(p[3]); System.out.println("  RENAMED " + p[2] + " -> " + p[3]); }
+            }
+            for (String[] p : lines) if ("@delete".equals(p[1])) {        // delete a class and every relationship drawn to it
+                IShapeUIModel sh = find(d, p[2]);
+                if (sh == null) continue;
+                for (IConnectorUIModel c : connectors(d)) {
+                    if (c.getModelElement() == null) continue;
+                    if (sh.getId().equals(c.getFromShape().getId()) || sh.getId().equals(c.getToShape().getId())) {
+                        System.out.println("  DELETED " + type(c) + " " + name(c.getFromShape()) + " -> " + name(c.getToShape()));
+                        c.getModelElement().delete();
+                    }
+                }
+                sh.getModelElement().delete();
+                System.out.println("  DELETED " + p[2]);
             }
             for (String[] p : lines) if ("@ensure".equals(p[1])) ensure(d, p[2], p[3], p[4]);
         }
@@ -257,6 +276,10 @@ public class Redraw {
                 pts.add(s);
                 if ("@path".equals(p[1])) {
                     for (String xy : p[6].split(";")) pts.add(new Point(i(xy.split(",")[0]), i(xy.split(",")[1])));
+                    // the first bend stays level with (or in line with) the real start, the last one with the real end
+                    Point first = pts.get(1), lastBend = pts.get(pts.size() - 1);
+                    if (p[4].startsWith("L") || p[4].startsWith("R")) first.y = s.y; else first.x = s.x;
+                    if (p[5].startsWith("T") || p[5].startsWith("B")) lastBend.x = e.x; else lastBend.y = e.y;
                 } else if (s.x != e.x && s.y != e.y) {
                     boolean horizontalFirst = p[4].startsWith("L") || p[4].startsWith("R");
                     pts.add(horizontalFirst ? new Point(e.x, s.y) : new Point(s.x, e.y));
@@ -275,8 +298,18 @@ public class Redraw {
                 }
                 List<Point> drawn = new ArrayList<>(pts);
                 if (reversed) java.util.Collections.reverse(drawn);
-                pin(c, drawn.toArray(new Point[0]));
-                points(c, drawn.toArray(new Point[0]));
+                if (ratioPins) {        // re-create the view with its points: VP then stores them exactly
+                    IModelElement rel = c.getModelElement();
+                    IShapeUIModel fa = c.getFromShape(), fb = c.getToShape();
+                    c.deleteViewOnly();
+                    c = (IConnectorUIModel) ApplicationManager.instance().getDiagramManager()
+                        .createConnector(d, rel, fa, fb, drawn.toArray(new Point[0]));
+                    c.setConnectorStyle(IConnectorUIModel.CS_OBLIQUE);
+                    fit(c, drawn.toArray(new Point[0]));
+                } else {
+                    pin(c, drawn.toArray(new Point[0]));
+                    points(c, drawn.toArray(new Point[0]));
+                }
                 font(c, 11);
                 done.add(c.getId());
                 String t = type(c);
@@ -469,11 +502,13 @@ public class Redraw {
     // no pin: VP keeps the end points exactly where the route puts them (a ratio pin re-snaps them by a pixel or two)
     static int PIN = IConnectorUIModel.PINTYPE_NONE;
 
+    static boolean ratioPins;                    // spec line CODE|@pin|ratio: ends pinned at their exact ratio
+
     static void pin(IConnectorUIModel c, Point[] pts) {
         if (pts == null || pts.length < 2) return;
         IShapeUIModel a = c.getFromShape(), b = c.getToShape();
-        c.setFromPinType(PIN);
-        c.setToPinType(PIN);
+        c.setFromPinType(ratioPins ? IConnectorUIModel.PINTYPE_RATIO : PIN);
+        c.setToPinType(ratioPins ? IConnectorUIModel.PINTYPE_RATIO : PIN);
         c.setFromPinRatio(new java.awt.geom.Point2D.Double((pts[0].x - a.getX()) / (double) a.getWidth(), (pts[0].y - a.getY()) / (double) a.getHeight()));
         Point e = pts[pts.length - 1];
         c.setToPinRatio(new java.awt.geom.Point2D.Double((e.x - b.getX()) / (double) b.getWidth(), (e.y - b.getY()) / (double) b.getHeight()));

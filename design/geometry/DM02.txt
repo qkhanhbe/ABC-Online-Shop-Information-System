@@ -1,0 +1,19 @@
+Geometry of 'DM02 Data Model Classes - Order History Delivery Stock and Reviews' (ClassDiagram):
+  Class: Review 723,375 149x164 caption 0,0 149x38
+  Class: ReplenishmentRequest 470,1148 166x122 caption 0,0 166x38
+  Class: InventoryEvent 1008,1148 149x160 caption 0,0 149x38
+  Class: StockLevel 696,1148 252x164 caption 0,0 252x38
+  Class: Milestone 235,375 149x122 caption 0,0 149x38
+  Class: StatusChange 261,1148 149x122 caption 0,0 149x38
+  Class: Shipment 73,74 473x145 caption 0,0 473x38
+  Class: Product 689,695 267x297 caption 0,0 267x38
+  Class: Order 60,695 551x297 caption 0,0 551x38
+  Class: Customer 606,154 382x65 caption 0,0 382x38
+  Association 'records': Order -> StatusChange points (335,992) (335,1148) caption 250,1058 83x24 text "records" mult 318,992 16x20 mult 300,1128 40x20
+  Association 'tracked by': Shipment -> Milestone points (309,219) (309,375) caption 199,285 110x24 text "tracked by" mult 292,219 16x20 mult 274,355 40x20
+  Association 'has': Product -> StockLevel points (822,992) (822,1148) caption 769,1058 50x24 text "has" mult 805,992 16x20 mult 805,1128 16x20
+  Association 'explained by': Product -> InventoryEvent points (925,992) (925,1132) (1026,1132) (1026,1148) caption 925,1050 128x24 text "explained by" mult 927,992 16x20 mult 1021,1128 40x20
+  Association 'replenished by': Product -> ReplenishmentRequest points (709,992) (709,1132) (610,1132) (610,1148) caption 564,1050 146x24 text "replenished by" mult 692,992 16x20 mult 575,1128 40x20
+  Association 'about': Review -> Product points (797,539) (797,695) caption 800,605 66x24 text "about" mult 792,539 40x20 mult 799,675 16x20
+  Association 'writes': Customer -> Review points (797,219) (797,375) caption 723,285 74x24 text "writes" mult 780,219 16x20 mult 762,355 40x20
+  Association 'verified by': Review -> Order points (723,515) (627,515) (627,715) (611,715) caption 513,603 119x24 text "verified by" mult 688,495 40x20 mult 613,695 16x20

@@ -1,0 +1,38 @@
+Geometry of 'AD06 Manage Cart (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane 40,40 1077x1366
+    ActivityPartition: Customer 40,40 503x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 40,64 503x1342
+      InitialNode: Start 279,94 24x24 caption 309,98 52x16
+      ActivityAction: Choose a product and a quantity 177,198 228x40 caption 0,0 228x40
+      ActivityAction: Review the cart 235,966 113x40 caption 0,0 113x40
+      DecisionNode: Next step? 275,1086 32x32 caption 297,1068 92x16
+      ActivityAction: Change a quantity (0 removes the line) 252,1230 267x40 caption 0,0 267x40
+      ActivityAction: Proceed to checkout 64,1230 148x40 caption 0,0 148x40
+      ActivityFinalNode: End 278,1350 26x26 caption 310,1355 47x16
+    ActivityPartition: System 543,40 574x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 543,64 574x1342
+      DecisionNode: Product for sale? 814,318 32x32 caption 836,300 136x16
+      ActivityAction: Report the product is not available 567,462 241x40 caption 0,0 241x40
+      ActivityAction: Add the quantity already in the cart 848,462 245x40 caption 0,0 245x40
+      DecisionNode: Enough available stock? (UC30) 814,582 32x32 caption 836,564 234x16
+      ActivityAction: Show the available quantity 601,726 194x40 caption 0,0 194x40
+      ActivityAction: Add a line with the current price 835,726 224x40 caption 0,0 224x40
+      ActivityAction: Save the cart 781,846 98x40 caption 0,0 98x40
+      ActivityFinalNode: End 731,1350 26x26 caption 763,1355 47x16
+      ActivityFinalNode: End 850,1350 26x26 caption 882,1355 47x16
+  ControlFlow: Start -> Choose a product and a quantity points (291,118) (291,198) caption 301,178 20x0 text ""
+  ControlFlow: Choose a product and a quantity -> Product for sale? points (405,224) (830,224) (830,318) caption 674,244 20x0 text ""
+  ControlFlow: Product for sale? -> Report the product is not available points (814,334) (785,334) (785,462) caption 760,317 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Report the product is not available -> End points (581,502) (581,1334) (744,1334) (744,1350) caption 591,1027 20x0 text ""
+  ControlFlow: Product for sale? -> Add the quantity already in the cart points (830,350) (830,476) (848,476) caption 833,353 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Add the quantity already in the cart -> Enough available stock? (UC30) points (848,488) (830,488) (830,582) caption 840,546 20x0 text ""
+  ControlFlow: Enough available stock? (UC30) -> Show the available quantity points (814,598) (771,598) (771,726) caption 760,581 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Show the available quantity -> End points (759,766) (759,1334) (863,1334) (863,1350) caption 769,1130 20x0 text ""
+  ControlFlow: Enough available stock? (UC30) -> Add a line with the current price points (830,614) (830,710) (849,710) (849,726) caption 833,617 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Add a line with the current price -> Save the cart points (857,766) (857,846) caption 867,826 20x0 text ""
+  ControlFlow: Save the cart -> Review the cart points (781,872) (364,872) (364,980) (348,980) caption 521,892 20x0 text ""
+  ControlFlow: Review the cart -> Next step? points (291,1006) (291,1086) caption 301,1066 20x0 text ""
+  ControlFlow: Next step? -> Change a quantity (0 removes the line) points (291,1118) (291,1230) caption 294,1121 90x14 text "[change]" TRUNCATED needs 80x22
+  ControlFlow: Change a quantity (0 removes the line) -> Enough available stock? (UC30) points (494,1270) (494,1346) (717,1346) (717,900) (1073,900) (1073,598) (846,598) caption 797,920 20x0 text ""
+  ControlFlow: Next step? -> Proceed to checkout points (275,1102) (228,1102) (228,1244) (212,1244) caption 169,1085 103x14 text "[checkout]" TRUNCATED needs 93x22
+  ControlFlow: Proceed to checkout -> End points (212,1256) (238,1256) (238,1363) (278,1363) caption 248,1336 20x0 text ""

@@ -1,0 +1,41 @@
+Geometry of 'AD02 Process and Ship Order (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane2 40,40 1072x1840
+    ActivityPartition: Sales Staff 40,40 268x34 caption 0,0 260x19
+    ActivitySwimlane2Compartment: null 40,74 268x1806 caption 0,0 260x1086
+      InitialNode: (InitialNode) 161,104 26x26 caption 193,109 20x16
+      ActivityAction: Open processing queue 64,210 220x50 caption 0,0 220x50
+      ActivityAction: Select order, confirm processing 64,470 220x50 caption 0,0 220x50
+      ActivityAction: Order On Hold, exception recorded 64,912 220x50 caption 0,0 220x50
+      ActivityFinalNode: (ActivityFinalNode) 160,1822 28x28 caption 194,1828 20x16
+    ActivityPartition: System 308,40 268x34 caption 0,0 260x19
+    ActivitySwimlane2Compartment: null 308,74 268x1806 caption 0,0 260x1086
+      ActivityAction: List Paid/Confirmed and On Hold orders 332,340 220x50 caption 0,0 220x50
+      ActivityAction: Verify payment and reservations 332,600 220x50 caption 0,0 220x50
+      DecisionNode: (DecisionNode) 387,730 110x70 caption 448,712 20x16
+      ActivityAction: Set Processing, add to pick list 332,912 220x50 caption 0,0 220x50
+      ActivityAction: Issue stock, create shipment, Ready for Shipment 332,1172 220x50 caption 0,0 220x50
+      ActivityAction: Accept new milestones, update order status 332,1692 220x50 caption 0,0 220x50
+      ActivityFinalNode: (ActivityFinalNode) 428,1822 28x28 caption 462,1828 20x16
+    ActivityPartition: Warehouse Staff 576,40 268x34 caption 0,0 260x19
+    ActivitySwimlane2Compartment: null 576,74 268x1806 caption 0,0 260x1086
+      ActivityAction: Pick and pack items 600,1042 220x50 caption 0,0 220x50
+      ActivityAction: Hand parcel to carrier 600,1302 220x50 caption 0,0 220x50
+    ActivityPartition: Shipping Provider 844,40 268x34 caption 0,0 260x19
+    ActivitySwimlane2Compartment: null 844,74 268x1806 caption 0,0 260x1086
+      ActivityAction: Create delivery, return carrier reference 868,1432 220x50 caption 0,0 220x50
+      ActivityAction: Send milestones (picked up ... delivered) 868,1562 220x50 caption 0,0 220x50
+  ControlFlow: (InitialNode) -> Open processing queue points (174,130) (174,210) caption 184,190 20x0 text ""
+  ControlFlow: Open processing queue -> List Paid/Confirmed and On Hold orders points (284,236) (296,236) (296,354) (332,354) caption 306,327 20x0 text ""
+  ControlFlow: List Paid/Confirmed and On Hold orders -> Select order, confirm processing points (332,366) (320,366) (320,484) (284,484) caption 330,457 20x0 text ""
+  ControlFlow: Select order, confirm processing -> Verify payment and reservations points (284,496) (296,496) (296,614) (332,614) caption 306,587 20x0 text ""
+  ControlFlow: Verify payment and reservations -> (DecisionNode) points (442,650) (442,730) caption 452,710 20x0 text ""
+  ControlFlow: (DecisionNode) -> Order On Hold, exception recorded points (392,768) (296,768) (296,926) (284,926) caption 176,771 117x14 text "[not eligible]"
+  ControlFlow: Order On Hold, exception recorded -> (ActivityFinalNode) points (174,962) (174,1822) caption 184,1412 20x0 text ""
+  ControlFlow: (DecisionNode) -> Set Processing, add to pick list points (442,800) (442,912) caption 445,803 87x14 text "[eligible]"
+  ControlFlow: Set Processing, add to pick list -> Pick and pack items points (552,938) (564,938) (564,1056) (600,1056) caption 574,1029 20x0 text ""
+  ControlFlow: Pick and pack items -> Issue stock, create shipment, Ready for Shipment points (600,1068) (588,1068) (588,1186) (552,1186) caption 598,1159 20x0 text ""
+  ControlFlow: Issue stock, create shipment, Ready for Shipment -> Hand parcel to carrier points (552,1198) (564,1198) (564,1316) (600,1316) caption 574,1289 20x0 text ""
+  ControlFlow: Hand parcel to carrier -> Create delivery, return carrier reference points (820,1328) (832,1328) (832,1446) (868,1446) caption 842,1419 20x0 text ""
+  ControlFlow: Create delivery, return carrier reference -> Send milestones (picked up ... delivered) points (978,1482) (978,1562) caption 988,1542 20x0 text ""
+  ControlFlow: Send milestones (picked up ... delivered) -> Accept new milestones, update order status points (868,1588) (588,1588) (588,1706) (552,1706) caption 661,1608 20x0 text ""
+  ControlFlow: Accept new milestones, update order status -> (ActivityFinalNode) points (442,1742) (442,1822) caption 452,1802 20x0 text ""

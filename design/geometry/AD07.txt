@@ -1,0 +1,40 @@
+Geometry of 'AD07 Track Order (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane 40,40 781x1598
+    ActivityPartition: Customer 40,40 307x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 40,64 307x1574
+      InitialNode: Start 181,94 24x24 caption 211,98 52x16
+      ActivityAction: Open My orders and choose an order 64,198 259x40 caption 0,0 259x40
+      ActivityAction: Read the progress of the order 86,1462 215x40 caption 0,0 215x40
+      ActivityFinalNode: End 180,1582 26x26 caption 212,1587 47x16
+    ActivityPartition: System 347,40 474x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 347,64 474x1574
+      DecisionNode: Logged in as a customer? 568,318 32x32 caption 590,300 194x16
+      ActivityAction: Send to the login page 401,462 161x40 caption 0,0 161x40
+      ActivityAction: Load the order by its id 602,462 165x40 caption 0,0 165x40
+      DecisionNode: Order exists and is the customer's? 529,582 32x32 caption 551,564 258x16
+      ActivityAction: Answer order not found 371,726 169x40 caption 0,0 169x40
+      ActivityAction: Load the shipment of the order 580,726 217x40 caption 0,0 217x40
+      DecisionNode: Shipment exists? 568,846 32x32 caption 590,828 136x16
+      ActivityAction: Add the carrier milestones 490,990 187x40 caption 0,0 187x40
+      MergeNode: Timeline ready 568,1110 32x32
+      ActivityAction: Sort the timeline by time 497,1222 173x40 caption 0,0 173x40
+      ActivityAction: Show status, carrier reference and timeline 435,1342 297x40 caption 0,0 297x40
+      ActivityFinalNode: End 485,1582 26x26 caption 517,1587 47x16
+      ActivityFinalNode: End 604,1582 26x26 caption 636,1587 47x16
+  ControlFlow: Start -> Open My orders and choose an order points (193,118) (193,198) caption 203,178 20x0 text ""
+  ControlFlow: Open My orders and choose an order -> Logged in as a customer? points (323,224) (584,224) (584,318) caption 510,244 20x0 text ""
+  ControlFlow: Logged in as a customer? -> Send to the login page points (568,334) (547,334) (547,462) caption 514,317 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Send to the login page -> End points (415,502) (415,712) (305,712) (305,1448) (498,1448) (498,1582) caption 315,1103 20x0 text ""
+  ControlFlow: Logged in as a customer? -> Load the order by its id points (584,350) (584,446) (616,446) (616,462) caption 587,353 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Load the order by its id -> Order exists and is the customer's? points (602,488) (576,488) (576,564) (545,564) (545,582) caption 586,557 20x0 text ""
+  ControlFlow: Order exists and is the customer's? -> Answer order not found points (529,598) (517,598) (517,726) caption 475,581 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Answer order not found -> End points (421,766) (421,1566) (617,1566) (617,1582) caption 431,1292 20x0 text ""
+  ControlFlow: Order exists and is the customer's? -> Load the shipment of the order points (545,614) (545,710) (594,710) (594,726) caption 548,617 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Load the shipment of the order -> Shipment exists? points (594,766) (594,828) (584,828) (584,846) caption 604,831 20x0 text ""
+  ControlFlow: Shipment exists? -> Add the carrier milestones points (584,878) (584,990) caption 587,881 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Shipment exists? -> Timeline ready points (568,862) (476,862) (476,1126) (568,1126) caption 514,865 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Add the carrier milestones -> Timeline ready points (584,1030) (584,1110) caption 594,1090 20x0 text ""
+  ControlFlow: Timeline ready -> Sort the timeline by time points (584,1142) (584,1222) caption 594,1202 20x0 text ""
+  ControlFlow: Sort the timeline by time -> Show status, carrier reference and timeline points (583,1262) (583,1342) caption 593,1322 20x0 text ""
+  ControlFlow: Show status, carrier reference and timeline -> Read the progress of the order points (435,1368) (317,1368) (317,1476) (301,1476) caption 327,1391 20x0 text ""
+  ControlFlow: Read the progress of the order -> End points (193,1502) (193,1582) caption 203,1562 20x0 text ""

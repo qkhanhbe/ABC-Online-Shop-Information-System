@@ -1,0 +1,20 @@
+Geometry of 'SD02 Track Order (Analysis)' (InteractionDiagram):
+  Activation: Activation 110,134 10x348
+  Activation: Activation 390,134 10x348
+  Lifeline: Customer 70,40 90x496 caption 70,40 90x19
+  Lifeline: OrderPage 345,40 100x496 caption 354,75 82x19
+  Activation: Activation 670,175 10x266
+  Activation: Activation 950,217 10x56
+  Lifeline: OrderController 615,40 120x496 caption 618,75 115x19
+  Lifeline: Order 915,40 80x496 caption 931,75 48x19
+  Activation: Activation 1230,345 10x53
+  Lifeline: Shipment 1190,40 90x496 caption 1198,75 74x19
+  Message 'open order O011': Customer -> OrderPage points (115,140) (395,140) caption 178,120 154x18 text "open order O011"
+  Message 'track(customerId, orderId)': OrderPage -> OrderController points (395,182) (675,182) caption 414,162 242x18 text "track(customerId, orderId)"
+  Message 'find(orderId)': OrderController -> Order points (675,224) (955,224) caption 746,204 138x18 text "find(orderId)"
+  Message 'order': Order -> OrderController points (955,266) (675,266) caption 778,246 74x18 text "order"
+  Message 'checkOwner(customerId)': OrderController -> OrderController points (675,308) (731,308) (731,322) (675,322) caption 737,304 210x18 text "checkOwner(customerId)"
+  Message 'milestones()': OrderController -> Shipment points (675,350) (1235,350) caption 890,330 130x18 text "milestones()"
+  Message 'accepted milestones': Shipment -> OrderController points (1235,392) (675,392) caption 862,372 186x18 text "accepted milestones"
+  Message 'status, timeline, last update': OrderController -> OrderPage points (675,434) (395,434) caption 402,414 266x18 text "status, timeline, last update"
+  Message 'show timeline': OrderPage -> Customer points (395,476) (115,476) caption 186,456 138x18 text "show timeline"

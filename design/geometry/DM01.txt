@@ -1,0 +1,33 @@
+Geometry of 'DM01 Data Model Classes - Customers Catalogue and Orders' (ClassDiagram):
+  Class: Shipment 951,1051 473x145 caption 0,0 473x38
+  Class: Payment 60,1051 297x221 caption 0,0 297x38
+  Class: OrderItem 742,1090 149x126 caption 0,0 149x38
+  Class: Order 486,598 551x297 caption 0,0 551x38
+  Class: Promotion 417,1051 265x202 caption 0,0 265x38
+  Class: Watch 707,1845 219x164 caption 0,0 219x38
+  Class: Bag 451,1863 196x145 caption 0,0 196x38
+  Class: Apparel 1453,1863 196x145 caption 0,0 196x38
+  Class: Footwear 1197,1845 196x164 caption 0,0 196x38
+  Class: Product 728,1410 267x297 caption 0,0 267x38
+  Class: Category 986,1863 151x103 caption 0,0 151x38
+  Class: CartItem 1484,1090 149x126 caption 0,0 149x38
+  Class: Cart 1340,655 438x183 caption 0,0 438x38
+  Class: Address 246,598 180x164 caption 0,0 180x38
+  Class: Customer 570,377 382x65 caption 0,0 382x38
+  Class: User 653,74 217x183 caption 0,0 217x38
+  Generalization: User -> Customer points (761,257) (761,377) caption 771,337 20x0 text ""
+  Generalization: Product -> Footwear points (906,1707) (906,1765) (1295,1765) (1295,1845) caption 1121,1785 20x0 text ""
+  Generalization: Product -> Apparel points (950,1707) (950,1747) (1551,1747) (1551,1863) caption 1298,1767 20x0 text ""
+  Generalization: Product -> Bag points (772,1707) (772,1747) (549,1747) (549,1863) caption 633,1767 20x0 text ""
+  Generalization: Product -> Watch points (817,1707) (817,1845) caption 827,1796 20x0 text ""
+  Association 'delivers to': Customer -> Address points (666,442) (666,482) (336,482) (336,598) caption 442,455 119x24 text "delivers to" mult 649,442 16x20 mult 300,578 40x20
+  Association 'owns': Customer -> Cart points (857,442) (857,482) (1559,482) (1559,655) caption 1177,455 63x24 text "owns" mult 859,442 16x20 mult 1523,635 40x20
+  Association 'contains': Cart -> CartItem points (1559,838) (1559,1090) caption 1560,952 92x24 text "contains" mult 1561,838 16x20 mult 1554,1070 40x20
+  Association 'refers to': CartItem -> Product points (1559,1216) (1559,1294) (906,1294) (906,1410) caption 1183,1297 101x24 text "refers to" mult 1524,1216 40x20 mult 908,1390 16x20
+  Association 'belongs to': Product -> Category points (861,1707) (861,1783) (1062,1783) (1062,1863) caption 906,1786 110x24 text "belongs to" mult 856,1707 40x20 mult 1045,1843 16x20
+  Association 'places': Customer -> Order points (761,442) (761,598) caption 764,508 74x24 text "places" mult 763,442 16x20 mult 756,578 40x20
+  Association 'contains': Order -> OrderItem points (817,895) (817,1090) caption 724,980 92x24 text "contains" mult 800,895 16x20 mult 782,1070 40x20
+  Association 'refers to': OrderItem -> Product points (817,1216) (817,1410) caption 720,1301 101x24 text "refers to" mult 782,1216 40x20 mult 800,1390 16x20
+  Association 'paid by': Order -> Payment points (596,895) (596,935) (209,935) (209,1051) caption 362,908 83x24 text "paid by" mult 579,895 16x20 mult 174,1031 40x20
+  Association 'uses': Order -> Promotion points (706,895) (706,953) (550,953) (550,1051) caption 599,956 59x24 text "uses" mult 701,895 40x20 mult 514,1031 40x20
+  Association 'shipped as': Order -> Shipment points (927,895) (927,935) (1188,935) (1188,1051) caption 1002,908 110x24 text "shipped as" mult 929,895 16x20 mult 1152,1031 40x20

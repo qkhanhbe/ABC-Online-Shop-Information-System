@@ -5,12 +5,15 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 D = os.path.join(ROOT, "diagrams")
 SRC = os.path.join(ROOT, "abc_shop")
 DES = os.path.join(ROOT, "design")
-GEN = os.path.join(DES, "generated", "abc_shop_design")
+GEN = os.path.join(DES, "generated", "abc_shop_design")   # V4 code, no longer in the project (V5 does not use this text)
 
 
 def sql_tables(*names):
     """CREATE TABLE statements of the script generated from the ER model."""
-    text = open(os.path.join(DES, "create_tables.sql"), encoding="utf-8").read()
+    path = os.path.join(DES, "create_tables_v4.sql")
+    if not os.path.exists(path):                 # V4 artefact; V5 (v5.py) reads only the tables of text from this module
+        return ""
+    text = open(path, encoding="utf-8").read()
     out = []
     for n in names:
         a = text.index("CREATE TABLE " + n + " (")
@@ -20,6 +23,8 @@ def sql_tables(*names):
 
 def gen_class(rel, name, keep=None):
     """One class of a generated module, optionally only the first `keep` methods."""
+    if not os.path.exists(os.path.join(GEN, rel)):
+        return ""
     text = open(os.path.join(GEN, rel), encoding="utf-8").read()
     m = re.search(r"((?:@dataclass\n)?class " + name + r"\b.*?)(?=\n\n\n|\Z)", text, re.S)
     body = m.group(1)
@@ -32,6 +37,8 @@ def gen_class(rel, name, keep=None):
 
 def gen_head(rel):
     """Module docstring and imports of a generated module."""
+    if not os.path.exists(os.path.join(GEN, rel)):
+        return ""
     text = open(os.path.join(GEN, rel), encoding="utf-8").read()
     return text[:text.index("\n\n\n")]
 
@@ -70,7 +77,7 @@ BLOCKS = [
         ["Association names", "eleven of eighteen named", "every association named", "Each line reads as a sentence: Order contains OrderItem"],
         ["Attributes", "some identifiers and dates missing", "paymentId, reviewId, createdAt, location, description, image, name in the lines", "Needed by the use cases (UC06 shows the image, UC11 the location)"]], [32, 30, 50, 53]),
     ("h3", "4.1.1. The classes in words"),
-    ("p", "The twenty-three classes fall into four groups. The <b>people</b> group describes who uses the shop. User is "
+    ("p", "The twenty-two classes fall into four groups. The <b>people</b> group describes who uses the shop. User is "
           "anyone who logs in, with an id, a name, an email address and a role. Customer is a kind of User that "
           "also has a registration date. Staff accounts are plain Users whose role is sales, warehouse, admin or "
           "manager; they have no attributes of their own, so they need no subclass. Address holds the receiver, phone, "
@@ -90,8 +97,8 @@ BLOCKS = [
           "price, a description, an image and a status (active or unpublished), and belongs to one Category. Its stock "
           "is a separate StockLevel with the physical and reserved quantities and a low-stock threshold. The "
           "derived attribute /available is physical minus reserved. The attributes that only one group of products has "
-          "live in the abstract ProductDetail and its four kinds (FootwearDetail, ApparelDetail, BagDetail, WatchDetail); "
-          "Category.detailKind names the kind its products use. Every change of the stock is an InventoryEvent of a "
+          "live in four subclasses of Product (FootwearProduct, ApparelProduct, BagProduct, WatchProduct); the category of a "
+          "product says which kind it is. Every change of the stock is an InventoryEvent of a "
           "kind (receipt, reserve, release, issue, adjust) with a reference that identifies its cause, and a "
           "ReplenishmentRequest asks the supplier for more."),
     ("p", "Two attributes look like duplicates but mean different things. CartItem.cartPrice and OrderItem.unitPrice "
@@ -153,8 +160,8 @@ BLOCKS = [
         ["Rules of Chapter 2 (BR, NFR07)", "CHECK and UNIQUE constraints", "The database rejects what the code might miss"],
         ["Technical needs", "Tables sequence (readable ids O001) and audit_log (NFR06)", "Not in the analysis; required by design"]], [42, 65, 58]),
     ("h3", "4.2.2. Tables and relationships"),
-    ("p", "The result is twenty-three tables: twenty-one from the twenty-three analysis classes (User and Customer share "
-          "the table users, the abstract ProductDetail has no table of its own, and StatusChange becomes "
+    ("p", "The result is twenty-three tables: twenty-one from the twenty-two analysis classes (User and Customer share "
+          "the table users, each Product subclass becomes a detail table keyed by product_id, and StatusChange becomes "
           "order_status_history) plus the technical tables sequence and audit_log. The table lists them with their keys; a "
           "key written as PK, FK is a primary key that is also a foreign key."),
     ("table", "The twenty-three tables of the database", ["Table", "Primary key", "Foreign keys", "Holds"], [
@@ -506,7 +513,7 @@ BLOCKS = [
 
     # ------------------------------------------------------------------ 4.6
     ("h2", "4.6. Conclusion"),
-    ("p", "The design started from twenty-three analysis classes and ended with a database of twenty-three tables and "
+    ("p", "The design started from twenty-two analysis classes and ended with a database of twenty-three tables and "
           "twenty-two foreign keys, generated from the physical model, and with twenty-eight Python classes in five layers generated from the "
           "class diagrams, all of which exist in the running application. Each step could be checked against the one "
           "before it. The tables were checked against the classes through the mapping rules, the design classes "

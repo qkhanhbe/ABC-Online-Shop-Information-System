@@ -1,0 +1,49 @@
+Geometry of 'AD01 Place Order (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane 40,40 1324x2162
+    ActivityPartition: Customer 40,40 608x34 caption 0,0 320x19
+    ActivitySwimlane2Compartment: null 40,74 608x2128 caption 0,0 320x1406
+      InitialNode: (InitialNode) 331,104 26x26 caption 363,109 20x16
+      ActivityAction: Select Checkout from cart 214,210 260x50 caption 0,0 260x50
+      ActivityAction: Correct quantities in cart 64,782 260x50 caption 0,0 260x50
+      ActivityFinalNode: (ActivityFinalNode) 270,2144 28x28 caption 304,2150 20x16
+      ActivityAction: Confirm address, enter promotion code 364,782 260x50 caption 0,0 260x50
+      ActivityAction: Confirm purchase 214,1042 260x50 caption 0,0 260x50
+      ActivityAction: See failure, cart kept 364,2014 140x50 caption 0,0 140x50
+      ActivityAction: View order confirmation 184,2014 140x50 caption 0,0 140x50
+      ActivityFinalNode: (ActivityFinalNode) 364,2144 28x28 caption 398,2150 20x16
+    ActivityPartition: System 648,40 408x34 caption 0,0 400x19
+    ActivitySwimlane2Compartment: null 648,74 408x2128 caption 0,0 400x1406
+      ActivityAction: Validate cart lines and prices (UC29) 722,340 260x50 caption 0,0 260x50
+      ActivityAction: Check availability (UC30) 722,470 260x50 caption 0,0 260x50
+      DecisionNode: (DecisionNode) 797,600 110x70 caption 858,582 20x16
+      ActivityAction: Apply promotion (UC32), calculate total (UC31) 722,912 260x50 caption 0,0 260x50
+      ActivityAction: Reserve stock and create Payment Pending order 722,1172 260x50 caption 0,0 260x50
+      ActivityAction: Send referenced payment request (UC09) 722,1302 260x50 caption 0,0 260x50
+      DecisionNode: (DecisionNode) 797,1692 110x70 caption 858,1674 20x16
+      ActivityAction: Mark Paid/Confirmed, clear cart 672,1874 150x60 caption 0,0 150x60
+      ActivityAction: Release reservation, Payment Failed 862,1874 170x60 caption 0,0 170x60
+    ActivityPartition: Payment Provider 1056,40 308x34 caption 0,0 300x19
+    ActivitySwimlane2Compartment: null 1056,74 308x2128 caption 0,0 300x1406
+      ActivityAction: Authorise payment 1080,1432 260x50 caption 0,0 260x50
+      ActivityAction: Return signed result 1080,1562 260x50 caption 0,0 260x50
+      ActivityFinalNode: (ActivityFinalNode) 1196,2144 28x28 caption 1230,2150 20x16
+  ControlFlow: (InitialNode) -> Select Checkout from cart points (344,130) (344,210) caption 354,190 20x0 text ""
+  ControlFlow: Select Checkout from cart -> Validate cart lines and prices (UC29) points (474,236) (706,236) (706,354) (722,354) caption 667,256 20x0 text ""
+  ControlFlow: Validate cart lines and prices (UC29) -> Check availability (UC30) points (852,390) (852,470) caption 862,450 20x0 text ""
+  ControlFlow: Check availability (UC30) -> (DecisionNode) points (852,520) (852,600) caption 862,580 20x0 text ""
+  ControlFlow: (DecisionNode) -> Correct quantities in cart points (802,638) (340,638) (340,796) (324,796) caption 711,621 82x14 text "[invalid]"
+  ControlFlow: Correct quantities in cart -> (ActivityFinalNode) points (162,832) (162,2128) (284,2128) (284,2144) caption 172,1569 20x0 text ""
+  ControlFlow: (DecisionNode) -> Confirm address, enter promotion code points (838,661) (838,796) (624,796) caption 767,670 68x14 text "[valid]"
+  ControlFlow: Confirm address, enter promotion code -> Apply promotion (UC32), calculate total (UC31) points (624,808) (706,808) (706,926) (722,926) caption 716,854 20x0 text ""
+  ControlFlow: Apply promotion (UC32), calculate total (UC31) -> Confirm purchase points (722,938) (490,938) (490,1056) (474,1056) caption 549,958 20x0 text ""
+  ControlFlow: Confirm purchase -> Reserve stock and create Payment Pending order points (474,1068) (706,1068) (706,1186) (722,1186) caption 667,1088 20x0 text ""
+  ControlFlow: Reserve stock and create Payment Pending order -> Send referenced payment request (UC09) points (852,1222) (852,1302) caption 862,1282 20x0 text ""
+  ControlFlow: Send referenced payment request (UC09) -> Authorise payment points (982,1328) (1044,1328) (1044,1446) (1080,1446) caption 1054,1394 20x0 text ""
+  ControlFlow: Authorise payment -> Return signed result points (1210,1482) (1210,1562) caption 1220,1542 20x0 text ""
+  ControlFlow: Return signed result -> (DecisionNode) points (1080,1588) (923,1588) (923,1718) (893,1718) caption 933,1609 20x0 text ""
+  ControlFlow: (DecisionNode) -> Mark Paid/Confirmed, clear cart points (802,1730) (782,1730) (782,1874) caption 690,1733 89x14 text "[verified]"
+  ControlFlow: (DecisionNode) -> Release reservation, Payment Failed points (876,1747) (876,1874) caption 879,1762 74x14 text "[failed]"
+  ControlFlow: Release reservation, Payment Failed -> See failure, cart kept points (862,1912) (836,1912) (836,2028) (504,2028) caption 751,2048 20x0 text ""
+  ControlFlow: See failure, cart kept -> (ActivityFinalNode) points (504,2040) (1180,2040) (1180,2158) (1196,2158) caption 919,2060 20x0 text ""
+  ControlFlow: Mark Paid/Confirmed, clear cart -> View order confirmation points (672,1912) (340,1912) (340,2028) (324,2028) caption 450,1932 20x0 text ""
+  ControlFlow: View order confirmation -> (ActivityFinalNode) points (324,2040) (348,2040) (348,2158) (364,2158) caption 358,2115 20x0 text ""

@@ -1,0 +1,16 @@
+Geometry of 'DCL06 Design Classes (controller) - Web Controllers' (ClassDiagram):
+  Class: ReportController 1906,215 294x46 caption 0,0 294x19
+  Class: StaffController 1321,215 525x141 caption 0,0 525x19
+  Class: OrderController 879,215 382x198 caption 0,0 382x19
+  Class: AccountController 507,215 312x122 caption 0,0 312x19
+  Class: ShopController 40,215 407x103 caption 0,0 407x19
+  Class: Response 1228,40 481x46 caption 0,0 481x19
+  Class: Request 530,40 298x65 caption 0,0 298x19
+  Class: WebApp 888,40 280x65 caption 0,0 280x19
+  Usage: WebApp -> ShopController points (908,105) (908,201) (463,201) (463,227) (447,227) caption 640,174 92x24 text "<<use>>"
+  Usage: WebApp -> AccountController points (888,96) (842,96) (842,230) (819,230) caption 747,151 92x24 text "<<use>>"
+  Usage: WebApp -> OrderController points (1028,105) (1028,215) caption 933,148 92x24 text "<<use>>"
+  Usage: WebApp -> StaffController points (1168,96) (1214,96) (1214,201) (1305,201) (1305,232) (1321,232) caption 1217,136 92x24 text "<<use>>"
+  Usage: WebApp -> ReportController points (1148,105) (1148,189) (1890,189) (1890,223) (1906,223) caption 1473,162 92x24 text "<<use>>"
+  Usage: WebApp -> Request points (888,72) (828,72) caption 732,122 92x24 text "<<use>>"
+  Usage: WebApp -> Response points (1168,72) (1228,72) caption 1232,86 92x24 text "<<use>>"

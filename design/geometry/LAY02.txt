@@ -1,0 +1,44 @@
+Geometry of 'LAY02 Layers - Cart and Checkout (UC07 and UC08)' (ClassDiagram):
+  Package: model 40,1653 1204x106 caption 0,20 1204x86
+    Class: Cart 1114,1697 100x36 caption 0,0 100x19
+    Class: CartItem 964,1697 120x36 caption 0,0 120x19
+    Class: Promotion 804,1697 130x36 caption 0,0 130x19
+    Class: Order 674,1697 100x36 caption 0,0 100x19
+    Class: OrderItem 514,1697 130x36 caption 0,0 130x19
+    Class: Payment 374,1697 110x36 caption 0,0 110x19
+    Class: Product 234,1697 110x36 caption 0,0 110x19
+    Class: StockLevel 64,1697 140x36 caption 0,0 140x19
+  Package: dao 40,1248 3210x315 caption 0,20 3210x295
+    Interface: CartDAO 2964,1354 256x84 caption 0,0 256x38
+    Interface: PromotionDAO 70,1354 367x103 caption 0,0 367x38
+    Interface: OrderDAO 975,1354 373x160 caption 0,0 373x38
+    Interface: PaymentDAO 1408,1354 328x103 caption 0,0 328x38
+    Interface: ProductDAO 1796,1354 502x160 caption 0,0 502x38
+    Interface: InventoryDAO 2358,1354 546x179 caption 0,0 546x38
+    Class: Database 497,1354 418x179 caption 0,0 418x19
+  Package: service 40,402 2289x756 caption 0,20 2289x736
+    Class: CheckoutService 1154,446 743x103 caption 0,0 743x19
+    Class: CartService 1735,669 564x141 caption 0,0 564x19
+    Class: PaymentService 528,715 433x84 caption 0,0 433x19
+    Class: InventoryService 811,930 879x198 caption 0,0 879x19
+    Interface: PaymentGateway 150,930 616x65 caption 0,0 616x38
+  Package: controller 40,40 442x272 caption 0,20 442x252
+    Class: OrderController 70,84 382x198 caption 0,0 382x19
+  Usage: OrderController -> CartService points (452,248) (1923,248) (1923,669) caption 1141,221 92x24 text "<<use>>"
+  Usage: OrderController -> CheckoutService points (452,260) (1138,260) (1138,458) (1154,458) caption 749,263 92x24 text "<<use>>"
+  Usage: CheckoutService -> CartService points (1897,530) (1911,530) (1911,669) caption 1816,587 92x24 text "<<use>>"
+  Usage: CheckoutService -> InventoryService points (1422,549) (1422,930) caption 1327,727 92x24 text "<<use>>"
+  Usage: CheckoutService -> PaymentService points (1154,530) (977,530) (977,725) (961,725) caption 882,615 92x24 text "<<use>>"
+  Usage: CheckoutService -> CartDAO points (1897,518) (2936,518) (2936,1376) (2964,1376) caption 2370,491 92x24 text "<<use>>"
+  Usage: CheckoutService -> OrderDAO points (1714,549) (1714,892) (1740,892) (1740,1338) (1322,1338) (1322,1354) caption 1743,864 92x24 text "<<use>>"
+  Usage: CheckoutService -> PromotionDAO points (1154,518) (126,518) (126,1354) caption 594,491 92x24 text "<<use>>"
+  Usage: CheckoutService -> Database points (1678,549) (1678,904) (1728,904) (1728,1314) (889,1314) (889,1354) caption 1221,1317 92x24 text "<<use>>"
+  Usage: CartService -> CartDAO points (2299,770) (2924,770) (2924,1388) (2964,1388) caption 2565,743 92x24 text "<<use>>"
+  Usage: CartService -> ProductDAO points (2017,810) (2017,1354) caption 2020,1058 92x24 text "<<use>>"
+  Usage: CartService -> InventoryDAO points (2299,782) (2378,782) (2378,1354) caption 2381,1056 92x24 text "<<use>>"
+  Usage: InventoryService -> InventoryDAO points (1690,1094) (2342,1094) (2342,1374) (2358,1374) caption 1916,1067 92x24 text "<<use>>"
+  Usage: InventoryService -> ProductDAO points (1690,1106) (1780,1106) (1780,1374) (1796,1374) caption 1783,1222 92x24 text "<<use>>"
+  Usage: PaymentService -> PaymentDAO points (961,773) (1666,773) (1666,916) (1752,916) (1752,1366) (1736,1366) caption 1267,776 92x24 text "<<use>>"
+  Usage: PaymentService -> OrderDAO points (528,785) (56,785) (56,1547) (995,1547) (995,1514) caption 479,1550 92x24 text "<<use>>"
+  Usage: PaymentService -> InventoryService points (788,799) (788,950) (811,950) caption 791,862 92x24 text "<<use>>"
+  Usage: PaymentService -> PaymentGateway points (776,799) (776,938) (766,938) caption 681,856 92x24 text "<<use>>"

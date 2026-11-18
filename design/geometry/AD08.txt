@@ -1,0 +1,38 @@
+Geometry of 'AD08 Manage Products (Swimlane)' (ActivityDiagram):
+  ActivitySwimlane2: Swimlane 40,40 907x1502
+    ActivityPartition: Administrator 40,40 332x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 40,64 332x1478
+      InitialNode: Start 194,94 24x24 caption 224,98 52x16
+      ActivityAction: Choose a category and enter the product 64,198 284x40 caption 0,0 284x40
+      ActivityAction: See the product in the catalogue 92,1366 227x40 caption 0,0 227x40
+      ActivityFinalNode: End 193,1486 26x26 caption 225,1491 47x16
+    ActivityPartition: System 372,40 575x24 caption 0,0 240x19
+    ActivitySwimlane2Compartment: null 372,64 575x1478
+      DecisionNode: Allowed to manage the catalogue? 643,318 32x32 caption 665,300 251x16
+      ActivityAction: Refuse the request 737,474 137x40 caption 0,0 137x40
+      DecisionNode: Name given and price positive? 444,462 32x32 caption 466,444 231x16
+      DecisionNode: Kind of the category? (BR-CAT-01) 643,606 32x32 caption 665,588 251x16
+      ActivityAction: Show what to correct 396,750 152x40 caption 0,0 152x40
+      ActivityAction: Save Product and its kind row in one transaction 588,750 335x40 caption 0,0 335x40
+      DecisionNode: New product? 643,870 32x32 caption 665,852 114x16
+      ActivityAction: Create an empty stock level 562,1014 195x40 caption 0,0 195x40
+      MergeNode: Saved 643,1134 32x32
+      ActivityAction: Record the change in the audit log 539,1246 240x40 caption 0,0 240x40
+      ActivityFinalNode: End 646,1486 26x26 caption 678,1491 47x16
+  ControlFlow: Start -> Choose a category and enter the product points (206,118) (206,198) caption 216,178 20x0 text ""
+  ControlFlow: Choose a category and enter the product -> Allowed to manage the catalogue? points (348,224) (627,224) (627,334) (643,334) caption 560,244 20x0 text ""
+  ControlFlow: Allowed to manage the catalogue? -> Refuse the request points (675,334) (751,334) (751,474) caption 678,317 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Refuse the request -> End points (859,514) (859,574) (959,574) (959,1470) (659,1470) (659,1486) caption 969,1120 20x0 text ""
+  ControlFlow: Allowed to manage the catalogue? -> Name given and price positive? points (659,350) (659,444) (460,444) (460,462) caption 597,353 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Name given and price positive? -> Show what to correct points (460,494) (460,750) caption 463,497 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Name given and price positive? -> Kind of the category? (BR-CAT-01) points (476,478) (659,478) (659,606) caption 479,481 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: Kind of the category? (BR-CAT-01) -> Show what to correct points (643,622) (564,622) (564,764) (548,764) caption 544,605 96x14 text "[different]" TRUNCATED needs 86x22
+  ControlFlow: Show what to correct -> Choose a category and enter the product points (410,750) (410,254) (330,254) (330,238) caption 420,474 20x0 text ""
+  ControlFlow: Kind of the category? (BR-CAT-01) -> Save Product and its kind row in one transaction points (659,638) (659,750) caption 662,641 75x14 text "[same]" TRUNCATED needs 65x22
+  ControlFlow: Save Product and its kind row in one transaction -> New product? points (659,790) (659,870) caption 669,850 20x0 text ""
+  ControlFlow: New product? -> Create an empty stock level points (659,902) (659,1014) caption 662,905 59x14 text "[yes]" TRUNCATED needs 49x22
+  ControlFlow: New product? -> Saved points (643,886) (548,886) (548,1150) (643,1150) caption 589,889 51x14 text "[no]" TRUNCATED needs 41x22
+  ControlFlow: Create an empty stock level -> Saved points (659,1054) (659,1134) caption 669,1114 20x0 text ""
+  ControlFlow: Saved -> Record the change in the audit log points (659,1166) (659,1246) caption 669,1226 20x0 text ""
+  ControlFlow: Record the change in the audit log -> See the product in the catalogue points (539,1272) (335,1272) (335,1380) (319,1380) caption 385,1292 20x0 text ""
+  ControlFlow: See the product in the catalogue -> End points (206,1406) (206,1486) caption 216,1466 20x0 text ""

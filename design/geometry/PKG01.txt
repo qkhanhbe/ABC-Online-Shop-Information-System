@@ -1,0 +1,14 @@
+Geometry of 'PKG01 Layers and Packages (Design)' (PackageDiagram):
+  Package: model 340,640 220x90 caption 0,20 220x70
+  Package: dao 340,440 220x90 caption 0,20 220x70
+  Package: ai 540,240 220x90 caption 0,20 220x70
+  Package: service 140,240 220x90 caption 0,20 220x70
+  Package: controller 340,40 220x90 caption 0,20 220x70
+  Usage: controller -> service points (340,116) (328,116) (328,260) caption 233,176 92x24 text "<<use>>"
+  Usage: controller -> ai points (560,116) (572,116) (572,240) caption 575,166 92x24 text "<<use>>"
+  Usage: service -> dao points (360,316) (372,316) (372,440) caption 398,366 92x24 text "<<use>>"
+  Usage: ai -> dao points (540,316) (528,316) (528,460) caption 433,394 92x24 text "<<use>>"
+  Usage: service -> model points (316,330) (316,624) (360,624) (360,640) caption 319,531 92x24 text "<<use>>"
+  Usage: ai -> model points (584,330) (584,624) (540,624) (540,660) caption 587,465 92x24 text "<<use>>"
+  Usage: dao -> model points (444,530) (444,660) caption 447,583 92x24 text "<<use>>"
+  Usage: controller -> model points (384,130) (384,426) (304,426) (304,668) (340,668) caption 387,266 92x24 text "<<use>>"

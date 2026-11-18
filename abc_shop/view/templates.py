@@ -35,7 +35,7 @@ def layout(request, title, body):
 <title>{e(title)} - ABC Online Shop</title><link rel="stylesheet" href="/static/style.css?v=6"></head>
 <body><header><a class="brand" href="/"><span class="mark">A</span>ABC <em>Online</em> Shop</a><nav>{' '.join(links)}</nav></header>
 <main>{note}{heading}{body}</main>
-<footer><span>ABC Online Shop &middot; course essay prototype &middot; <a href="/credits">Photo credits</a></span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
+<footer><span>ABC Online Shop &middot; course essay prototype</span><span>Be Quoc Khanh &middot; B23DCCE049 &middot; PTIT 2026</span></footer>
 </body></html>"""
 
 
@@ -315,6 +315,9 @@ def credits(request, rows):
     body = "".join(f"<tr><td><img src='/images/{e(r['file'])}' alt='' width='56' height='56' style='border-radius:8px;object-fit:cover'></td>"
                    f"<td>{e(r['product'])}</td><td><a href='{e(r['page'])}'>{e(r['title'])}</a></td>"
                    f"<td>{e(r['artist'])}</td><td>{e(r['license'])}</td></tr>" for r in rows)
+    if not rows:
+        return layout(request, "Photo credits", "<p class='panel'>The product pictures are drawings made for this "
+                      "prototype (abc_shop/tools/make_images.py); no third-party photo is used.</p>")
     return layout(request, "Photo credits",
                   "<p class='hint'>The product photos come from Wikimedia Commons under the licences below; they were "
                   "cropped and resized for the catalogue. Brands and products in the photos belong to their owners.</p>"

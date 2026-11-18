@@ -1,0 +1,36 @@
+Geometry of 'SD05 Checkout Through the Layers (Design)' (InteractionDiagram):
+  Lifeline: OrderDAO 1243,40 90x864 caption 1249,75 79x19
+  Lifeline: Order 1403,40 70x864 caption 1414,75 48x19
+  Activation: Activation 95,124 10x726
+  Activation: Activation 407,124 10x726
+  Lifeline: Customer 60,40 80x864 caption 60,40 80x19
+  Lifeline: OrderController 352,40 120x864 caption 355,75 115x19
+  Activation: Activation 767,165 10x644
+  Activation: Activation 1133,291 10x56
+  Lifeline: CheckoutService 712,40 120x864 caption 710,75 124x19
+  Lifeline: CartService 1088,40 100x864 caption 1094,75 88x19
+  Activation: Activation 1583,493 10x34
+  Activation: Activation 1733,535 10x202
+  Lifeline: InventoryService 1528,40 120x864 caption 1527,75 123x19
+  Lifeline: PaymentService 1678,40 120x864 caption 1679,75 118x19
+  Activation: Activation 2053,577 10x55
+  NOTE: (NOTE) 898,920 460x46 caption 0,0 445x0
+  Lifeline: PaymentGateway 1998,40 120x864 caption 1995,75 126x19
+  Message 'POST /checkout (promo, card, key)': Customer -> OrderController points (100,130) (412,130) caption 107,110 298x18 text "POST /checkout (promo, card, key)"
+  Message 'place_order(customer, promo, card, key)': OrderController -> CheckoutService points (412,172) (772,172) caption 419,152 346x18 text "place_order(customer, promo, card, key)"
+  Message 'find_by_idempotency_key(key)': CheckoutService -> OrderDAO points (772,214) (1288,214) caption 901,194 258x18 text "find_by_idempotency_key(key)"
+  Message 'None': OrderDAO -> CheckoutService points (1288,256) (772,256) caption 997,236 66x18 text "None"
+  Message 'validate_cart(cart)': CheckoutService -> CartService points (772,298) (1138,298) caption 862,278 186x18 text "validate_cart(cart)"
+  Message '[] (no problems)': CartService -> CheckoutService points (1138,340) (772,340) caption 874,320 162x18 text "[] (no problems)"
+  Message 'apply_promotion(), calc_shipping()': CheckoutService -> CheckoutService points (772,382) (843,382) (843,396) (772,396) caption 849,378 306x18 text "apply_promotion(), calc_shipping()"
+  Message 'create_from_cart(id, cart, address)': CheckoutService -> Order points (772,424) (1438,424) caption 948,404 314x18 text "create_from_cart(id, cart, address)"
+  Message 'save_order(order)': CheckoutService -> OrderDAO points (772,466) (1288,466) caption 945,446 170x18 text "save_order(order)"
+  Message 'reserve_order(order)': CheckoutService -> InventoryService points (772,508) (1588,508) caption 1079,488 202x18 text "reserve_order(order)"
+  Message 'request_payment(order, card)': CheckoutService -> PaymentService points (772,550) (1738,550) caption 1122,530 266x18 text "request_payment(order, card)"
+  Message 'authorize(ref, amount, USD, card)': PaymentService -> PaymentGateway points (1738,592) (2058,592) caption 1745,572 306x18 text "authorize(ref, amount, USD, card)"
+  Message 'signed result': PaymentGateway -> PaymentService points (2058,634) (1738,634) caption 1825,614 146x18 text "signed result"
+  Message 'change_status(Paid/Confirmed)': PaymentService -> Order points (1738,676) (1438,676) caption 1451,656 274x18 text "change_status(Paid/Confirmed)"
+  Message 'save_order(order)': PaymentService -> OrderDAO points (1738,718) (1288,718) caption 1424,698 178x18 text "save_order(order)"
+  Message 'Succeeded': PaymentService -> CheckoutService points (1738,760) (772,760) caption 1198,740 114x18 text "Succeeded"
+  Message '{order, payment}': CheckoutService -> OrderController points (772,802) (412,802) caption 507,782 170x18 text "{order, payment}"
+  Message '302 /orders/O017': OrderController -> Customer points (412,844) (100,844) caption 171,824 170x18 text "302 /orders/O017"

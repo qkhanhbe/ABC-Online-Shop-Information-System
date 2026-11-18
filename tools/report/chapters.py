@@ -1,4 +1,4 @@
-import final
+import v5
 
-FRONT = final.FRONT
-BLOCKS = final.BLOCKS
+FRONT = v5.FRONT
+BLOCKS = v5.BLOCKS

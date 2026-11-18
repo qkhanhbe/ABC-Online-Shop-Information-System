@@ -234,8 +234,9 @@ def build():
         build_db=read("design/build_db_output.txt"), check_code=read("design/check_code_output.txt"),
         tests=html.escape("\n".join(open(os.path.join(ROOT, "demo_results/test_output.txt"), encoding="utf-8").read().split("\n")[-4:])),
         evaluation=read("demo_results/evaluation_output.txt"),
-        ddl=html.escape(re.search(r"CREATE TABLE category.*?\);\n\nCREATE TABLE product .*?\);\n\nCREATE TABLE bag_detail.*?\);",
-                                  open(os.path.join(ROOT, "design/create_tables.sql"), encoding="utf-8").read(), re.S).group(0)),
+        ddl=html.escape("\n\n".join(re.search(rf"CREATE TABLE {t} \(.*?\);",
+                                              open(os.path.join(ROOT, "design/create_tables.sql"), encoding="utf-8").read(),
+                                              re.S).group(0) for t in ("Category", "Product", "Bag"))),
         place_order=code_page("service/checkout_service.py") + "#L" + str(locate("service/checkout_service.py", "CheckoutService.place_order")),
     )
     page = TEMPLATE

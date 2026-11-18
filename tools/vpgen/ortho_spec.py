@@ -396,6 +396,25 @@ def dcl05():
     return out
 
 
+# ---------------------------------------------------------------- CL01: product kinds inherit from Product
+def cl01():
+    code = "CL01"
+    out = [f"{code}|@pin|ratio", f"{code}|@delete|ProductDetail"]   # new connectors: pin the shared end exactly
+    kinds = [("FootwearDetail", "FootwearProduct", 106), ("ApparelDetail", "ApparelProduct", 88),
+             ("BagDetail", "BagProduct", 88), ("WatchDetail", "WatchProduct", 106)]
+    for old, new, _ in kinds:
+        out.append(f"{code}|@rename|{old}|{new}")
+    for old, new, _ in kinds:
+        out.append(f"{code}|@ensure|Product|{new}|Generalization")
+    x0, w, gapx, top, bus, sy = 1300, 180, 20, 660, 610, 480     # Product box is (1100, 330, 140, 183)
+    for k, (_, new, h) in enumerate(kinds):
+        x = x0 + k * (w + gapx)
+        out.append(f"{code}|@box|{new}|{x}|{top}|{w}|{h}")
+        cx = x + w // 2
+        out.append(f"{code}|@path|Product|{new}|R+{sy - 421}|T|1290,{sy};1290,{bus};{cx},{bus}")
+    return out
+
+
 HEAD = """# Tidy redraw (Redraw.jsrc), written by ortho_spec.py.
 # CODE|@at|name|cx|cy|w|h  CODE|@box|name|x|y|w|h  CODE|@bus|actor|trunkX  CODE|@link|A|B|sideA|sideB|labelSide
 # CODE|@path|A|B|sideA|sideB|x,y;...  CTX01|@ctx|...  SDxx|@seq|step|minGap
@@ -410,7 +429,7 @@ SD06|@seq|42|150
 
 if __name__ == "__main__":
     body = []
-    for f in (ucd1, ucd2, ucd3, ucd4, uc00, ucai, dm01, dcl05):
+    for f in (ucd1, ucd2, ucd3, ucd4, uc00, ucai, dm01, dcl05, cl01):
         body += f() + [""]
     with open(os.path.join(HERE, "redraw_spec.txt"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(HEAD + "\n" + "\n".join(body))

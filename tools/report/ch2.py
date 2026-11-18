@@ -82,7 +82,7 @@ BLOCKS = [
     ("h2", "2.5. Analysis Class Model"),
     ("p", "The classes were found by the noun-phrase method applied to the use case specifications and the information "
           "catalogue, then filtered: nouns that name an actor (Manager), a screen (checkout page) or a single attribute "
-          "(price) were removed. Eighteen classes remained, and the product detail hierarchy added five more (Section 2.5). They carry attributes but no operations yet; operations are "
+          "(price) were removed. Eighteen classes remained, and the four product kinds added as subclasses of Product brought the total to twenty-two (Section 2.5). They carry attributes but no operations yet; operations are "
           "added in the first design step (Section 4.3)."),
     ("fig", os.path.join(D, "CL01 Analysis Class Diagram.png"), "Analysis class diagram - VP diagram \"CL01 Analysis Class Diagram\"", 165),
     ("table", "Relationships of the analysis model and their justification", ["Relationship", "Kind", "Justification"], [

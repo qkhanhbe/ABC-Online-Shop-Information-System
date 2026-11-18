@@ -1,0 +1,28 @@
+Geometry of 'SD03 Voice Search' (InteractionDiagram):
+  Activation: Activation 110,124 10x516
+  Activation: Activation 406,124 10x516
+  Lifeline: Customer 70,40 90x654 caption 70,40 90x19
+  Lifeline: ShopController 351,40 120x654 caption 355,75 112x19
+  Activation: Activation 590,165 10x56
+  Activation: Activation 740,249 10x55
+  Lifeline: SpeechService 540,40 110x654 caption 540,75 110x19
+  Lifeline: QueryService 690,40 110x654 caption 695,75 100x19
+  Activation: Activation 890,334 10x265
+  Activation: Activation 1104,375 10x56
+  Lifeline: SearchService 840,40 110x654 caption 842,75 107x19
+  Lifeline: ProductDAO 1059,40 100x654 caption 1062,75 94x19
+  Activation: Activation 1254,503 10x55
+  Lifeline: RankingService 1199,40 120x654 caption 1202,75 115x19
+  Message 'search(audio, mode=voice)': Customer -> ShopController points (115,130) (411,130) caption 146,110 234x18 text "search(audio, mode=voice)"
+  Message 'transcribe(audio)': ShopController -> SpeechService points (411,172) (595,172) caption 418,152 170x18 text "transcribe(audio)"
+  Message 'text': SpeechService -> ShopController points (595,214) (411,214) caption 470,194 66x18 text "text"
+  Message 'voice_query(text)': ShopController -> QueryService points (411,256) (745,256) caption 493,236 170x18 text "voice_query(text)"
+  Message 'query {terms, filters}': QueryService -> ShopController points (745,298) (411,298) caption 473,278 210x18 text "query {terms, filters}"
+  Message 'search(query)': ShopController -> SearchService points (411,340) (895,340) caption 584,320 138x18 text "search(query)"
+  Message 'list_products()': SearchService -> ProductDAO points (895,382) (1109,382) caption 925,362 154x18 text "list_products()"
+  Message 'products': ProductDAO -> SearchService points (1109,424) (895,424) caption 953,404 98x18 text "products"
+  Message 'retrieve(query)': SearchService -> SearchService points (895,466) (943,466) (943,481) (895,481) caption 949,462 154x18 text "retrieve(query)"
+  Message 'rank(candidates, query)': SearchService -> RankingService points (895,508) (1259,508) caption 964,488 226x18 text "rank(candidates, query)"
+  Message 'ranked results': RankingService -> SearchService points (1259,550) (895,550) caption 1000,530 154x18 text "ranked results"
+  Message 'top-5 results': SearchService -> ShopController points (895,592) (411,592) caption 580,572 146x18 text "top-5 results"
+  Message 'search_results(results, trace)': ShopController -> Customer points (411,634) (115,634) caption 122,614 282x18 text "search_results(results, trace)"
