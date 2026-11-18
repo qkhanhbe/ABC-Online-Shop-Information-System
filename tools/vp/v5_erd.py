@@ -61,7 +61,7 @@ if __name__ == "__main__":
          outputFile=os.path.join(ROOT, "design", "create_tables.sql"))
     r = vp.call("getDiagramElements", quiet=True, diagramName=ERD)
     LOG.append(f"Result: {len(re.findall('Table: ', r))} tables, {len(re.findall('ForeignKey', r))} foreign keys")
-    head = ("Calls of the Visual Paradigm MCP plugin 1.33.0 (Visual Paradigm Enterprise 18.1, TieuLuan_KHANHBQ.vpp) and the\n"
+    head = ("Calls of the Visual Paradigm MCP plugin 1.33.0 (Visual Paradigm Enterprise 18.1, ABC_Online_Shop_4_Design.vpp) and the\n"
             "result strings they returned, in order (tools/vp/v5_erd.py; the code generation, section 4, is in v5_design_build.py).\n\n")
     old = open(os.path.join(ROOT, "design", "v5_tool_log.txt"), encoding="utf-8").read()
     code = old[old.index("==== 4. Design class diagrams to code"):] if "==== 4." in old else ""

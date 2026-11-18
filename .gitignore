@@ -7,12 +7,9 @@ venv/
 .*.vpp.lck
 abc_shop/data/abc_shop.db
 abc_shop/data/uploads/
-design/abc_design.db
 tools/report/cache/
 tools/vpgen/classes/
 tools/vpgen/mode.log
-design/abc_design*.db
 abc_shop/data/stt_model/
 tools/vp/png/
 *.vpp.bak
-design/abc_design.db

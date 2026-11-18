@@ -1,4 +1,4 @@
-Calls of the Visual Paradigm MCP plugin 1.33.0 (Visual Paradigm Enterprise 18.1, TieuLuan_KHANHBQ.vpp) and the
+Calls of the Visual Paradigm MCP plugin 1.33.0 (Visual Paradigm Enterprise 18.1, TieuLuan_KHANHBQ.vpp, now ABC_Online_Shop_4_Design.vpp) and the
 result strings they returned, in order (tools/vp/v5_erd.py; the code generation, section 4, is in v5_design_build.py).
 
 ==== 1. Data model class diagram to ERD ============================================================

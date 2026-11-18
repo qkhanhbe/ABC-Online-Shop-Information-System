@@ -1,0 +1,141 @@
+package essay.gen;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.IModel;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * Cuts the full project down to the state of one phase, for presenting the work phase by phase: the models (phases)
+ * after the last one kept are deleted with their diagrams and elements. Because a class of each phase is its own
+ * model element (package Analysis, Data Model, model), the analysis classes keep only attribute names, the data
+ * model classes add keys, types and the ORM stereotype, and only the design adds methods.
+ */
+public class V5Phase {
+
+    public void run(IProject project, List<String> keep) {
+        adopt(project);
+        untype(project);
+        Map<IDiagramUIModel, Integer> before = new LinkedHashMap<>();
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            IModelElement owner = d.getParentModel();
+            if (owner != null && !keep.contains(owner.getName())) {
+                System.out.println("V5PHASE delete diagram " + d.getName());
+                d.delete();
+            } else {
+                before.put(d, linked(d));
+            }
+        }
+        for (IModelElement e : project.toModelElementArray("Model")) {
+            if (!keep.contains(e.getName())) {
+                System.out.println("V5PHASE delete model " + e.getName() + " (" + ((IModel) e).childCount() + " elements)");
+                e.delete();
+            }
+        }
+        // deleting a model leaves some of its elements (the ERD tables) at the top level: drop what no kept diagram shows
+        List<String> fixed = Arrays.asList("Model", "Stereotype", "ProjectFormat", "ModelRelationshipContainer");
+        int orphans = 0;
+        for (IModelElement e : project.toModelElementArray()) {
+            if (fixed.contains(e.getModelType())) continue;
+            if (e.getDiagramElements() == null || e.getDiagramElements().length == 0) {
+                e.delete();
+                orphans++;
+            } else {
+                System.out.println("V5PHASE top-level element kept (shown): " + e.getModelType() + " " + e.getName());
+            }
+        }
+        System.out.println("V5PHASE orphans deleted " + orphans);
+        int broken = 0;
+        for (Map.Entry<IDiagramUIModel, Integer> b : before.entrySet()) {
+            int now = linked(b.getKey());
+            if (now != b.getValue()) {
+                System.out.println("V5PHASE changed " + b.getKey().getName() + ": " + b.getValue() + " -> " + now);
+                broken++;
+            }
+        }
+        System.out.println("V5PHASE kept " + before.size() + " diagrams, " + broken + " changed");
+        members(project);
+    }
+
+    /** Top-level elements (the ERD tables generated after the project was organised) go under the model of the
+     *  earliest phase whose diagram shows them. */
+    static void adopt(IProject project) {
+        List<String> fixed = Arrays.asList("Model", "Stereotype", "ProjectFormat", "ModelRelationshipContainer");
+        int n = 0;
+        for (IModelElement e : project.toModelElementArray()) {
+            if (fixed.contains(e.getModelType()) || e.getDiagramElements() == null) continue;
+            IModel best = null;
+            for (IDiagramElement de : e.getDiagramElements()) {
+                IModelElement owner = de.getDiagramUIModel().getParentModel();
+                if (owner instanceof IModel && (best == null || owner.getName().compareTo(best.getName()) < 0)) {
+                    best = (IModel) owner;
+                }
+            }
+            if (best != null) {
+                best.addChild(e);
+                n++;
+            }
+        }
+        System.out.println("V5PHASE top-level elements filed under their phase: " + n);
+    }
+
+    /** Analysis classes have no types: also the classes behind the analysis sequence diagrams (package Analysis Model,
+     *  kept from V4 with typed attributes), which no class diagram shows. */
+    static void untype(IProject project) {
+        int n = 0;
+        for (IModelElement e : project.toAllLevelModelElementArray("Class")) {
+            IModelElement p = e.getParent();
+            if (p == null || !Arrays.asList("Analysis Model", "Analysis").contains(p.getName())) continue;
+            for (com.vp.plugin.model.IAttribute a : ((com.vp.plugin.model.IClass) e).toAttributeArray()) {
+                String t = a.getTypeAsString();
+                if (t != null && !t.isEmpty()) {
+                    a.setType((String) null);
+                    n++;
+                }
+            }
+        }
+        System.out.println("V5PHASE analysis attribute types removed: " + n);
+    }
+
+    /** per package: classes, attributes, typed attributes, operations (what each phase adds) */
+    static void members(IProject project) {
+        Map<String, int[]> m = new LinkedHashMap<>();
+        for (IModelElement e : project.toAllLevelModelElementArray("Class")) {
+            IModelElement p = e.getParent();
+            String k = p == null ? "?" : p.getName();
+            int[] c = m.computeIfAbsent(k, x -> new int[4]);
+            com.vp.plugin.model.IClass cl = (com.vp.plugin.model.IClass) e;
+            c[0]++;
+            for (com.vp.plugin.model.IAttribute a : cl.toAttributeArray()) {
+                c[1]++;
+                String t = a.getTypeAsString();
+                if (t != null && !t.isEmpty()) c[2]++;
+            }
+            c[3] += cl.operationCount();
+        }
+        for (Map.Entry<String, int[]> x : m.entrySet()) {
+            int[] c = x.getValue();
+            System.out.println("V5PHASE package " + x.getKey() + ": " + c[0] + " classes, " + c[1] + " attributes ("
+                    + c[2] + " typed), " + c[3] + " operations");
+        }
+    }
+
+    /** shapes and lines of the diagram that still have their model element */
+    static int linked(IDiagramUIModel d) {
+        int n = 0;
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (e.getModelElement() != null) n++;
+        }
+        return n;
+    }
+
+    static List<String> list(String csv) {
+        return Arrays.asList(csv.split("\\s*,\\s*"));
+    }
+}

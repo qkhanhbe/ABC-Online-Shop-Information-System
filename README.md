@@ -11,17 +11,32 @@ traceability to code, database, AI, demo script and answers to the 50 oral-exami
 
 | Deliverable | Location |
 |---|---|
-| Essay (official report) | [Tieuluan_V5_04_10_KhanhBQ_049.pdf](Tieuluan_V5_04_10_KhanhBQ_049.pdf): 1 Introduction and requirements, 2 Analysis, 3 AI, 4 Data model, 5 Design, 6 Implementation |
-| Diagrams | [TieuLuan_KHANHBQ.vpp](TieuLuan_KHANHBQ.vpp), 47 diagrams in Visual Paradigm in five sub-projects (models), one per phase: 1 Requirements, 2 Analysis, 3 AI Search, 4 Data Model, 5 Design; PNG export (Community Edition) in [diagrams/](diagrams) |
+| Minor thesis (official report) | [minorThesisV5_04_KhanhBQ.049.pdf](minorThesisV5_04_KhanhBQ.049.pdf): 1 Introduction and requirements, 2 Analysis, 3 AI, 4 Data model, 5 Design, 6 Implementation |
+| Diagrams | [ABC_Online_Shop_4_Design.vpp](ABC_Online_Shop_4_Design.vpp) (final, used by the report), 47 diagrams in Visual Paradigm in five sub-projects (models), one per phase: 1 Requirements, 2 Analysis, 3 AI Search, 4 Data Model, 5 Design; the project at the end of each earlier phase: see below; PNG export (Community Edition) in [diagrams/](diagrams) |
 | Analysis classes | CL01, one diagram: attribute names only; Footwear, Apparel, Bag and Watch are subclasses of Product |
 | Data model | DM01 = CL01 + identifiers, types, `<<ORM Persistable>>`; ERD01 generated from it by `syncClassesToErd`; tool calls in [design/v5_tool_log.txt](design/v5_tool_log.txt) |
-| SQL | [design/create_tables.sql](design/create_tables.sql), generated from ERD01 by `generateSql` (SQLite); application schema [abc_shop/dao/schema.sql](abc_shop/dao/schema.sql) |
+| SQL and database (SQLite) | [design/create_tables.sql](design/create_tables.sql), generated from ERD01 by `generateSql`; [design/abc_design.db](design/abc_design.db), the database built from it by `design/build_db.py` and filled by the application; application schema [abc_shop/dao/schema.sql](abc_shop/dao/schema.sql), demo database `abc_shop/data/abc_shop.db` (created on first run) |
 | Database check | [design/build_db.py](design/build_db.py), output [design/build_db_output.txt](design/build_db_output.txt) |
 | Design and generated code | DCL01-DCL05 (one per package; DCL01 = DM01 + methods), PKG01, LAY01-LAY05, SD05-SD09; [design/generated/](design/generated) written by `generateCode`, checked by [design/check_code.py](design/check_code.py) |
 | Source code | [abc_shop/](abc_shop) (Python, SQLite; model, dao, service, ai, controller, view) |
 | Test and demo evidence | [demo_results/](demo_results): pytest, demo and AI evaluation output, web screenshots |
 | Defence showcase and Q&A | [showcase/index.html](showcase/index.html) (built by [showcase/build.py](showcase/build.py) from [showcase/content.py](showcase/content.py)) |
 | Tools | [tools/vp/](tools/vp): scripts that drew the diagrams through the Visual Paradigm MCP plugin (v5_*.py); [tools/vpgen/](tools/vpgen): headless plugin (tidy, five phase models, polish, export); [tools/report/](tools/report): builds the PDF |
+
+## Visual Paradigm projects, one per phase
+
+Each project contains everything up to the end of its phase, so the work can be shown step by step; the report and
+the PNG files come from the last one.
+
+| Project | Models | What it adds |
+|---|---|---|
+| [ABC_Online_Shop_1_Requirements.vpp](ABC_Online_Shop_1_Requirements.vpp) | 1 Requirements | STK01, BP01, PT01, UC00, UCD1-UCD4 |
+| [ABC_Online_Shop_2_Analysis_and_AI.vpp](ABC_Online_Shop_2_Analysis_and_AI.vpp) | + 2 Analysis, 3 AI Search | CL01 (22 classes, attribute names only, no type, no key, no method), AD01-AD08, CTX01, DFD0, DFD1, SD01-SD04, ST01, UC_AI, CMP01 |
+| [ABC_Online_Shop_3_Data_Model.vpp](ABC_Online_Shop_3_Data_Model.vpp) | + 4 Data Model | DM01 (keys, types, `<<ORM Persistable>>`, multiplicities), ERD01 generated from it (22 tables, 24 foreign keys) |
+| [ABC_Online_Shop_4_Design.vpp](ABC_Online_Shop_4_Design.vpp) | + 5 Design | DCL01-DCL05 (the methods), PKG01, LAY01-LAY05, SD05-SD09, CMP02, DEP01; SQL and code generated from it |
+
+The earlier projects are cut from the final one by `tools/vpgen` (mode `v5phase`): the models after the phase are
+deleted with their diagrams and elements, and no diagram that stays loses an element.
 
 ## Run the shop
 
@@ -40,7 +55,7 @@ Demo accounts: `khanh@example.com / khanh2026` (customer), `sales@abc.vn / sales
 ## From the models to the database and the code
 
 The chain runs through the tools of the Visual Paradigm MCP plugin 1.33 (github.com/thanhtrnnn/vp-mcp) with Visual
-Paradigm Enterprise open on `TieuLuan_KHANHBQ.vpp`:
+Paradigm Enterprise open on `ABC_Online_Shop_4_Design.vpp`:
 
 ```powershell
 python tools/vp/v5_build.py analysis        # analysis classes (attribute names only)

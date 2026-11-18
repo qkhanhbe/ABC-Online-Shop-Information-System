@@ -646,14 +646,18 @@ for b in CONCL:
                       "replacing the prototype AI components with a multilingual Whisper model, CLIP and a fine-tuned PhoBERT"))
     elif b[0] == "table" and b[1] == "Submitted files":
         b = (b[0], b[1], b[2], [
-            ["Tieuluan_V5_04_10_KhanhBQ_049.pdf", "This essay"],
-            ["TieuLuan_KHANHBQ.vpp", "Visual Paradigm project with the 47 diagrams of the essay in five sub-projects (models), one per phase"],
+            ["minorThesisV5_04_KhanhBQ.049.pdf", "This essay"],
+            ["ABC_Online_Shop_4_Design.vpp", "Visual Paradigm project with the 47 diagrams of the essay in five sub-projects (models), "
+                                             "one per phase; the figures of this essay come from it"],
+            ["ABC_Online_Shop_1_Requirements.vpp<br/>ABC_Online_Shop_2_Analysis_and_AI.vpp<br/>ABC_Online_Shop_3_Data_Model.vpp",
+             "The same project as it stood at the end of each earlier phase, for presenting the work step by step"],
             ["diagrams/", "PNG export of every diagram (Visual Paradigm Community Edition)"],
             ["abc_shop/", "Source code, data, tests, README"],
-            ["design/", "create_tables.sql (generateSql), generated/ (generateCode), build_db.py, check_code.py, v5_tool_log.txt"],
+            ["design/", "create_tables.sql (generateSql, SQLite), abc_design.db (the SQLite database built from it), "
+                        "generated/ (generateCode), build_db.py, check_code.py, v5_tool_log.txt"],
             ["tools/vp/", "Scripts that drew the V5 diagrams and called the MCP tools"],
             ["demo_results/", "Demo, evaluation and test output; web screenshots"],
-            ["showcase/", "Defence guide with the diagrams, traceability and the answers to the 50 questions"]]) + tuple(b[4:])
+            ["showcase/", "Defence guide with the diagrams, traceability and the answers to the 50 questions"]], [74, 91])
     elif b[0] == "table":
         b = (b[0], b[1], b[2], [[str(c).replace("screenshots 5.x", "screenshots in Chapter 6") for c in r] for r in b[3]]) + tuple(b[4:])
     CONCL2.append(b)

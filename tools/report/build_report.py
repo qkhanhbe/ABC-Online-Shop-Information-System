@@ -1,4 +1,4 @@
-"""Builds Tieuluan_V5_04_10_KhanhBQ_049.pdf (A6 report style: Times New Roman, light-blue tables).
+"""Builds minorThesisV5_04_KhanhBQ.049.pdf (A6 report style: Times New Roman, light-blue tables).
 
 Content lives in chapters.py as lists of blocks:
   ("h1", title) ("h2", title) ("h3", title) ("p", html) ("bullets", [html]) ("code", text)
@@ -23,7 +23,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-OUT = os.path.join(ROOT, "Tieuluan_V5_04_10_KhanhBQ_049.pdf")
+OUT = os.path.join(ROOT, "minorThesisV5_04_KhanhBQ.049.pdf")
 FONTS = r"C:\Windows\Fonts"
 
 pdfmetrics.registerFont(TTFont("TNR", os.path.join(FONTS, "times.ttf")))

@@ -20,7 +20,7 @@ FRONT = [
           "plugin; six design class diagrams in five packages, two layer diagrams and two design sequence diagrams, from which "
           "74 Python classes were generated and found, member by member, in the running application; and a Python web "
           "application on SQLite with 45 automated tests. All 44 diagrams are kept in one Visual Paradigm project "
-          "(TieuLuan_KHANHBQ.vpp). On the test sets, the search returns the expected item first for 25 of 26 queries "
+          "(ABC_Online_Shop_4_Design.vpp). On the test sets, the search returns the expected item first for 25 of 26 queries "
           "(96.2%) and the review analyser reaches an aspect F1 of 0.96."),
     ("p", "<i>Keywords: requirements engineering, use case, data flow diagram, UML, data modeling, DAO, MVC, layered "
           "architecture, multimodal search, aspect-based sentiment analysis, recommendation, Python.</i>"),
@@ -63,7 +63,7 @@ BLOCKS = [
          "Assignment 06 prototype, new Python application abc_shop"]], [38, 62, 65]),
     ("p", "Three conventions hold throughout. First, identifiers are the ones fixed in Assignment 02 (BP, SN, FR, NFR, "
           "UC), so FR10 in Chapter 1 is the same FR10 that appears in a test name in Chapter 5. Second, every diagram is "
-          "a Visual Paradigm diagram of the project TieuLuan_KHANHBQ.vpp, and the figure caption gives its name in the "
+          "a Visual Paradigm diagram of the project ABC_Online_Shop_4_Design.vpp, and the figure caption gives its name in the "
           "project. The diagrams were exported with Visual Paradigm Community Edition; because Community Edition "
           "cannot open data flow diagrams, the three DFD-type diagrams (CTX01, DFD0, DFD1) are drawn from the shapes "
           "and routes stored in the same project, in the notation Visual Paradigm uses. Third, every number in Chapters 3 and 5 comes from a program that was run: the outputs are stored in "
