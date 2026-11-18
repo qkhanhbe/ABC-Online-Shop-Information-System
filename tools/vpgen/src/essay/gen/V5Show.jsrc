@@ -1,0 +1,86 @@
+package essay.gen;
+
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vp.plugin.ApplicationManager;
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.diagram.IShapeUIModel;
+import com.vp.plugin.diagram.connector.IAssociationUIModel;
+import com.vp.plugin.diagram.shape.IClassUIModel;
+import com.vp.plugin.model.IAssociation;
+import com.vp.plugin.model.IAssociationEnd;
+import com.vp.plugin.model.IClass;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+
+/**
+ * V5 finishing touches that the MCP plugin does not expose, run after Polish:
+ *  - LAY01, LAY02: the classes of the model package are shown by name only, in one row inside their frame,
+ *    because the layers above only use them as types.
+ */
+public class V5Show {
+
+    public void run(IProject project) {
+        for (IDiagramUIModel d : project.toDiagramArray()) {
+            String n = d.getName();
+            try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
+            if (n.startsWith("LAY01 ") || n.startsWith("LAY02 ")) System.out.println("V5SHOW collapsed " + collapseModel(d) + " on " + n);
+        }
+    }
+
+    int showRoles(IDiagramUIModel d) {
+        int n = 0;
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof IAssociationUIModel) || !(e.getModelElement() instanceof IAssociation)) continue;
+            IAssociationUIModel u = (IAssociationUIModel) e;
+            IAssociation a = (IAssociation) e.getModelElement();
+            IAssociationEnd from = (IAssociationEnd) a.getFromEnd(), to = (IAssociationEnd) a.getToEnd();
+            Point[] pts = u.getPoints();
+            if (pts == null || pts.length < 2) continue;
+            Rectangle ra = Polish.role(pts[0], pts[1], u.getMultiplicityARectangle(), from.getName());
+            Rectangle rb = Polish.role(pts[pts.length - 1], pts[pts.length - 2], u.getMultiplicityBRectangle(), to.getName());
+            if (ra != null) u.setRoleARectangle(ra);
+            if (rb != null) u.setRoleBRectangle(rb);
+            u.setShowFromRoleName(true);
+            u.setShowToRoleName(true);
+            n++;
+        }
+        return n;
+    }
+
+    int collapseModel(IDiagramUIModel d) {
+        IShapeUIModel frame = null;
+        List<IClassUIModel> boxes = new ArrayList<>();
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            IModelElement m = e.getModelElement();
+            if (m == null) continue;
+            if (e instanceof IShapeUIModel && "Package".equals(m.getModelType()) && "model".equals(m.getName())) {
+                frame = (IShapeUIModel) e;
+            }
+            if (e instanceof IClassUIModel && m instanceof IClass && m.getParent() != null
+                    && "model".equals(m.getParent().getName())) {
+                IClass c = (IClass) m;
+                IClassUIModel u = (IClassUIModel) e;
+                u.setShowAttributeType(IClassUIModel.ATTR_SHOW_TYPE_NONE);
+                u.setShowOperationType(IClassUIModel.OP_SHOW_TYPE_NONE);
+                boxes.add(u);
+            }
+        }
+        if (frame == null) return 0;
+        int x = frame.getX() + 24, y = frame.getY() + 44, h = 0;
+        for (IClassUIModel u : boxes) {
+            int w = Math.max(100, 10 * u.getModelElement().getName().length() + 40);
+            u.setBounds(x, y, w, 36);
+            u.resetCaption();
+            x += w + 30;
+            h = Math.max(h, 36);
+        }
+        frame.setBounds(frame.getX(), frame.getY(), Math.max(x - frame.getX(), 260), h + 70);
+        frame.resetCaption();
+        return boxes.size();
+    }
+}
