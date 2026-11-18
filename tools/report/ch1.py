@@ -5,7 +5,7 @@ D = os.path.join(ROOT, "diagrams")
 
 FRONT = [
     ("h1x", "ABSTRACT"),
-    ("p", "This essay is the final version (V5) of the course essay. It follows one information system, the "
+    ("p", "This minor thesis is version 1 (V1). It follows one information system, the "
           "<b>ABC Online Shop</b>, from requirement determination and analysis through artificial intelligence in "
           "e-commerce, the data model and the design to a working, demonstrated implementation. The material was built up "
           "during the semester: Assignment 01 investigated the shop and its problems, Assignment 02 turned them into a "

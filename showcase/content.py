@@ -150,7 +150,7 @@ EVOLUTION = [
              dict(label="Class ORM", fig="ORM01",
                   cap="22 lớp phân tích thêm kiểu, định danh và «ORM Persistable»; mọi quan hệ có tên và bản số hai đầu."),
              dict(label="Data model (sinh)", fig="DM01",
-                  cap="syncClassesToErd sinh 22 bảng, 24 khoá ngoại; quyết định khoá áp lại bằng tool ({file:design/v5_tool_log.txt})."),
+                  cap="syncClassesToErd sinh 22 bảng, 24 khoá ngoại; quyết định khoá áp lại bằng tool ({file:design/vp_tool_log.txt})."),
              dict(label="SQL (sinh)", sql=("design/create_tables.sql", "Bag"),
                   cap="generateSql (SQLite) viết {file:design/create_tables.sql}: khoá chính, khoá ngoại có tên."),
              dict(label="Database", shot="demo_results/web_03b_product_bag.png",
@@ -225,7 +225,7 @@ SCRIPT = [
     ("0:00–0:45", "Bài toán: thông tin rời rạc và chậm; 6 vấn đề và nguyên nhân gốc.", "Showcase mục A, {fig:PT01}"),
     ("0:45–1:45", "Quy trình và yêu cầu: BPMN, use case tổng quát, đặc tả UC08.", "{fig:BP01}, {fig:UC00}, PDF chương 1"),
     ("1:45–3:00", "Phân tích → thiết kế: CL01 (kế thừa, chỉ tên thuộc tính) → ORM01 (+ID, kiểu, ORM) → DCL01 (+method) → code; SD01 → SD05.", "Mở VP: Model Explorer có 5 project con 1 Requirements → 5 Design; mở 2 Analysis/CL01, 4 Data Model/ORM01, 5 Design/DCL01, SD05; showcase mục C"),
-    ("3:00–4:00", "Data model: ORM01 «ORM Persistable» → syncClassesToErd → DM01 → generateSql → build_db; generateCode → check_code.", "Mở VP: ORM01, DM01; {file:design/v5_tool_log.txt}"),
+    ("3:00–4:00", "Data model: ORM01 «ORM Persistable» → syncClassesToErd → DM01 → generateSql → build_db; generateCode → check_code.", "Mở VP: ORM01, DM01; {file:design/vp_tool_log.txt}"),
     ("4:00–5:00", "Truy vết: từ UC08 đến place_order và test.", "IDE: checkout_service.py dòng place_order; showcase mục D"),
     ("5:00–6:30", "Demo: tìm kiếm AI, trang P16, checkout, đơn bị từ chối thanh toán, báo cáo.", "Trình duyệt localhost:8000"),
     ("6:30–7:00", "Kiểm chứng và hạn chế: 45 test, 74/74 lớp, 22/22 bảng; phần còn thiếu.", "Showcase mục G"),
@@ -417,7 +417,7 @@ ANSWERS = [
      "FK promo_code → Promotion được rỗng) 1–n OrderItem (PK ghép order_id, product_id). Quy tắc chuyển mà bộ sinh áp dụng: mỗi lớp "
      "một bảng; quan hệ 1–n thành khoá ngoại ở phía n; hợp thành thì khoá con chứa khoá cha; kế thừa thành bảng con dùng chung khoá "
      "(Customer dùng user_id của User; Footwear, Apparel, Bag, Watch dùng product_id của Product). Những chỗ bộ sinh không tự quyết "
-     "(lớp không có định danh) được quyết bằng tool setPrimaryKey, renameColumn và ghi ở {file:design/v5_tool_log.txt}. "
+     "(lớp không có định danh) được quyết bằng tool setPrimaryKey, renameColumn và ghi ở {file:design/vp_tool_log.txt}. "
      "Script SQL sinh bằng generateSql: {file:design/create_tables.sql}.</p>"),
     (G7, "Chọn một bảng: khoá ứng viên, khoá chính, phụ thuộc hàm, ràng buộc toàn vẹn.",
      "<p>Bảng <code>payment</code>: khoá ứng viên payment_id và attempt_ref (mỗi lần thử có mã duy nhất); khoá chính payment_id; attempt_ref UNIQUE. "

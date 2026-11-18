@@ -1,6 +1,6 @@
 # ABC Online Shop: from requirements to running code
 
-Final essay (version 5) of **Information System Analysis and Design** (PTIT 2026, lecturer PGS.TS. Trần Đình Quế):
+Minor thesis (version 1) of **Information System Analysis and Design** (PTIT 2026, lecturer PGS.TS. Trần Đình Quế):
 one e-commerce information system followed through requirements, analysis, AI integration, data model, design,
 implementation and demonstration. Student: Bế Quốc Khánh (KHANHBQ), B23DCCE049.
 
@@ -11,10 +11,10 @@ traceability to code, database, AI, demo script and answers to the 50 oral-exami
 
 | Deliverable | Location |
 |---|---|
-| Minor thesis (official report) | [minorThesisV5_04_KhanhBQ.049.pdf](minorThesisV5_04_KhanhBQ.049.pdf): 1 Introduction and requirements, 2 Analysis, 3 AI, 4 Data model, 5 Design, 6 Implementation |
+| Minor thesis (official report) | [minorThesisV1_04_KhanhBQ.049.pdf](minorThesisV1_04_KhanhBQ.049.pdf): 1 Introduction and requirements, 2 Analysis, 3 AI, 4 Data model, 5 Design, 6 Implementation |
 | Diagrams | [ABC_Online_Shop_4_Design.vpp](ABC_Online_Shop_4_Design.vpp) (final, used by the report), 47 diagrams in Visual Paradigm in five sub-projects (models), one per phase: 1 Requirements, 2 Analysis, 3 AI Search, 4 Data Model, 5 Design; the project at the end of each earlier phase: see below; PNG export (Community Edition) in [diagrams/](diagrams) |
 | Analysis classes | CL01, one diagram: attribute names only; Footwear, Apparel, Bag and Watch are subclasses of Product |
-| Data model | ORM01, the class diagram with multiplicity, labels and ORM (CL01 + identifiers, types, `<<ORM Persistable>>`); DM01, the data model (tables, keys, foreign keys) generated from it by `syncClassesToErd`; tool calls in [design/v5_tool_log.txt](design/v5_tool_log.txt) |
+| Data model | ORM01, the class diagram with multiplicity, labels and ORM (CL01 + identifiers, types, `<<ORM Persistable>>`); DM01, the data model (tables, keys, foreign keys) generated from it by `syncClassesToErd`; tool calls in [design/vp_tool_log.txt](design/vp_tool_log.txt) |
 | SQL and database (SQLite) | [design/create_tables.sql](design/create_tables.sql), generated from the data model DM01 by `generateSql`; [design/abc_design.db](design/abc_design.db), the database built from it by `design/build_db.py` and filled by the application; application schema [abc_shop/dao/schema.sql](abc_shop/dao/schema.sql), demo database `abc_shop/data/abc_shop.db` (created on first run) |
 | Database check | [design/build_db.py](design/build_db.py), output [design/build_db_output.txt](design/build_db_output.txt) |
 | Design and generated code | DCL01-DCL05 (one per package; DCL01 = ORM01 + methods), PKG01, LAY01-LAY05, SD05-SD09; [design/generated/](design/generated) written by `generateCode`, checked by [design/check_code.py](design/check_code.py) |

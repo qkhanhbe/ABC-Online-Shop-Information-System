@@ -1,4 +1,4 @@
-"""Builds minorThesisV5_04_KhanhBQ.049.pdf (A6 report style: Times New Roman, light-blue tables).
+"""Builds minorThesisV1_04_KhanhBQ.049.pdf (A6 report style: Times New Roman, light-blue tables).
 
 Content lives in chapters.py as lists of blocks:
   ("h1", title) ("h2", title) ("h3", title) ("p", html) ("bullets", [html]) ("code", text)
@@ -23,7 +23,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-OUT = os.path.join(ROOT, "minorThesisV5_04_KhanhBQ.049.pdf")
+OUT = os.path.join(ROOT, "minorThesisV1_04_KhanhBQ.049.pdf")
 FONTS = r"C:\Windows\Fonts"
 
 pdfmetrics.registerFont(TTFont("TNR", os.path.join(FONTS, "times.ttf")))
@@ -316,7 +316,7 @@ def draw_cover(canvas, doc):
     centred("ABC ONLINE SHOP", "TNR-B", 25.9, 387)
     centred("Requirements, AI Integration Analysis, Data Model, Design, and Implementation", "TNR", 14.3, 430)
     centred("Footwear, Apparel, Bags and Watches Online Retail Specialization", "TNR", 13, 462)
-    centred("Version 5", "TNR-B", 14.3, 503)
+    centred("Version 1", "TNR-B", 14.3, 503)
     rows = [("Student", "Bế Quốc Khánh"), ("Student ID", "B23DCCE049"), ("Class", "04"),
             ("Lecturer", "PGS.TS. Trần Đình Quế")]
     canvas.setFont("TNR", 13)

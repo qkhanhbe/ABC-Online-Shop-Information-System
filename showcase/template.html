@@ -100,7 +100,7 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
   <div class="sep"></div>
   <div class="tools">
     <a href="http://localhost:8000/" target="_blank" rel="noopener">Mở cửa hàng (localhost:8000) ↗</a>
-    <a href="../minorThesisV5_04_KhanhBQ.049.pdf">Minor thesis V5 (PDF)</a>
+    <a href="../minorThesisV1_04_KhanhBQ.049.pdf">Minor thesis V1 (PDF)</a>
     <a href="../ABC_Online_Shop_4_Design.vpp">Dự án Visual Paradigm (.vpp, bản cuối)</a>
     <a href="../design/create_tables.sql">Script SQL sinh từ data model</a>
     <a href="../abc_shop/dao/schema.sql">schema.sql của ứng dụng</a>
@@ -182,7 +182,7 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
     <div class="box"><h3>Từ class đến database (không vẽ tay)</h3><ol class="tight">
       <li>Pha 2, class phân tích {fig:CL01}: một sơ đồ 22 lớp, chỉ có tên thuộc tính, chưa có kiểu, khoá và method.</li>
       <li>Pha 4, class diagram có ORM {fig:ORM01}: cùng 22 lớp, cùng vị trí, thêm định danh, kiểu, «ORM Persistable», tên quan hệ và bản số hai đầu.</li>
-      <li><b>syncClassesToErd</b> sinh {fig:DM01}: 22 bảng, 24 khoá ngoại; khoá của bảng không có định danh quyết bằng tool, ghi ở {file:design/v5_tool_log.txt}.</li>
+      <li><b>syncClassesToErd</b> sinh {fig:DM01}: 22 bảng, 24 khoá ngoại; khoá của bảng không có định danh quyết bằng tool, ghi ở {file:design/vp_tool_log.txt}.</li>
       <li><b>generateSql</b> (SQLite) viết {file:design/create_tables.sql}.</li>
       <li>{file:design/build_db.py}: chạy script, so với schema của ứng dụng (22/22 bảng giống), nạp dữ liệu bằng chính ứng dụng, thử câu lệnh vi phạm.</li></ol>
       <p class="muted">generateSql dùng bộ sinh của VP khi dự án có cấu hình database (Tools › DB › Database Configuration);
@@ -230,7 +230,7 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
   <table><tr><th>Hạng mục</th><th>Trạng thái</th><th>Bằng chứng</th></tr>
   <tr><td>Yêu cầu chức năng của luồng giao dịch (FR01–FR14, FR18–FR24)</td><td><span class="pill pass">PASS</span></td><td>45 test, demo_results/demo_output.txt</td></tr>
   <tr><td>Quản trị danh mục, khách hàng (FR15–FR17)</td><td><span class="pill part">PARTIAL</span></td><td>Có service và test, chưa có trang quản lý danh mục và khách hàng</td></tr>
-  <tr><td>Data model sinh từ class diagram (không vẽ tay)</td><td><span class="pill pass">PASS</span></td><td>syncClassesToErd, design/v5_tool_log.txt</td></tr>
+  <tr><td>Data model sinh từ class diagram (không vẽ tay)</td><td><span class="pill pass">PASS</span></td><td>syncClassesToErd, design/vp_tool_log.txt</td></tr>
   <tr><td>Database đúng data model</td><td><span class="pill pass">PASS</span></td><td>build_db.py: 22/22 bảng giống về cột, khoá chính, khoá ngoại; schema.sql thêm NOT NULL, CHECK, UNIQUE, trigger</td></tr>
   <tr><td>Code sinh từ class thiết kế theo package</td><td><span class="pill pass">PASS</span></td><td>generateCode: 74 lớp / 5 package; check_code.py: 74/74 khớp</td></tr>
   <tr><td>Kiến trúc ba lớp, phụ thuộc chỉ đi xuống</td><td><span class="pill pass">PASS</span></td><td>{test:test_dependencies_only_point_downwards}</td></tr>

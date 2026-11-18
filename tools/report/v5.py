@@ -251,7 +251,7 @@ CH2 += [("h2", "2.x. Chapter Summary"),
 CH3 = shift(final.CH3)
 
 # ======================================================================================== chapter 4
-TOOL_LOG = open(os.path.join(DES, "v5_tool_log.txt"), encoding="utf-8").read()
+TOOL_LOG = open(os.path.join(DES, "vp_tool_log.txt"), encoding="utf-8").read()
 SYNC_LOG = TOOL_LOG[TOOL_LOG.index("$ syncClassesToErd("):TOOL_LOG.index("==== 2.")].strip()
 SYNC_LOG = SYNC_LOG.replace("; 24 new foreign key(s): ", ";\n24 new foreign key(s):\n  ").replace("], ", "],\n  ")
 EDIT_LOG = TOOL_LOG[TOOL_LOG.index("$ renameElement("):TOOL_LOG.index("==== 3.")].strip()
@@ -285,7 +285,7 @@ CH4 = [
           "syncClassesToErd of the MCP plugin "
           "(the counterpart of Visual Paradigm's Synchronize to Entity Relationship Diagram). Every decision that the "
           "generator cannot take, such as the key of a table whose class has no identifier, is applied to the generated "
-          "diagram with a tool call that is recorded in design/v5_tool_log.txt."),
+          "diagram with a tool call that is recorded in design/vp_tool_log.txt."),
     ("h2", "4.x. Class Diagram with Multiplicity, Labels and ORM"),
     ("p", "The persistent classes are the 22 analysis classes with three additions: the type of every attribute, an "
           "identifier where the business has one (user_id, product_id, order_id, code ...), and the stereotype "
@@ -336,8 +336,8 @@ CH4 = [
     ("table", "The 22 tables generated from the data model classes", ["Table", "Primary key", "Foreign keys", "Holds"],
      TABLES, [32, 30, 58, 45]),
     ("h3", "9.9.2. Product and its four kinds"),
-    ("p", "The lecturer's remark on the first version was that one Product class holding every attribute of every kind of "
-          "product leaves most attributes empty. In V5 the remark is followed from the analysis to the database: in the "
+    ("p", "The lecturer's remark on an earlier draft of the model was that one Product class holding every attribute of every kind of "
+          "product leaves most attributes empty. Here the remark is followed from the analysis to the database: in the "
           "analysis Footwear, Apparel, Bag and Watch are subclasses of Product; the generator turned the generalization into "
           "one table per kind that shares the product's key; and the application reads a product from Product and exactly "
           "one kind table, chosen by the detail kind of its category. Every column of a kind table can be NOT NULL, because "
@@ -426,7 +426,7 @@ CH5 = [
           "typed parameters and a return type, and the navigability of the associations. The other packages hold the "
           "classes that exist only while the program runs: data access objects, services, the AI services and the web "
           "controllers. Because the methods make the classes wider, the model diagram is laid out in five rows, with the "
-          "four kinds of product in one column on the right of Product. The classes of every package are read from the code of abc_shop (tools/vp/v5_design_spec.py), so "
+          "four kinds of product in one column on the right of Product. The classes of every package are read from the code of abc_shop by a script in tools/vp, so "
           "the diagrams and the program cannot drift apart without check_code.py noticing (Section 5.5)."),
     ("h3", "9.9.1. Types, visibility and multiplicity"),
     ("p", "The types are the data model's (String, Integer, Float, Boolean) and the classes of the model; collections are "
@@ -651,7 +651,7 @@ for b in CONCL:
                       "replacing the prototype AI components with a multilingual Whisper model, CLIP and a fine-tuned PhoBERT"))
     elif b[0] == "table" and b[1] == "Submitted files":
         b = (b[0], b[1], b[2], [
-            ["minorThesisV5_04_KhanhBQ.049.pdf", "This essay"],
+            ["minorThesisV1_04_KhanhBQ.049.pdf", "This minor thesis"],
             ["ABC_Online_Shop_4_Design.vpp", "Visual Paradigm project with the 47 diagrams of the essay in five sub-projects (models), "
                                              "one per phase; the figures of this essay come from it"],
             ["ABC_Online_Shop_1_Requirements.vpp<br/>ABC_Online_Shop_2_Analysis_and_AI.vpp<br/>ABC_Online_Shop_3_Data_Model.vpp",
@@ -659,8 +659,8 @@ for b in CONCL:
             ["diagrams/", "PNG export of every diagram (Visual Paradigm Community Edition)"],
             ["abc_shop/", "Source code, data, tests, README"],
             ["design/", "create_tables.sql (generateSql, SQLite), abc_design.db (the SQLite database built from it), "
-                        "generated/ (generateCode), build_db.py, check_code.py, v5_tool_log.txt"],
-            ["tools/vp/", "Scripts that drew the V5 diagrams and called the MCP tools"],
+                        "generated/ (generateCode), build_db.py, check_code.py, vp_tool_log.txt"],
+            ["tools/vp/", "Scripts that drew the diagrams and called the MCP tools"],
             ["demo_results/", "Demo, evaluation and test output; web screenshots"],
             ["showcase/", "Defence guide with the diagrams, traceability and the answers to the 50 questions"]], [74, 91])
     elif b[0] == "table":

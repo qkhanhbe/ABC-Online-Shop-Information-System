@@ -63,9 +63,9 @@ if __name__ == "__main__":
     LOG.append(f"Result: {len(re.findall('Table: ', r))} tables, {len(re.findall('ForeignKey', r))} foreign keys")
     head = ("Calls of the Visual Paradigm MCP plugin 1.33.0 (Visual Paradigm Enterprise 18.1, ABC_Online_Shop_4_Design.vpp) and the\n"
             "result strings they returned, in order (tools/vp/v5_erd.py; the code generation, section 4, is in v5_design_build.py).\n\n")
-    old = open(os.path.join(ROOT, "design", "v5_tool_log.txt"), encoding="utf-8").read()
+    old = open(os.path.join(ROOT, "design", "vp_tool_log.txt"), encoding="utf-8").read()
     code = old[old.index("==== 4. Design class diagrams to code"):] if "==== 4." in old else ""
-    open(os.path.join(ROOT, "design", "v5_tool_log.txt"), "w", encoding="utf-8").write(head + "\n".join(LOG) + "\n" + code)
+    open(os.path.join(ROOT, "design", "vp_tool_log.txt"), "w", encoding="utf-8").write(head + "\n".join(LOG) + "\n" + code)
     vp.call("exportDiagramImage", quiet=True, diagramName=ERD, filePath=vp.PNG + ERD + ".png")
     vp.call("saveProject", quiet=True)
     print("\n".join(LOG[-3:]))

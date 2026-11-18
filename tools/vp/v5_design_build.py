@@ -152,7 +152,7 @@ def draw_layers():
 
 
 def generate_code():
-    """One generateCode call per package; the calls and results replace section 4 of design/v5_tool_log.txt."""
+    """One generateCode call per package; the calls and results replace section 4 of design/vp_tool_log.txt."""
     import glob
     import py_compile
     log, total = ["==== 4. Design class diagrams to code " + "=" * 88], 0
@@ -173,7 +173,7 @@ def generate_code():
         for f in files:
             py_compile.compile(f, doraise=True)
     log.append(f"Result: {total} classes in {len(DIAGRAMS)} packages; every file compiles (python -m py_compile).")
-    path = os.path.join(ROOT, "design", "v5_tool_log.txt")
+    path = os.path.join(ROOT, "design", "vp_tool_log.txt")
     text = open(path, encoding="utf-8").read()
     if "==== 4." in text:
         text = text[:text.index("==== 4. Design class diagrams to code")]
