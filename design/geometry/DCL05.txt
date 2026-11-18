@@ -1,9 +1,16 @@
-Geometry of 'DCL05 Design Classes (ai) - Search Review Insights and Recommendations' (ClassDiagram):
-  Class: ReviewInsightService 667,485 351x141 caption 0,0 351x19
-  Class: RecommenderService 201,485 406x84 caption 0,0 406x19
-  Class: SpeechService 903,291 277x84 caption 0,0 277x19
-  Class: ImageService 552,291 291x46 caption 0,0 291x19
-  Class: RankingService 40,291 452x84 caption 0,0 452x19
-  Class: QueryService 599,40 564x141 caption 0,0 564x19
-  Class: SearchService 57,40 482x122 caption 0,0 482x19
-  Usage: SearchService -> RankingService points (298,162) (298,291) caption 203,214 92x24 text "<<use>>"
+Geometry of 'DCL05 Design Class Diagram (controller)' (ClassDiagram):
+  Class: ReportController 1906,215 294x46 caption 0,0 294x19
+  Class: StaffController 1321,215 525x141 caption 0,0 525x19
+  Class: OrderController 719,215 161x0 caption 0,0 161x19
+  Class: AccountController 329,215 179x0 caption 0,0 179x19
+  Class: ShopController -112,215 152x0 caption 0,0 152x19
+  Class: Response 1228,40 481x46 caption 0,0 481x19
+  Class: Request 530,40 298x65 caption 0,0 298x19
+  Class: WebApp 888,40 280x65 caption 0,0 280x19
+  Usage: WebApp -> ShopController points (908,105) (908,201) (463,201) (463,227) (295,227) caption 640,174 92x24 text "<<use>>"
+  Usage: WebApp -> AccountController points (888,96) (842,96) (842,230) (641,230) caption 747,151 92x24 text "<<use>>"
+  Usage: WebApp -> OrderController points (1028,105) (868,215) caption 933,148 92x24 text "<<use>>"
+  Usage: WebApp -> StaffController points (1168,96) (1214,96) (1214,201) (1305,201) (1305,232) (1321,232) caption 1217,136 92x24 text "<<use>>"
+  Usage: WebApp -> ReportController points (1148,105) (1148,189) (1890,189) (1890,223) (1906,223) caption 1473,162 92x24 text "<<use>>"
+  Usage: WebApp -> Request points (888,72) (828,72) caption 732,122 92x24 text "<<use>>"
+  Usage: WebApp -> Response points (1168,72) (1228,72) caption 1232,86 92x24 text "<<use>>"

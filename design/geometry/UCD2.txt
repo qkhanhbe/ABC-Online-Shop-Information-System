@@ -1,0 +1,30 @@
+Geometry of 'UCD2 Cart, Order and Payment' (UseCaseDiagram):
+  System: ABC Online Shop - Cart, Order and Payment 270,30 1120x876 caption 0,0 1120x19
+    UseCase: UC07 Manage Shopping Cart 320,82 240x51 caption 0,0 240x52
+    UseCase: UC08 Place Order / Checkout 690,310 260x60 caption 0,0 260x60
+    UseCase: UC09 Make Payment 720,552 200x51 caption 0,0 200x52
+    UseCase: UC10 View Order History 320,682 240x51 caption 0,0 240x52
+    UseCase: UC11 Track Order 340,502 200x51 caption 0,0 200x52
+    UseCase: UC12 Cancel Order 720,682 200x51 caption 0,0 200x52
+    UseCase: UC13 Submit Review 720,802 200x51 caption 0,0 200x52
+    UseCase: UC29 Validate Cart 1110,192 200x51 caption 0,0 200x52
+    UseCase: UC30 Check Product Availability 670,82 300x51 caption 0,0 300x52
+    UseCase: UC31 Calculate Order Total 1080,312 260x51 caption 0,0 260x52
+    UseCase: UC32 Apply Promotion 1110,432 200x51 caption 0,0 200x52
+  Actor: Customer 70,372 40x71 caption 47,445 87x19
+  Actor: Payment Provider 1530,542 40x71 caption 1480,615 140x19
+  Actor: Sales Staff 1530,672 40x71 caption 1503,745 93x19
+  Include: UC08 Place Order / Checkout -> UC29 Validate Cart points (890,315) (890,217) (1110,217) caption 952,196 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Include: UC08 Place Order / Checkout -> UC30 Check Product Availability points (820,310) (820,133) caption 720,212 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Include: UC08 Place Order / Checkout -> UC31 Calculate Order Total points (950,340) (1080,340) caption 967,318 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Include: UC08 Place Order / Checkout -> UC09 Make Payment points (820,370) (820,552) caption 720,451 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Include: UC07 Manage Shopping Cart -> UC30 Check Product Availability points (560,107) (670,107) caption 567,86 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Extend: UC08 Place Order / Checkout -> UC32 Apply Promotion points (890,365) (890,457) (1110,457) caption 956,436 85x18 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Extend: UC10 View Order History -> UC12 Cancel Order points (560,707) (720,707) caption 596,686 85x18 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Extend: UC10 View Order History -> UC13 Submit Review points (440,733) (440,828) (720,828) caption 537,807 86x18 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Association: Customer -> UC07 Manage Shopping Cart points (110,407) (220,407) (220,107) (320,107) caption 160,106 25x24 text ""
+  Association: Customer -> UC08 Place Order / Checkout points (110,407) (220,407) (220,340) (690,340) caption 565,405 27x25 text ""
+  Association: Customer -> UC10 View Order History points (110,407) (220,407) (220,707) (320,707) caption 5,210 28x25 text ""
+  Association: Customer -> UC11 Track Order points (110,407) (220,407) (220,527) (340,527) caption 316,465 27x24 text ""
+  Association: Payment Provider -> UC09 Make Payment points (1530,577) (920,577) caption 330,815 28x25 text ""
+  Association: Sales Staff -> UC12 Cancel Order points (1530,707) (920,707) caption 315,843 25x24 text ""

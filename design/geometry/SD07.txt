@@ -1,0 +1,26 @@
+Geometry of 'SD07 Log In (Design)' (InteractionDiagram):
+  Activation: Activation 1595,208 8x48
+  Activation: Activation 1366,172 8x353
+  Activation: Activation 831,136 8x425
+  Activation: Activation 482,100 8x515
+  Activation: Activation 101,98 8x517
+  Lifeline: CustomerDAO 1534,30 130x613 caption 1546,65 106x19
+  Lifeline: AuthService 1305,30 130x605 caption 1324,65 92x19
+  Lifeline: AccountController 744,30 183x605 caption 769,65 133x19
+  Lifeline: WebApp 421,30 130x605 caption 453,65 67x19
+  Lifeline: Customer 40,30 130x605 caption 40,30 130x19
+  CombinedFragment: CombinedFragment 397,316 1062x254 caption 0,0 27x22
+    InteractionOperand: Operand 397,338 1062x144
+    InteractionOperand: Operand2 397,482 1062x88
+  Message 'POST /login (email, password)': Customer -> WebApp points (109,100) (482,100) caption 153,71 285x24 text "POST /login (email, password)"
+  Message 'login(request)': WebApp -> AccountController points (490,136) (831,136) caption 585,107 151x24 text "login(request)"
+  Message 'login(email, password)': AccountController -> AuthService points (839,172) (1366,172) caption 992,143 221x24 text "login(email, password)"
+  Message 'find_by_email(email)': AuthService -> CustomerDAO points (1374,208) (1595,208) caption 1381,179 207x24 text "find_by_email(email)"
+  Message 'user or None': CustomerDAO -> AuthService points (1595,244) (1374,244) caption 1412,215 145x24 text "user or None"
+  Message 'check_password(password, hash)': AuthService -> AuthService points (1374,280) (1406,280) (1406,296) (1374,296) caption 1412,276 313x24 text "check_password(password, hash)"
+  Message 'user': AuthService -> AccountController points (1366,369) (839,369) caption 1064,340 76x24 text "user"
+  Message 'session[user_id] = user_id': AccountController -> AccountController points (839,405) (871,405) (871,421) (839,421) caption 877,401 250x24 text "session[user_id] = user_id"
+  Message 'redirect to the page of the role': AccountController -> WebApp points (831,457) (490,457) caption 520,428 281x24 text "redirect to the page of the role"
+  Message 'ValidationError (incorrect)': AuthService -> AccountController points (1366,513) (839,513) caption 974,484 256x24 text "ValidationError (incorrect)"
+  Message '400 login page': AccountController -> WebApp points (831,549) (490,549) caption 576,520 169x24 text "400 login page"
+  Message 'response with session cookie': WebApp -> Customer points (482,603) (109,603) caption 153,574 285x24 text "response with session cookie"

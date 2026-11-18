@@ -11,8 +11,7 @@ DIAGRAMS = [
         ("UCD3", "Use case chi tiết: quản trị"),
         ("UCD4", "Use case chi tiết: vận hành và báo cáo")]),
     ("Chương 2 - Phân tích", [
-        ("CL01", "Class phân tích 1: khách hàng, danh mục, giỏ, đơn; 4 loại sản phẩm kế thừa thẳng Product"),
-        ("CL02", "Class phân tích 2: lịch sử đơn, giao hàng, tồn kho, đánh giá"),
+        ("CL01", "Class phân tích: 22 lớp, chỉ có tên thuộc tính; 4 loại sản phẩm kế thừa thẳng Product"),
         ("AD05", "Activity có làn: tìm kiếm sản phẩm (UC05)"),
         ("AD06", "Activity có làn: quản lý giỏ hàng (UC07, UC30)"),
         ("AD01", "Activity có làn: đặt hàng, thanh toán (UC08)"),
@@ -33,21 +32,25 @@ DIAGRAMS = [
         ("SD04", "Tìm kiếm bằng ảnh"),
         ("AD04", "Pipeline tóm tắt đánh giá")]),
     ("Chương 4 - Data Model", [
-        ("DM01", "Class diagram có bản số, tên quan hệ và «ORM Persistable» (1): mua hàng"),
-        ("DM02", "Class diagram có bản số, tên quan hệ và «ORM Persistable» (2): sau bán hàng"),
-        ("ERD01", "ERD do syncClassesToErd sinh từ DM01, DM02: 22 bảng, 24 khoá ngoại")]),
+        ("DM01", "Data model class: CL01 + định danh, kiểu, bản số, tên quan hệ, «ORM Persistable»"),
+        ("ERD01", "ERD do syncClassesToErd sinh từ DM01: 22 bảng, 24 khoá ngoại, cùng lưới với DM01")]),
     ("Chương 5 - Thiết kế", [
-        ("DCL01", "Class thiết kế (model) 1: lớp phân tích + method, kiểu, điều hướng"),
-        ("DCL02", "Class thiết kế (model) 2: lịch sử, giao hàng, tồn kho, đánh giá"),
-        ("DCL03", "Class thiết kế (dao): interface DAO, lớp SQLite, Database"),
-        ("DCL04", "Class thiết kế (service): các service nghiệp vụ và gateway"),
-        ("DCL05", "Class thiết kế (ai): tìm kiếm, phân tích đánh giá, gợi ý"),
-        ("DCL06", "Class thiết kế (controller): router WebApp và các controller"),
+        ("DCL01", "Class thiết kế (model): DM01 + method của code, điều hướng"),
+        ("DCL02", "Class thiết kế (dao): interface DAO, lớp SQLite, Database"),
+        ("DCL03", "Class thiết kế (service): các service nghiệp vụ và gateway"),
+        ("DCL04", "Class thiết kế (ai): tìm kiếm, phân tích đánh giá, gợi ý"),
+        ("DCL05", "Class thiết kế (controller): router WebApp và các controller"),
         ("PKG01", "Các tầng (package) và phụ thuộc «use» đi xuống"),
         ("LAY01", "Layer của use case tìm kiếm: lớp theo tầng, operation và phụ thuộc"),
         ("LAY02", "Layer của giỏ hàng và thanh toán: lớp theo tầng, operation và phụ thuộc"),
+        ("LAY03", "Layer của đăng ký, đăng nhập (UC01, UC02)"),
+        ("LAY04", "Layer của thanh toán thẻ (UC09): PaymentGateway và SimulatedPaymentProvider"),
+        ("LAY05", "Layer của gợi ý sản phẩm (UC33, UC34)"),
         ("SD05", "Sequence thiết kế: checkout qua các tầng"),
         ("SD06", "Sequence thiết kế: theo dõi đơn qua các tầng"),
+        ("SD07", "Sequence thiết kế: đăng nhập (alt đúng/sai mật khẩu)"),
+        ("SD08", "Sequence thiết kế: thanh toán thẻ (alt SUCCEEDED/DECLINED)"),
+        ("SD09", "Sequence thiết kế: gợi ý sản phẩm (opt dựng mô hình, loop chấm điểm)"),
         ("CMP02", "Sơ đồ thành phần của hệ thống"),
         ("DEP01", "Sơ đồ triển khai")]),
 ]
@@ -89,9 +92,9 @@ def kind(code):
 
 PHASES = [
     ("Yêu cầu", "Khảo sát (A01): bên liên quan {fig:STK01}, quy trình {fig:BP01}, cây vấn đề {fig:PT01}; 24 FR, 12 NFR, 32 use case {fig:UC00}."),
-    ("Phân tích", "Class phân tích có kế thừa và method {fig:CL01} {fig:CL02}; 8 activity ({fig:AD05}, {fig:AD01} ...); ngữ cảnh {fig:CTX01}; DFD, sequence BCE, trạng thái."),
-    ("Data Model", "Class «ORM Persistable» {fig:DM01} {fig:DM02} → syncClassesToErd sinh {fig:ERD01} (22 bảng, 24 khoá ngoại)."),
-    ("Thiết kế", "Class thiết kế = class phân tích + method {fig:DCL01}; generateSql → {file:design/create_tables.sql}; tầng {fig:PKG01} {fig:LAY02}; generateCode → {file:design/generated}."),
+    ("Phân tích", "Class phân tích có kế thừa, chỉ tên thuộc tính {fig:CL01}; 8 activity ({fig:AD05}, {fig:AD01} ...); ngữ cảnh {fig:CTX01}; DFD, sequence BCE, trạng thái."),
+    ("Data Model", "CL01 + ID, kiểu, «ORM Persistable» = {fig:DM01} → syncClassesToErd sinh {fig:ERD01} (22 bảng, 24 khoá ngoại)."),
+    ("Thiết kế", "Class thiết kế = data model class + method {fig:DCL01}; generateSql → {file:design/create_tables.sql}; tầng {fig:PKG01} {fig:LAY02} {fig:LAY04}; generateCode → {file:design/generated}."),
     ("Cài đặt và kiểm chứng", "Python, SQLite, 45 test; check_code.py 74/74 lớp khớp; build_db.py 22/22 bảng khớp; evaluate.py; ảnh chụp demo."),
 ]
 
@@ -165,7 +168,7 @@ EVOLUTION = [
     dict(title="4. Class thiết kế theo package → code sinh → code ứng dụng",
          note="Layer → sinh code (generateCode, Python)",
          steps=[
-             dict(label="Thiết kế", fig="DCL03",
+             dict(label="Thiết kế", fig="DCL02",
                   cap="Mỗi package một class diagram: model, dao, service, ai, controller; interface và lớp cài đặt."),
              dict(label="Code sinh", code=("design/generated/model/cart.py", ["Cart"]),
                   cap="generateCode viết {file:design/generated}: 74 lớp trong 5 package, mỗi lớp một module."),
@@ -202,7 +205,7 @@ TRACE = [
     ("UC06 Xem chi tiết sản phẩm (Category → bảng của loại sản phẩm)", [
         ("Yêu cầu", "FR06; góp ý của thầy về Product/Category; BR-CAT-01"),
         ("Phân tích", "{fig:CL01} (4 loại sản phẩm kế thừa thẳng Product), {fig:AD08}"),
-        ("Thiết kế", "{fig:DM01} → {fig:ERD01} (bảng con dùng chung khoá), {fig:DCL01}, {fig:DCL03}"),
+        ("Thiết kế", "{fig:DM01} → {fig:ERD01} (bảng con dùng chung khoá), {fig:DCL01}, {fig:DCL02}"),
         ("Database", "Category.detail_kind, Product, Footwear / Apparel / Bag / Watch (PK = FK product_id), trigger *_kind"),
         ("Code", "{code:controller/shop_controller.py:ShopController.product} → {code:service/catalog_service.py:CatalogService.product_detail} → "
                  "{code:dao/sqlite_dao.py:SqliteProductDAO._to_product} → {code:model/product.py:Product.spec_rows}"),
@@ -221,7 +224,7 @@ TRACE = [
 SCRIPT = [
     ("0:00–0:45", "Bài toán: thông tin rời rạc và chậm; 6 vấn đề và nguyên nhân gốc.", "Showcase mục A, {fig:PT01}"),
     ("0:45–1:45", "Quy trình và yêu cầu: BPMN, use case tổng quát, đặc tả UC08.", "{fig:BP01}, {fig:UC00}, PDF chương 1"),
-    ("1:45–3:00", "Phân tích → thiết kế: CL01 (kế thừa, có method) → DCL01 → code; SD01 → SD05.", "Mở VP: CL01, DCL01, SD05; showcase mục C"),
+    ("1:45–3:00", "Phân tích → thiết kế: CL01 (kế thừa, chỉ tên thuộc tính) → DM01 (+ID, kiểu, ORM) → DCL01 (+method) → code; SD01 → SD05.", "Mở VP: Model Explorer có 5 project con 1 Requirements → 5 Design; mở 2 Analysis/CL01, 4 Data Model/DM01, 5 Design/DCL01, SD05; showcase mục C"),
     ("3:00–4:00", "Data model: DM01 «ORM Persistable» → syncClassesToErd → ERD01 → generateSql → build_db; generateCode → check_code.", "Mở VP: DM01, ERD01; {file:design/v5_tool_log.txt}"),
     ("4:00–5:00", "Truy vết: từ UC08 đến place_order và test.", "IDE: checkout_service.py dòng place_order; showcase mục D"),
     ("5:00–6:30", "Demo: tìm kiếm AI, trang P16, checkout, đơn bị từ chối thanh toán, báo cáo.", "Trình duyệt localhost:8000"),
@@ -409,7 +412,7 @@ ANSWERS = [
      "(đọc dòng hàng), PaymentService đổi trạng thái qua {code:model/order.py:Order.change_status}. Phân biệt: đối tượng Order trong bộ nhớ có danh sách lồng; "
      "trong CSDL nó là 1 dòng Orders + n dòng OrderItem + m dòng StatusChange; bảng là cấu trúc, bản ghi là dữ liệu.</p>"),
     (G7, "Trình bày ERD: thực thể, thuộc tính, khoá, quan hệ; chuyển thành bảng thế nào?",
-     "<p>ERD không vẽ tay: class phân tích được bổ sung kiểu, định danh và «ORM Persistable» thành {fig:DM01}, {fig:DM02}, rồi tool "
+     "<p>ERD không vẽ tay: class phân tích được bổ sung kiểu, định danh và «ORM Persistable» thành {fig:DM01}, rồi tool "
      "syncClassesToErd của plugin MCP sinh {fig:ERD01} (22 bảng, 24 khoá ngoại). Ví dụ Orders (PK order_id, FK customer_id → Customer, "
      "FK promo_code → Promotion được rỗng) 1–n OrderItem (PK ghép order_id, product_id). Quy tắc chuyển mà bộ sinh áp dụng: mỗi lớp "
      "một bảng; quan hệ 1–n thành khoá ngoại ở phía n; hợp thành thì khoá con chứa khoá cha; kế thừa thành bảng con dùng chung khoá "
@@ -448,7 +451,7 @@ ANSWERS = [
      "<p><b>Association</b>: hai lớp biết nhau, vòng đời độc lập – Review → Product, cài đặt bằng trường khoá product_id. <b>Aggregation</b>: toàn thể–bộ phận "
      "yếu, bộ phận sống độc lập – Customer ◇ Address, code là trường address: Optional[Address]. <b>Composition</b>: bộ phận không sống ngoài toàn thể – Order ◆ "
      "OrderItem, code là list items tạo bên trong Order; trong CSDL khoá con chứa khoá cha, xoá giỏ thì CASCADE xoá dòng giỏ. <b>Inheritance</b>: Customer kế "
-     "thừa User (<code>class Customer(User)</code>), Bag kế thừa Product. Xem {fig:CL01}, {fig:DCL03}.</p>"),
+     "thừa User (<code>class Customer(User)</code>), Bag kế thừa Product. Xem {fig:CL01}, {fig:DCL01}.</p>"),
     (G8, "Customer, ShoppingCart, Order, OrderDetail, Product, Payment: trách nhiệm, quan hệ; thêm giảm giá sản phẩm thì sửa class, method nào?",
      "<p>Customer đặt đơn (1–0..*), sở hữu Cart (1–0..1); Cart ◆ CartItem → Product; Order ◆ OrderItem → Product; Order 1–0..* Payment. Trách nhiệm: Cart và "
      "Order tự tính tổng từ dòng, dòng tự tính sub_total; Payment kiểm kết quả khớp ({code:model/payment.py:Payment.matches}). Giảm giá theo sản phẩm: thêm "

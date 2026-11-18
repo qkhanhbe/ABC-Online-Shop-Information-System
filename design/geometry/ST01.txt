@@ -1,0 +1,32 @@
+Geometry of 'ST01 Order State Machine' (StateDiagram):
+  State: Payment Pending 458,174 170x50 caption 458,174 170x19
+  State: Payment Failed 556,314 170x50 caption 556,314 170x19
+  State: Paid/Confirmed 251,314 170x50 caption 251,314 170x19
+  State: On Hold 248,454 170x50 caption 248,454 170x19
+  State: Processing 194,594 170x50 caption 194,594 170x19
+  State: Ready for Shipment 166,734 170x50 caption 166,734 170x19
+  State: Shipped 166,874 170x50 caption 166,874 170x19
+  State: Delivery Failed 112,1014 170x50 caption 112,1014 170x19
+  State: Delivered 166,1154 170x50 caption 166,1154 170x19
+  State: Cancelled 416,734 170x50 caption 416,734 170x19
+  InitialState: (InitialPseudoState) 531,60 24x24 caption 561,64 20x16
+  FinalState: (FinalState2) 238,1294 26x26 caption 266,1322 20x16
+  FinalState: (FinalState2) 488,1294 26x26 caption 516,1322 20x16
+  FinalState: (FinalState2) 628,1294 26x26 caption 656,1322 20x16
+  Transition 'place order [cart valid] / reserve stock': (InitialPseudoState) -> Payment Pending points (543,84) (543,174) caption 220,122 320x14 text "place order [cart valid] / reserve stock"
+  Transition 'payment succeeded': Payment Pending -> Paid/Confirmed points (458,206) (437,206) (437,322) (421,322) caption 252,257 182x14 text "payment succeeded"
+  Transition 'payment declined': Payment Pending -> Payment Failed points (592,224) (592,314) caption 595,262 162x14 text "payment declined"
+  Transition: Payment Failed -> (FinalState2) points (641,364) (641,1294) caption 651,849 20x0 text ""
+  Transition 'cancel': Payment Pending -> Cancelled points (522,224) (522,734) caption 446,472 73x14 text "cancel"
+  Transition 'confirm [paid, reserved]': Paid/Confirmed -> Processing points (271,364) (271,440) (226,440) (226,594) caption 14,510 209x14 text "confirm [paid, reserved]"
+  Transition 'manual check': Paid/Confirmed -> On Hold points (333,364) (333,454) caption 336,395 56x28 text "manual check"
+  Transition 'resolved': On Hold -> Processing points (333,504) (333,594) caption 241,542 89x14 text "resolved"
+  Transition 'cancel': Paid/Confirmed -> Cancelled points (421,346) (436,346) (436,734) caption 439,533 73x14 text "cancel"
+  Transition 'cancel': Processing -> Cancelled points (364,626) (400,626) (400,742) (416,742) caption 324,677 73x14 text "cancel"
+  Transition 'packed / issue stock': Processing -> Ready for Shipment points (265,644) (265,734) caption 79,682 183x14 text "packed / issue stock"
+  Transition 'PICKED_UP': Ready for Shipment -> Shipped points (251,784) (251,874) caption 125,822 123x14 text "PICKED_UP"
+  Transition 'FAILED_ATTEMPT': Shipped -> Delivery Failed points (251,924) (251,1014) caption 70,962 178x14 text "FAILED_ATTEMPT"
+  Transition 'DELIVERED (retry)': Delivery Failed -> Delivered points (197,1064) (197,1154) caption 18,1102 176x14 text "DELIVERED (retry)"
+  Transition 'DELIVERED': Shipped -> Delivered points (298,924) (298,1154) caption 301,1032 123x14 text "DELIVERED"
+  Transition: Delivered -> (FinalState2) points (251,1204) (251,1294) caption 261,1269 20x0 text ""
+  Transition: Cancelled -> (FinalState2) points (501,784) (501,1294) caption 511,1059 20x0 text ""

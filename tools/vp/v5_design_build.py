@@ -20,12 +20,11 @@ from v5_spec import ASSOCIATIONS, FIGURES
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DIAGRAMS = {
-    "model": ["DCL01 Design Classes (model) - Customers Catalogue and Orders",
-              "DCL02 Design Classes (model) - Order History Delivery Stock and Reviews"],
-    "dao": ["DCL03 Design Classes (dao) - Data Access Objects"],
-    "service": ["DCL04 Design Classes (service) - Business Services"],
-    "ai": ["DCL05 Design Classes (ai) - Search Review Insights and Recommendations"],
-    "controller": ["DCL06 Design Classes (controller) - Web Controllers"],
+    "model": ["DCL01 Design Class Diagram (model)"],
+    "dao": ["DCL02 Design Class Diagram (dao)"],
+    "service": ["DCL03 Design Class Diagram (service)"],
+    "ai": ["DCL04 Design Class Diagram (ai)"],
+    "controller": ["DCL05 Design Class Diagram (controller)"],
 }
 NAV = {("Cart", "CartItem"): "items", ("Order", "OrderItem"): "items", ("Order", "StatusChange"): "history",
        ("Shipment", "Milestone"): "milestones", ("Customer", "Address"): "address"}
@@ -153,12 +152,32 @@ def draw_layers():
 
 
 def generate_code():
+    """One generateCode call per package; the calls and results replace section 4 of design/v5_tool_log.txt."""
+    import glob
+    import py_compile
+    log, total = ["==== 4. Design class diagrams to code " + "=" * 88], 0
     for package, diagrams in DIAGRAMS.items():
         out = os.path.join(ROOT, "design", "generated", package)
+        for old in glob.glob(os.path.join(out, "*.py")):
+            os.remove(old)
         os.makedirs(out, exist_ok=True)
-        print(package, vp.call("generateCode", quiet=True, diagramName=", ".join(diagrams), language="python",
-                               packageName=package, outputDir=out, jpa=False, accessors=False,
-                               primaryKeys="")[:300])
+        r = vp.call("generateCode", quiet=True, diagramName=", ".join(diagrams), language="python",
+                    packageName=package, outputDir=out, jpa=False, accessors=False, primaryKeys="").strip()
+        print(package, r[:300])
+        rel = "design/generated/" + package
+        names = ", ".join(diagrams)
+        log.append(f'$ generateCode("{names}", "python", "{package}", "{rel}", false, false, "")\n'
+                   + r.replace(out, rel.replace("/", os.sep)))
+        files = glob.glob(os.path.join(out, "*.py"))
+        total += len([f for f in files if not f.endswith("__init__.py")])
+        for f in files:
+            py_compile.compile(f, doraise=True)
+    log.append(f"Result: {total} classes in {len(DIAGRAMS)} packages; every file compiles (python -m py_compile).")
+    path = os.path.join(ROOT, "design", "v5_tool_log.txt")
+    text = open(path, encoding="utf-8").read()
+    if "==== 4." in text:
+        text = text[:text.index("==== 4. Design class diagrams to code")]
+    open(path, "w", encoding="utf-8").write(text + "\n".join(log) + "\n")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,30 @@
+Geometry of 'SD09 Recommendation (Design)' (InteractionDiagram):
+  Activation: Activation 1688,442 8x48
+  Activation: Activation 1494,333 8x48
+  Activation: Activation 1190,261 8x335
+  Activation: Activation 855,136 8x496
+  Activation: Activation 513,100 8x568
+  Activation: Activation 101,98 8x570
+  Lifeline: InventoryDAO 1623,30 138x666 caption 1640,65 104x19
+  Lifeline: OrderDAO 1433,30 130x658 caption 1459,65 79x19
+  Lifeline: ProductDAO 1129,30 130x658 caption 1147,65 94x19
+  Lifeline: RecommenderService 763,30 192x658 caption 781,65 157x19
+  Lifeline: ShopController 439,30 156x658 caption 461,65 112x19
+  Lifeline: Customer 40,30 130x658 caption 40,30 130x19
+  CombinedFragment: CombinedFragment3 739,156 848x234 caption 0,0 32x22
+    InteractionOperand: Operand5 739,178 848x212
+  CombinedFragment: CombinedFragment4 739,389 1046x162 caption 0,0 40x22
+    InteractionOperand: Operand6 739,411 1046x140
+  Message 'GET /product/{product_id}': Customer -> ShopController points (109,100) (513,100) caption 187,71 249x24 text "GET /product/{product_id}"
+  Message 'similar(product_id, 4)': ShopController -> RecommenderService points (521,136) (855,136) caption 584,107 209x24 text "similar(product_id, 4)"
+  Message 'fit()': RecommenderService -> RecommenderService points (863,209) (895,209) (895,225) (863,225) caption 901,205 67x24 text "fit()"
+  Message 'list_products()': RecommenderService -> ProductDAO points (863,261) (1190,261) caption 949,232 154x24 text "list_products()"
+  Message 'products (TF-IDF of search_text)': ProductDAO -> RecommenderService points (1190,297) (863,297) caption 875,268 302x24 text "products (TF-IDF of search_text)"
+  Message 'list_orders()': RecommenderService -> OrderDAO points (863,333) (1494,333) caption 1110,304 136x24 text "list_orders()"
+  Message 'orders (co-purchase counts)': OrderDAO -> RecommenderService points (1494,369) (863,369) caption 1045,340 266x24 text "orders (co-purchase counts)"
+  Message 'get_stock(candidate)': RecommenderService -> InventoryDAO points (863,442) (1688,442) caption 1171,413 208x24 text "get_stock(candidate)"
+  Message 'available': InventoryDAO -> RecommenderService points (1688,478) (863,478) caption 1219,449 112x24 text "available"
+  Message 'score = 0.7 content + 0.3 co-purchase': RecommenderService -> RecommenderService points (863,514) (895,514) (895,530) (863,530) caption 901,510 354x24 text "score = 0.7 content + 0.3 co-purchase"
+  Message 'get_product(best k)': RecommenderService -> ProductDAO points (863,584) (1190,584) caption 923,555 206x24 text "get_product(best k)"
+  Message 'top 4 (product, score)': RecommenderService -> ShopController points (855,620) (521,620) caption 577,591 222x24 text "top 4 (product, score)"
+  Message 'product page: Customers also like': ShopController -> Customer points (513,656) (109,656) caption 150,627 323x24 text "product page: Customers also like"

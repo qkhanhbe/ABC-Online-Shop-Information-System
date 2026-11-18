@@ -1,0 +1,43 @@
+Geometry of 'DFD0 Level 0 Diagram' (DataFlowDiagram):
+  DFExternalEntity: Customer 96,221 120x148 caption 0,0 120x19
+  DFExternalEntity: Administrator 92,77 124x56 caption 0,0 124x19
+  DFExternalEntity: Payment Provider 68,858 148x84 caption 0,0 148x19
+  DFExternalEntity: Shipping Provider 60,1012 156x84 caption 0,0 156x19
+  DFExternalEntity: Warehouse Staff 76,732 140x56 caption 0,0 140x19
+  DFExternalEntity: Manager 96,1187 120x56 caption 0,0 120x19
+  DFProcess: Manage Catalogue 467,60 150x90 caption 0,19 150x19
+  DFProcess: Search and Browse 467,220 150x90 caption 0,19 150x19
+  DFProcess: Manage Cart 467,648 150x90 caption 0,19 150x19
+  DFProcess: Place Order and Pay 868,656 160x148 caption 0,19 160x19
+  DFProcess: Fulfil and Ship 871,1010 150x90 caption 0,19 150x19
+  DFProcess: Manage Inventory 873,496 150x90 caption 0,19 150x19
+  DFProcess: Manage Reviews 467,380 150x90 caption 0,19 150x19
+  DFProcess: Produce Reports 873,1170 150x90 caption 0,19 150x19
+  DFDataStore: Products 1279,77 150x84 caption 32,0 118x19
+  DFDataStore: Customers 1279,697 150x36 caption 32,0 118x19
+  DFDataStore: Orders 1279,997 150x116 caption 32,0 118x19
+  DFDataStore: Inventory 1279,513 150x84 caption 32,0 118x19
+  DFDataStore: Payments 1279,803 150x36 caption 32,0 118x19
+  DFDataStore: Reviews 1279,407 150x36 caption 32,0 118x19
+  DFDataFlow 'product data': Administrator -> Manage Catalogue points (216,105) (467,105) caption 281,78 121x24 text "product data"
+  DFDataFlow 'product record': Manage Catalogue -> Products points (617,105) (1279,105) caption 880,78 137x24 text "product record"
+  DFDataFlow 'query': Customer -> Search and Browse points (216,292) (467,292) caption 308,295 66x24 text "query"
+  DFDataFlow 'products': Products -> Search and Browse points (1279,147) (633,147) (633,231) (617,231) caption 911,150 90x24 text "products"
+  DFDataFlow 'results': Search and Browse -> Customer points (467,262) (216,262) caption 305,235 74x24 text "results"
+  DFDataFlow 'cart change': Customer -> Manage Cart points (195,369) (195,659) (467,659) caption 77,502 115x24 text "cart change"
+  DFDataFlow 'cart': Manage Cart -> Place Order and Pay points (617,693) (868,693) caption 717,666 51x24 text "cart"
+  DFDataFlow 'address': Customers -> Place Order and Pay points (1279,715) (1028,715) caption 1112,718 85x24 text "address"
+  DFDataFlow 'order': Place Order and Pay -> Orders points (1028,770) (1044,770) (1044,1011) (1279,1011) caption 978,878 63x24 text "order"
+  DFDataFlow 'payment request': Place Order and Pay -> Payment Provider points (868,734) (631,734) (631,900) (216,900) caption 347,873 155x24 text "payment request"
+  DFDataFlow 'payment result': Payment Provider -> Place Order and Pay points (216,930) (661,930) (661,764) (868,764) caption 369,933 139x24 text "payment result"
+  DFDataFlow 'payment': Place Order and Pay -> Payments points (1028,782) (1263,782) (1263,811) (1279,811) caption 1100,785 90x24 text "payment"
+  DFDataFlow 'reservation': Place Order and Pay -> Inventory points (1028,674) (1263,674) (1263,583) (1279,583) caption 1090,647 110x24 text "reservation"
+  DFDataFlow 'paid order': Orders -> Fulfil and Ship points (1279,1055) (1021,1055) caption 1099,1028 102x24 text "paid order"
+  DFDataFlow 'delivery request': Fulfil and Ship -> Shipping Provider points (871,1054) (216,1054) caption 470,1027 148x24 text "delivery request"
+  DFDataFlow 'milestones': Shipping Provider -> Fulfil and Ship points (216,1084) (871,1084) caption 490,1087 107x24 text "milestones"
+  DFDataFlow 'stock event': Warehouse Staff -> Manage Inventory points (216,740) (453,740) (453,567) (873,567) caption 607,540 112x24 text "stock event"
+  DFDataFlow 'balance': Manage Inventory -> Inventory points (1023,541) (1279,541) caption 1109,514 84x24 text "balance"
+  DFDataFlow 'review': Customer -> Manage Reviews points (216,347) (451,347) (451,391) (467,391) caption 297,350 73x24 text "review"
+  DFDataFlow 'review': Manage Reviews -> Reviews points (617,427) (1279,427) caption 912,400 73x24 text "review"
+  DFDataFlow 'orders': Orders -> Produce Reports points (1279,1095) (1039,1095) (1039,1181) (1023,1181) caption 1123,1098 72x24 text "orders"
+  DFDataFlow 'reports': Produce Reports -> Manager points (873,1215) (216,1215) caption 507,1218 77x24 text "reports"

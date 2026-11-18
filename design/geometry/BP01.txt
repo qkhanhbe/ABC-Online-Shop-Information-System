@@ -1,0 +1,56 @@
+Geometry of 'BP01 High-Level Business Process' (BusinessProcessDiagram):
+  BPPool: Customer 40,40 2078x184 caption 0,0 20x184
+    BPStartEvent: Wants a product 149,85 30x30 caption 99,117 130x19
+    BPTask: Browse and search 279,78 159x45 caption 20,0 139x45
+    BPTask: Fill cart and check out 488,76 170x48 caption 20,0 150x48
+    BPTask: Receive parcel 708,78 129x45 caption 20,0 109x45
+    BPEndEvent: Order received 931,85 30x30 caption 887,117 119x19
+  BPPool: ABC Online Shop 40,314 2078x779 caption 0,0 20x779
+    BPLane: Online shop system 70,314 2048x299 caption 0,0 20x299
+      BPStartEvent: Order submitted 179,379 30x30 caption 130,411 129x19
+      BPTask: Validate cart, reserve stock 309,370 170x48 caption 20,0 150x48
+      BPTask: Request payment 529,372 147x45 caption 20,0 127x45
+      BPGateway: Payment verified? 1141,374 40x40 caption 1091,353 141x19
+      BPTask: Release stock 1001,462 124x45 caption 20,0 104x45
+      BPEndEvent: Order failed 1209,469 30x30 caption 1175,501 99x19
+      BPTask: Record milestones 1560,468 156x45 caption 20,0 136x45
+      BPIntermediateEvent: Result received 964,379 30x30 caption 917,411 124x19
+    BPLane: Sales Staff 70,613 2048x160 caption 0,0 20x160
+      BPTask: Process order 1017,671 125x45 caption 20,0 105x45
+    BPLane: Warehouse Staff 70,773 2048x160 caption 0,0 20x160
+      BPTask: Pick and pack 1192,831 124x45 caption 20,0 104x45
+      BPTask: Hand over parcel 1366,831 144x45 caption 20,0 124x45
+    BPLane: Manager 70,933 2048x160 caption 0,0 20x160
+      BPTask: Review sales and stock 1766,989 170x48 caption 20,0 150x48
+      BPEndEvent: Period closed 2027,998 30x30 caption 1986,1030 112x19
+  BPPool: Payment Provider 40,1183 2078x80 caption 0,0 2078x20
+    BPTask: Authorise payment 841,1193 157x45 caption 20,0 137x45
+  BPPool: Shipping Provider 40,1333 2078x80 caption 0,0 2078x20
+    BPTask: Collect parcel 1377,1343 122x45 caption 20,0 102x45
+    BPTask: Deliver and report 1563,1343 150x45 caption 20,0 130x45
+  BPPool: Supplier 40,1483 2078x80 caption 0,0 2078x20
+    BPTask: Supply goods 1193,1493 123x45 caption 20,0 103x45
+  BPSequenceFlow: Wants a product -> Browse and search points (179,100) (278,100) caption 238,120 20x0 text ""
+  BPSequenceFlow: Browse and search -> Fill cart and check out points (438,100) (487,100) caption 472,120 20x0 text ""
+  BPSequenceFlow: Fill cart and check out -> Receive parcel points (658,100) (707,100) caption 692,120 20x0 text ""
+  BPSequenceFlow: Receive parcel -> Order received points (837,100) (931,100) caption 894,120 20x0 text ""
+  BPSequenceFlow: Order submitted -> Validate cart, reserve stock points (209,394) (308,394) caption 268,414 20x0 text ""
+  BPSequenceFlow: Validate cart, reserve stock -> Request payment points (479,394) (528,394) caption 513,414 20x0 text ""
+  BPSequenceFlow '[verified]': Payment verified? -> Process order points (1161,414) (1161,741) (1079,741) (1079,716) caption 1117,745 89x24 text "[verified]"
+  BPSequenceFlow '[failed]': Payment verified? -> Release stock points (1140,394) (1116,394) (1116,349) (1063,349) (1063,461) caption 1091,511 74x24 text "[failed]"
+  BPSequenceFlow: Release stock -> Order failed points (1125,484) (1209,484) caption 1177,504 20x0 text ""
+  BPSequenceFlow: Process order -> Pick and pack points (1142,693) (1167,693) (1167,853) (1191,853) caption 1177,792 20x0 text ""
+  BPSequenceFlow: Pick and pack -> Hand over parcel points (1316,853) (1365,853) caption 1350,873 20x0 text ""
+  BPSequenceFlow: Hand over parcel -> Record milestones points (1510,853) (1535,853) (1535,490) (1559,490) caption 1545,692 20x0 text ""
+  BPSequenceFlow: Record milestones -> Review sales and stock points (1716,490) (1741,490) (1741,1013) (1765,1013) caption 1751,771 20x0 text ""
+  BPSequenceFlow: Review sales and stock -> Period closed points (1936,1013) (2027,1013) caption 1991,1033 20x0 text ""
+  BPMessageFlow 'order': Fill cart and check out -> Order submitted points (573,124) (573,269) (194,269) (194,379) caption 353,243 63x24 text "order"
+  BPSequenceFlow: Request payment -> Result received points (676,394) (964,394) caption 830,414 20x0 text ""
+  BPSequenceFlow: Result received -> Payment verified? points (994,394) (1140,394) caption 1077,414 20x0 text ""
+  BPSequenceFlow: Collect parcel -> Deliver and report points (1499,1365) (1562,1365) caption 1540,1385 20x0 text ""
+  BPMessageFlow 'payment request': Request payment -> Authorise payment points (602,417) (602,1138) (919,1138) (919,1192) caption 684,1112 155x24 text "payment request"
+  BPMessageFlow 'signed result': Authorise payment -> Result received points (933,1192) (933,1160) (979,1160) (979,409) caption 987,885 123x24 text "signed result"
+  BPMessageFlow 'parcel': Hand over parcel -> Collect parcel points (1438,876) (1438,1342) caption 1446,1097 70x24 text "parcel"
+  BPMessageFlow 'milestones': Deliver and report -> Record milestones points (1638,1342) (1638,513) caption 1523,916 107x24 text "milestones"
+  BPMessageFlow 'delivery': Deliver and report -> Receive parcel points (1652,1342) (1652,778) (772,778) (772,123) caption 995,752 83x24 text "delivery"
+  BPMessageFlow 'replenishment request': Pick and pack -> Supply goods points (1254,876) (1254,1492) caption 1047,1172 199x24 text "replenishment request"

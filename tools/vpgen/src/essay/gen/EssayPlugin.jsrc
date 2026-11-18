@@ -209,6 +209,20 @@ public class EssayPlugin implements VPPlugin, VPPluginCommandLineSupport {
             }
             return;
         }
+        if (args.length > 0 && "v5org".equals(args[0])) {            // tidy spec|out.vpp: delete/rename, then five phases
+            String[] pp = sb.toString().trim().split("[|]");
+            IProject project = ApplicationManager.instance().getProjectManager().getProject();
+            try {
+                new Tidy().run(project, pp[0].trim());
+                new V5Org().run(project, !(pp.length > 2 && "noorg".equals(pp[2].trim())));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            project.setName("TieuLuan_KHANHBQ");
+            ApplicationManager.instance().getProjectManager().saveProjectAs(new File(pp[1].trim()));
+            System.out.println("SAVED " + pp[1].trim());
+            return;
+        }
         if (args.length > 0 && "tidy".equals(args[0])) {             // spec file|out.vpp
             String[] pp = sb.toString().trim().split("[|]");
             IProject project = ApplicationManager.instance().getProjectManager().getProject();

@@ -1,0 +1,32 @@
+Geometry of 'PT01 Problem Tree' (Flowchart):
+  FlowchartPredefinedProcess: No single source for sales data 1806,60 241x70 caption 1806,60 241x70
+  FlowchartProcess: Reports built by hand (BP06) 1825,210 203x40 caption 1825,210 203x40
+  FlowchartPredefinedProcess: Carrier updates by phone and e-mail 1459,60 277x70 caption 1459,60 277x70
+  FlowchartProcess: Untracked deliveries (BP05) 1500,210 196x40 caption 1500,210 196x40
+  FlowchartPredefinedProcess: No defined order states 1198,60 191x70 caption 1198,60 191x70
+  FlowchartProcess: Unclear order status (BP04) 1196,210 195x40 caption 1196,210 195x40
+  FlowchartPredefinedProcess: Payment results typed in by hand 870,60 258x70 caption 870,60 258x70
+  FlowchartProcess: Unverified payment status (BP03) 882,210 234x40 caption 882,210 234x40
+  FlowchartPredefinedProcess: Stock edited as one number, no event history 463,60 337x70 caption 463,60 337x70
+  FlowchartProcess: Overselling and stock errors (BP02) 507,210 249x40 caption 507,210 249x40
+  FlowchartPredefinedProcess: Catalogue and stock kept by different people 60,60 333x70 caption 60,60 333x70
+  FlowchartProcess: Inconsistent product data (BP01) 112,210 230x40 caption 112,210 230x40
+  FlowchartProcess: Order, stock and payment information is fragmented and late 938,330 417x40 caption 938,330 417x40
+  FlowchartDocument: Management decides late 1297,450 180x60 caption 1297,450 180x60
+  FlowchartDocument: Lost and cancelled sales 1052,450 175x60 caption 1052,450 175x60
+  FlowchartDocument: Customers lose trust 831,450 151x60 caption 831,450 151x60
+  FlowchartFlowline: Order, stock and payment information is fragmented and late -> Customers lose trust points (938,362) (921,362) (921,450) caption 931,417 20x0 text ""
+  FlowchartFlowline: Order, stock and payment information is fragmented and late -> Lost and cancelled sales points (1146,370) (1146,450) caption 1156,430 20x0 text ""
+  FlowchartFlowline: Order, stock and payment information is fragmented and late -> Management decides late points (1355,362) (1377,362) (1377,450) caption 1387,415 20x0 text ""
+  FlowchartFlowline: Inconsistent product data (BP01) -> Order, stock and payment information is fragmented and late points (342,242) (493,242) (493,350) (938,350) caption 596,370 20x0 text ""
+  FlowchartFlowline: Catalogue and stock kept by different people -> Inconsistent product data (BP01) points (227,130) (227,210) caption 237,190 20x0 text ""
+  FlowchartFlowline: Overselling and stock errors (BP02) -> Order, stock and payment information is fragmented and late points (756,242) (868,242) (868,338) (938,338) caption 878,289 20x0 text ""
+  FlowchartFlowline: Stock edited as one number, no event history -> Overselling and stock errors (BP02) points (631,130) (631,210) caption 641,190 20x0 text ""
+  FlowchartFlowline: Unverified payment status (BP03) -> Order, stock and payment information is fragmented and late points (1027,250) (1027,330) caption 1037,310 20x0 text ""
+  FlowchartFlowline: Payment results typed in by hand -> Unverified payment status (BP03) points (1002,130) (1002,210) caption 1012,190 20x0 text ""
+  FlowchartFlowline: Unclear order status (BP04) -> Order, stock and payment information is fragmented and late points (1293,250) (1293,330) caption 1303,310 20x0 text ""
+  FlowchartFlowline: No defined order states -> Unclear order status (BP04) points (1293,130) (1293,210) caption 1303,190 20x0 text ""
+  FlowchartFlowline: Untracked deliveries (BP05) -> Order, stock and payment information is fragmented and late points (1500,242) (1405,242) (1405,338) (1355,338) caption 1415,287 20x0 text ""
+  FlowchartFlowline: Carrier updates by phone and e-mail -> Untracked deliveries (BP05) points (1597,130) (1597,210) caption 1607,190 20x0 text ""
+  FlowchartFlowline: Reports built by hand (BP06) -> Order, stock and payment information is fragmented and late points (1825,242) (1710,242) (1710,350) (1355,350) caption 1654,370 20x0 text ""
+  FlowchartFlowline: No single source for sales data -> Reports built by hand (BP06) points (1926,130) (1926,210) caption 1936,190 20x0 text ""

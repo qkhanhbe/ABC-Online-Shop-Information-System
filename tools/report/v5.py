@@ -130,37 +130,32 @@ CLASSES = [
 
 CLASS_SECTION = [
     ("h2", "2.x. Class Diagram"),
-    ("p", "The analysis class diagram names the things of the business that the system must remember and what each of "
-          "them is responsible for. It is drawn in two parts with the same notation as the reference models of the course: "
-          "the classes of buying (customers, catalogue, carts, orders, payment and shipment) and the classes that follow an "
-          "order (its history, the delivery milestones, stock, replenishment and reviews). A class drawn on both parts, "
-          "such as Order or Product, is the same model element. The attributes are written without types and without "
-          "identifiers, and the operations are the responsibilities found in the use case specifications: an analysis "
-          "class says <i>what</i> it knows and does, not how it is stored (Chapter 4) or coded (Chapter 5)."),
-    ("h3", "9.9.1. Customers, catalogue and orders"),
-    figm("CL01", "Analysis class diagram, part 1: customers, catalogue, carts, orders, payment and shipment", [
-        ("Product", "Product keeps what every product has, and its responsibilities are operations: whether it is for sale, "
-                    "its specification rows, its search words and a price change."),
-        (("union", KINDS), "Footwear, Apparel, Bag and Watch inherit directly from Product: each kind adds only its own "
-                           "attributes, so no product carries empty attributes of another kind."),
+    ("p", "The analysis class diagram names the things of the business that the system must remember. It is one diagram "
+          "with all 22 classes, laid out wide for a landscape page: customers and their carts on the left, orders with "
+          "their payment, history and shipment in the middle, and the catalogue with its stock and the four kinds of "
+          "product on the right. At this stage a class has only the names of its attributes: no type, no identifier and "
+          "no method. Types, keys and the ORM stereotype are added in the data model (Chapter 4), and the methods in the "
+          "design (Chapter 5), on the same 22 classes; the data model diagram keeps the positions of this one, so the two "
+          "can be laid side by side."),
+    figm("CL01", "Analysis class diagram: the 22 classes of the shop with attribute names, associations and inheritance", [
+        ("Product", "Product keeps only what every product has: name, brand, colour, price, description, image, status."),
+        (("union", KINDS), "Footwear, Apparel, Bag and Watch inherit directly from Product (no intermediate detail class): "
+                           "each kind adds only its own attributes, so no product carries empty attributes of another kind."),
         ("Category", "Category classifies the products (belongs to, 0..* to 1); its detail kind names the kind of its "
                      "products (BR-CAT-01)."),
-        (("line", "Cart", "CartItem"), "Composition: a cart line cannot exist without its cart, and the cart keeps the price "
-                                       "the line was added with."),
-        ("Order", "No identifier and no type is written in the analysis model; keys are a decision of the data model."),
-    ]),
-    ("h3", "9.9.2. Order history, delivery, stock and reviews"),
-    figm("CL02", "Analysis class diagram, part 2: order history, delivery milestones, stock, replenishment and reviews", [
-        (("line", "Order", "StatusChange"), "Every change of an order's status is kept as a StatusChange (composition), so "
-                                            "the history explains the current status (NFR06)."),
-        ("StockLevel", "The stock of a product has the derived operation available() = physical - reserved."),
-        ("InventoryEvent", "Every stock movement is an InventoryEvent explained by its product: stock is never changed "
-                           "without an event."),
+        (("line", "Cart", "CartItem"), "Composition: a cart line cannot exist without its cart, and keeps the price the "
+                                       "line was added with."),
+        (("line", "Order", "StatusChange"), "Every change of an order's status is kept as a StatusChange, so the history "
+                                            "explains the current status (NFR06)."),
+        ("Order", "No identifier, no type and no method in the analysis: keys are a decision of the data model, methods "
+                  "of the design."),
         ("Review", "A review is about a product, written by a customer and verified by the order that delivered it."),
     ]),
     ("h3", "9.9.3. Classes, attributes and responsibilities"),
-    ("table", "Analysis classes, their attributes and their responsibilities", ["Class", "Attributes", "Responsibilities (operations)"],
+    ("table", "Analysis classes, their attributes and their responsibilities", ["Class", "Attributes", "Responsibilities (methods in Chapter 5)"],
      CLASSES, [38, 66, 61]),
+    ("p", "The responsibilities are written in the table, not in the diagram: they become the methods of the design "
+          "classes in Chapter 5 (Class_Design = Class_Analysis + methods)."),
     ("h3", "9.9.4. Relationships"),
     ("table", "Relationships of the analysis model", ["Relationship", "Kind and multiplicity", "Reason"], [
         ["Customer - User", "Generalization", "A customer is a user with an address, a cart and orders; staff are users with another role"],
@@ -180,9 +175,9 @@ CLASS_SECTION = [
         "<b>Kinds of product by inheritance.</b> Following the lecturer's remark, the attributes of one kind of product are "
         "not kept in Product and not in an intermediate detail class: the kinds are subclasses of Product. The data model "
         "of Chapter 4 turns the generalization into one table per kind that shares the product's key.",
-        "<b>Responsibilities as operations already in the analysis.</b> Each operation answers a step of a use case "
-        "specification (for example Cart.add_item for UC07 step 3, Order.change_status for UC19). The design keeps the "
-        "same names and adds types and parameters (Chapter 5).",
+        "<b>One model, three levels of detail.</b> The analysis diagram has attribute names only; the data model adds "
+        "identifiers, types and &lt;&lt;ORM Persistable&gt;&gt;; the design adds the methods, each answering a step of a "
+        "use case specification (for example Cart.add_item for UC07 step 3, Order.change_status for UC19).",
         "<b>History instead of overwritten values.</b> StatusChange, Milestone and InventoryEvent keep the past; the "
         "current status, position and stock are explained by them.",
         "<b>Order copies what must not change.</b> The address and, in OrderItem, the name and unit price are copies taken "
@@ -228,9 +223,9 @@ CONTEXT_SECTION = [("h2", "2.x. Context Diagram")] + context[1:]
 
 consistency = [("h2", "2.x. Consistency Across Models"),
                ("table", "Cross-model consistency checks", ["Check", "Result"], [
-                   ["Every lifeline of SD01/SD02 is a class of CL01/CL02 or a boundary/control of the use case",
+                   ["Every lifeline of SD01/SD02 is a class of CL01 or a boundary/control of the use case",
                     "Passed (Cart, StockLevel, Order, Shipment are entities)"],
-                   ["Every data store of DFD0 corresponds to classes of CL01/CL02",
+                   ["Every data store of DFD0 corresponds to classes of CL01",
                     "Passed (D1 Products = Product and its kinds, Category; D4 Inventory = StockLevel, InventoryEvent)"],
                    ["Every state of ST01 is a value of Order.status and every transition is reachable from a use case",
                     "Passed; Delivery Failed reached only from UC23"],
@@ -246,8 +241,8 @@ CH2 = [("h1", "CHAPTER 2. ANALYSIS"),
 CH2 += [("h2", "2.x. From Requirements to Analysis Models")] + intro2[1:]
 CH2 += CLASS_SECTION + ACTIVITY_SECTION + CONTEXT_SECTION + dfd + seq + state + rules + crud + consistency
 CH2 += [("h2", "2.x. Chapter Summary"),
-        ("p", "The analysis model has 22 classes in two class diagrams, with Footwear, Apparel, Bag and Watch as subclasses of "
-              "Product and the responsibilities of each class written as operations; eight activity diagrams for the "
+        ("p", "The analysis model has 22 classes in one class diagram, with Footwear, Apparel, Bag and Watch as subclasses of "
+              "Product, attribute names only and the responsibilities of each class listed for the design; eight activity diagrams for the "
               "implemented use cases; the context diagram; two DFD levels, two analysis sequence diagrams and the order state "
               "machine. The models agree on six cross-checks.")]
 
@@ -257,7 +252,8 @@ CH3 = shift(final.CH3)
 # ======================================================================================== chapter 4
 TOOL_LOG = open(os.path.join(DES, "v5_tool_log.txt"), encoding="utf-8").read()
 SYNC_LOG = TOOL_LOG[TOOL_LOG.index("$ syncClassesToErd(\"DM01"):TOOL_LOG.index("==== 2.")].strip()
-EDIT_LOG = TOOL_LOG[TOOL_LOG.index("$ setPrimaryKey(ERD01, \"Customer\""):TOOL_LOG.index("==== 3.")].strip()
+SYNC_LOG = SYNC_LOG.replace("; 24 new foreign key(s): ", ";\n24 new foreign key(s):\n  ").replace("], ", "],\n  ")
+EDIT_LOG = TOOL_LOG[TOOL_LOG.index("$ renameElement("):TOOL_LOG.index("==== 3.")].strip()
 
 TABLES = [
     ["User", "user_id", "-", "Account of every user (customers and staff)"],
@@ -293,9 +289,9 @@ CH4 = [
           "identifier where the business has one (user_id, product_id, order_id, code ...), and the stereotype "
           "&lt;&lt;ORM Persistable&gt;&gt;, which tells the generator that the class becomes a table. Every association "
           "keeps its name and has a multiplicity at both ends; the role names (for example <i>items</i> of a cart) are set "
-          "in the model, where the code generator of Chapter 5 uses them as field names. The two diagrams follow the two "
-          "parts of the analysis model."),
-    figm("DM01", "Class diagram with multiplicity, labels and ORM, part 1: customers, catalogue and orders", [
+          "in the model, where the code generator of Chapter 5 uses them as field names. The diagram is the analysis "
+          "diagram with these additions, and has no methods yet."),
+    figm("DM01", "Class diagram with multiplicity, labels and ORM: the 22 persistent classes", [
         ("User", "Only a class with the stereotype &lt;&lt;ORM Persistable&gt;&gt; becomes a table; every class of the model has it."),
         (("attr", "Product", 0), "A table needs a primary key, so the business identifier is added: product_id; a class whose "
                                  "rows are identified by their owner (Address, CartItem) gets its key in the ERD."),
@@ -305,27 +301,27 @@ CH4 = [
                            "subclass), so Product has no empty columns."),
         (("line", "Cart", "CartItem"), "A composition makes the part depend on the whole: the key of CartItem contains "
                                        "the key of its Cart."),
-    ]),
-    figm("DM02", "Class diagram with multiplicity, labels and ORM, part 2: history, delivery, stock and reviews", [
         ("StatusChange", "StatusChange has no business identifier; the generated table gets a surrogate key ID."),
         ("StockLevel", "StockLevel is one per product (1 to 1): its key is the product's key."),
-        ("Review", "Review has three foreign keys: the product, the customer who wrote it and the order that delivered it."),
     ]),
     ("h2", "4.x. Data Model"),
-    ("p", "syncClassesToErd was called once for each data model diagram, with the same target ERD. The first call created "
-          "16 tables and 16 foreign keys, the second added the remaining 6 tables and 8 foreign keys and reused the tables of "
-          "the classes that appear on both diagrams. The generator reports what it could not decide as warnings: the classes "
-          "without a key attribute received a column ID, and the type boolean was left for the SQL generator to map."),
-    ("term", SYNC_LOG, "syncClassesToErd: the two calls and the result strings of the plugin", 170),
+    ("p", "syncClassesToErd was called once, on the data model class diagram DM01, with the ERD as target. It created the "
+          "22 tables and the 24 foreign keys: an association became a foreign key in the table of its many side, and a "
+          "generalization an identifying foreign key (Customer shares the key of User, each kind the key of Product). The "
+          "generator reports what it could not decide as warnings: the six classes without a key attribute received a "
+          "column ID, and the type boolean was left for the SQL generator to map."),
+    ("term", SYNC_LOG, "syncClassesToErd: the call and the result string of the plugin", 170),
     ("p", "The warnings were answered by decisions, each applied with a tool call on the generated ERD. A class identified "
           "by its owner gets the owner's key (Address by customer_id, StockLevel by product_id); a composition part gets a "
           "composite key of its whole and its own identifier (CartItem and OrderItem by the order or cart and the product, "
-          "Milestone by the shipment and the sequence number); Customer shares the key of User; the foreign key columns are "
+          "Milestone by the shipment and the sequence number); the foreign key columns are "
           "named after their role (customer_id, promo_code) and the table Order is renamed Orders because ORDER is an SQL "
           "keyword. StatusChange keeps the generated surrogate key ID, because two status changes of an order can carry the "
           "same status and time."),
     ("term", EDIT_LOG, "Decisions applied to the generated ERD with the plugin's tools", 170),
-    figm("ERD01", "Data model generated from the class diagrams by syncClassesToErd (22 tables, 24 foreign keys)", [
+    ("p", "The ERD keeps the grid of the data model diagram: every table stands where its class stands in DM01, so the "
+          "two figures can be compared table by table."),
+    figm("ERD01", "Data model generated from the class diagram DM01 by syncClassesToErd (22 tables, 24 foreign keys)", [
         ("Customer", "Customer shares the key of User: the generalization became an identifying foreign key."),
         (("union", KINDS), "Each kind of product is a table whose primary key product_id is also the foreign key to Product."),
         ("CartItem", "The composition gave CartItem the composite key (cart_id, product_id); OrderItem and Milestone likewise."),
@@ -420,17 +416,19 @@ CH5 = [
           "tool of the Visual Paradigm MCP plugin and checked against the running application."),
     ("h2", "5.x. Class Design"),
     ("p", "Class design is the analysis class with its methods (the lecturer's criterion). For the model package the "
-          "design classes are the 22 analysis classes with the types of the data model, every method of the code with "
+          "design class diagram is the data model diagram of Chapter 4, with the same 22 classes and associations, "
+          "plus every method of the code with "
           "typed parameters and a return type, and the navigability of the associations. The other packages hold the "
           "classes that exist only while the program runs: data access objects, services, the AI services and the web "
-          "controllers. The classes of every package are read from the code of abc_shop (tools/vp/v5_design_spec.py), so "
+          "controllers. Because the methods make the classes wider, the model diagram is laid out in five rows, with the "
+          "four kinds of product in one column on the right of Product. The classes of every package are read from the code of abc_shop (tools/vp/v5_design_spec.py), so "
           "the diagrams and the program cannot drift apart without check_code.py noticing (Section 5.5)."),
     ("h3", "9.9.1. Types, visibility and multiplicity"),
     ("p", "The types are the data model's (String, Integer, Float, Boolean) and the classes of the model; collections are "
           "List&lt;T&gt;. Attributes and methods are public, as Python has no private members; an association end the code "
           "holds is private and becomes a field with a leading underscore in the generated code. Multiplicities are those "
           "of the analysis."),
-    figm("DCL01", "Design class diagram (model), part 1: the domain classes of buying with typed attributes and methods", [
+    figm("DCL01", "Design class diagram (model): the 22 domain classes with typed attributes and methods", [
         ("Order", "Every method of the class in the code, with typed parameters and a return type (create_from_cart, "
                   "change_status ...)."),
         (("attr", "Cart", 1), "A reference to another aggregate is kept as its key (customer_id): carts and customers are "
@@ -438,18 +436,15 @@ CH5 = [
         (("line", "Cart", "CartItem"), "The composition end the code holds is navigable and named: it becomes the field "
                                        "items of Cart."),
         (("union", KINDS), "The kinds of product stay subclasses of Product in the design and in the code."),
-    ]),
-    figm("DCL02", "Design class diagram (model), part 2: history, delivery, stock and reviews", [
         ("StockLevel", "apply(event) is the only way to change the stock figures; available() is derived."),
-        (("line", "Order", "StatusChange"), "The status history is the field history of Order."),
-    ]),
+    ], width=170),
     ("h3", "9.9.2. Relationships"),
     ("p", "Inside the model package the associations of the analysis remain, now navigable only in the direction the code "
           "uses. Between packages the relationships are dependencies: a data access object interface is realized by its "
           "SQLite implementation, which uses the Database object; a service uses the interfaces and other services it "
           "receives in its constructor; a controller uses its services. The dependencies always point downwards, from the "
           "controllers to the services to the data access objects to the model."),
-    figm("DCL03", "Design class diagram (dao): interfaces of the data access objects, their SQLite implementations and Database", [
+    figm("DCL02", "Design class diagram (dao): interfaces of the data access objects, their SQLite implementations and Database", [
         ("ProductDAO", "An interface declares what can be done with one kind of model object; services depend only on it."),
         (("line", "ProductDAO", "SqliteProductDAO"), "The SQLite implementation realizes the interface; it reads a product from "
                                                      "Product and the table of its kind."),
@@ -457,10 +452,10 @@ CH5 = [
         ("VectorIndex", "The image vectors of the search live in memory, rebuilt from the product images."),
     ], width=170),
     dao_table,
-    figl("DCL04", "Design class diagram (service): the business services and the gateways to the payment and shipping providers"),
+    figl("DCL03", "Design class diagram (service): the business services and the gateways to the payment and shipping providers"),
     service_table,
-    figl("DCL05", "Design class diagram (ai): search, review insights and recommendation"),
-    figl("DCL06", "Design class diagram (controller): the router WebApp and the web controllers"),
+    figl("DCL04", "Design class diagram (ai): search, review insights and recommendation"),
+    figl("DCL05", "Design class diagram (controller): the router WebApp and the web controllers"),
     routes_table,
     ("h3", "9.9.3. Method responsibilities"),
     ("table", "Selected methods and the use case step they implement", ["Method", "Responsibility", "Use case"], [
@@ -494,7 +489,8 @@ CH5 = [
           "uses only the layers below it."),
     fig("PKG01", "Layers and packages of the design with their &lt;&lt;use&gt;&gt; dependencies", 95),
     ("h3", "9.9.1. Dependencies"),
-    ("p", "The two layer diagrams take one use case each and show its classes in their layers with their operations and the "
+    ("p", "The five layer diagrams take one use case (or two related ones) each and show its classes in their layers "
+          "with their operations and the "
           "dependencies between them. The model classes are shown by name only: the layers above use them as parameter and "
           "return types, so no dependency arrow is drawn to each of them."),
     figm("LAY01", "Layers of the search classes (UC05), with their operations and dependencies", [
@@ -509,6 +505,23 @@ CH5 = [
         ("Database", "The transaction of Database makes order and reservation succeed or fail together."),
         ("model", "The model classes are shown by name only."),
     ], width=170),
+    figm("LAY03", "Layers of the account classes (UC01 Register, UC02 Log In)", [
+        ("AccountController", "AccountController reads the register and login forms and keeps the user id in the session."),
+        ("AuthService", "AuthService checks the password hash and the role; it is the only class that knows the hashing."),
+        ("CustomerDAO", "Users and customers are stored and read through the CustomerDAO interface; the audit log records "
+                        "every login."),
+    ], width=150),
+    figm("LAY04", "Layers of the card payment classes (UC09 Pay by Card)", [
+        ("PaymentService", "PaymentService asks the gateway for an authorization and applies the signed result exactly once."),
+        ("PaymentGateway", "The shop depends on the PaymentGateway interface only; SimulatedPaymentProvider realizes it in "
+                           "the demo and a real provider would replace it without a change above."),
+        ("InventoryService", "A declined payment releases the reserved stock of the order."),
+    ], width=170),
+    figm("LAY05", "Layers of the recommendation classes (UC33 Similar Products, UC34 Bought Together)", [
+        ("RecommenderService", "RecommenderService (ai) combines content similarity and co-purchase counts."),
+        ("ProductDAO", "It reads products, orders and stock only through the DAO interfaces, like every other service."),
+        ("model", "The model classes are shown by name only."),
+    ], width=150),
     ("h3", "9.9.2. Runtime classes"),
     ("p", "The classes of controller, service, ai and dao have no table: they are created once when the application starts "
           "(abc_shop/shop.py) and receive their collaborators in the constructor, which is what the &lt;&lt;use&gt;&gt; "
@@ -523,14 +536,31 @@ CH5 = [
     fig("SD05", "Checkout through the layers (design sequence of UC08)", 170),
     sd06_p,
     fig("SD06", "Order tracking through the layers (design sequence of UC11)", 170),
+    ("h3", "9.9.1. Log In"),
+    ("p", "The login passes the controller, the authentication service and the customer DAO. The password is compared with "
+          "the stored hash inside AuthService; a wrong email and a wrong password give the same answer (alt fragment), so "
+          "the page does not reveal which accounts exist. On success the user id is kept in the session and the user is "
+          "sent to the page of the role."),
+    fig("SD07", "Log in through the layers (design sequence of UC02)", 170),
+    ("h3", "9.9.2. Pay Order by Card"),
+    ("p", "PaymentService saves a pending attempt before it calls the gateway, so every provider result can be matched to "
+          "exactly one attempt. The result is applied only after its signature, amount and currency are checked: a "
+          "succeeded payment moves the order to Paid, a declined one to Payment Failed and releases the reserved stock "
+          "(alt fragment). Payment and order are saved after the decision."),
+    fig("SD08", "Pay an order by card through the layers (design sequence of UC09)", 170),
+    ("h3", "9.9.3. Recommendation"),
+    ("p", "The product page asks RecommenderService for four similar products. The model is built once (opt fragment): "
+          "TF-IDF vectors of the product texts and co-purchase counts from the orders. Each other product is scored only if "
+          "it is in stock (loop fragment), with 0.7 for content similarity and 0.3 for co-purchase."),
+    fig("SD09", "Recommendation of similar products (design sequence of UC33)", 170),
     ("h2", "5.x. Code Generated"),
     ("p", "The code of each package is generated from its design class diagrams by the tool generateCode of the MCP plugin "
           "(the counterpart of Visual Paradigm's Instant Generator, which has no programming interface), in Python, into "
           "design/generated/&lt;package&gt;. The generator writes one module per class with the superclass, the fields of "
           "the attributes and of the navigable association ends, and a stub for every operation with its typed parameters."),
     ("table", "Code generated per package", ["Package", "Design class diagrams", "Modules generated"], [
-        ["model", "DCL01, DCL02", "22"], ["dao", "DCL03", "23"], ["service", "DCL04", "14"], ["ai", "DCL05", "7"],
-        ["controller", "DCL06", "8"]], [30, 80, 55]),
+        ["model", "DCL01", "22"], ["dao", "DCL02", "23"], ["service", "DCL03", "14"], ["ai", "DCL04", "7"],
+        ["controller", "DCL05", "8"]], [30, 80, 55]),
     ("code", "# design/generated/model/bag.py (generated)\n" + gen_bag),
     ("code", "# design/generated/model/cart.py (generated)\n" + gen_cart),
     ("p", "design/check_code.py compares every generated class with the class of the same name in abc_shop: the superclass "
@@ -539,9 +569,10 @@ CH5 = [
           "operation apply_voucher to the generated Cart)."),
     ("term", os.path.join(DES, "check_code_output.txt"), "check_code.py: the generated classes compared with the application", 165),
     ("h2", "5.x. Chapter Summary"),
-    ("p", "Six design class diagrams describe the five packages from the code, the ERD of Chapter 4 generated an SQL script "
-          "whose 22 tables, keys and foreign keys equal those of the application schema, the layers depend downwards only, "
-          "two design sequence diagrams follow checkout and tracking through the layers, and generateCode produced 74 Python "
+    ("p", "Five design class diagrams, one per package, describe the classes of the code; the model diagram is the data "
+          "model diagram with methods. The ERD of Chapter 4 generated an SQL script whose 22 tables, keys and foreign keys "
+          "equal those of the application schema, five layer diagrams show that the layers depend downwards only, five "
+          "design sequence diagrams follow checkout, tracking, login, card payment and recommendation through the layers, and generateCode produced 74 Python "
           "classes from the design diagrams, all of which exist in the application with the same members."),
 ]
 
@@ -551,6 +582,42 @@ CH6[0] = ("h1", "CHAPTER 6. IMPLEMENTATION AND DEMONSTRATION")
 CH6 = [("fig", b[1], b[2].replace("the specification table comes from bag_detail, the detail table named by the category",
                                   "the specification table comes from the Bag table, the kind named by the category"),
         *b[3:]) if b[0] == "fig" else b for b in CH6]
+
+DEMO_OUT = open(os.path.join(ROOT, "demo_results", "demo_output.txt"), encoding="utf-8").read()
+
+
+def demo_part(start, end):
+    return DEMO_OUT[DEMO_OUT.index(start):DEMO_OUT.index(end)].strip()
+
+
+ADDED = [
+    ("h2", "6.x. Demonstration of the Added Design Use Cases"),
+    ("p", "Chapter 5 added layer and sequence diagrams for logging in, paying by card and recommending products "
+          "(LAY03-LAY05, SD07-SD09). This section shows the same use cases in the running application."),
+    ("h3", "9.9.1. Register and Log In"),
+    ("p", "The register form asks for the name, the email and a password; AuthService stores only the hash of the password. "
+          "A login with a wrong password is refused with the same message as a login with an unknown email (the alt "
+          "fragment of SD07), so the page does not tell which accounts exist; the refused attempt is answered with the "
+          "status 400 and the email is kept in the form."),
+    ("fig", os.path.join(ROOT, "demo_results", "web_11_register.png"), "Register page (UC01)", 120),
+    ("fig", os.path.join(ROOT, "demo_results", "web_12_login_refused.png"),
+     "A refused login (UC02, alternative flow): the same message for a wrong email and a wrong password", 120),
+    ("h3", "9.9.2. Pay by Card"),
+    ("p", "demo.py runs checkout twice with the simulated payment provider. With the token tok_visa the provider answers "
+          "SUCCEEDED and the order becomes Paid/Confirmed; the same submission again returns the same order without a second "
+          "charge. With tok_declined the provider answers DECLINED: the order becomes Payment Failed, the reserved stock is "
+          "released and the cart is kept, which is the second operand of the alt fragment of SD08. The test "
+          "test_declined_payment_releases_reservation_and_keeps_cart checks the same path."),
+    ("term", demo_part("--- 2. UC07 + UC08", "--- 4. UC19"), "demo.py: a paid and a declined card payment", 165),
+    ("h3", "9.9.3. Product Recommendations"),
+    ("p", "The product page shows four products under Customers also like (UC33), and the order history four products "
+          "for the customer (UC34). RecommenderService scores the products in stock by 0.7 content similarity and 0.3 "
+          "co-purchase, as SD09 shows; the scores below are those of the demo database."),
+    ("term", DEMO_OUT[DEMO_OUT.index("--- 7. Recommendations"):].split("\n\n")[0].strip(),
+     "demo.py: products similar to P01 and products recommended for customer C001", 150),
+]
+_at = next(i for i, b in enumerate(CH6) if b[0] == "h2" and "AI Components in Code" in b[1])
+CH6 = CH6[:_at] + ADDED + CH6[_at:]
 
 # ======================================================================================== conclusion
 CONCL = [("h1", "CONCLUSION AND FUTURE WORK")]
@@ -565,8 +632,8 @@ SUMMARY = ("This essay followed ABC Online Shop from its business problem to a r
            "subclasses of Product, eight activity diagrams and the context of the system. The AI chapter treated "
            "multimodal search, review insights and recommendation as ordinary requirements with data, risks and "
            "measurements. The data model completed the classes into persistent classes, from which Visual Paradigm "
-           "generated the ERD and the SQL script through its MCP plugin; the design described five packages in six class "
-           "diagrams, two layer diagrams and two sequence diagrams and generated 74 Python classes from them. The "
+           "generated the ERD and the SQL script through its MCP plugin; the design described five packages in five class "
+           "diagrams, five layer diagrams and five sequence diagrams and generated 74 Python classes from them. The "
            "application runs on the generated tables with 45 passing tests, and check_code.py and build_db.py show that "
            "code and database are the ones the models describe.")
 CONCL2 = []
@@ -580,7 +647,7 @@ for b in CONCL:
     elif b[0] == "table" and b[1] == "Submitted files":
         b = (b[0], b[1], b[2], [
             ["Tieuluan_V5_04_10_KhanhBQ_049.pdf", "This essay"],
-            ["TieuLuan_KHANHBQ.vpp", "Visual Paradigm project with the 44 diagrams of the essay"],
+            ["TieuLuan_KHANHBQ.vpp", "Visual Paradigm project with the 47 diagrams of the essay in five sub-projects (models), one per phase"],
             ["diagrams/", "PNG export of every diagram (Visual Paradigm Community Edition)"],
             ["abc_shop/", "Source code, data, tests, README"],
             ["design/", "create_tables.sql (generateSql), generated/ (generateCode), build_db.py, check_code.py, v5_tool_log.txt"],

@@ -1,0 +1,29 @@
+Geometry of 'LAY04 Layers - Card Payment (UC09)' (ClassDiagram):
+  Package: model 40,1700 464x106 caption 0,20 464x86
+    Class: Payment 364,1744 110x36 caption 0,0 110x19
+    Class: Order 234,1744 100x36 caption 0,0 100x19
+    Class: StockLevel 64,1744 140x36 caption 0,0 140x19
+  Package: dao 40,1357 2577x253 caption 0,20 2577x233
+    Interface: PaymentDAO 676,1401 328x103 caption 0,0 328x38
+    Interface: OrderDAO 1064,1401 373x160 caption 0,0 373x38
+    Interface: InventoryDAO 70,1401 546x179 caption 0,0 546x38
+    Interface: AuditDAO 1497,1401 612x84 caption 0,0 612x38
+    Class: Database 2169,1401 418x179 caption 0,0 418x19
+  Package: service 40,402 1695x865 caption 0,20 1695x845
+    Class: CheckoutService 293,446 743x103 caption 0,0 743x19
+    Class: PaymentService 448,669 433x84 caption 0,0 433x19
+    Class: InventoryService 70,873 879x198 caption 0,0 879x19
+    Interface: PaymentGateway 1009,940 616x65 caption 0,0 616x38
+    Class: SimulatedPaymentProvider 1009,1191 616x46 caption 0,0 616x19
+  Package: controller 40,40 442x272 caption 0,20 442x252
+    Class: OrderController 70,84 382x198 caption 0,0 382x19
+  Usage: OrderController -> CheckoutService points (282,282) (282,458) (293,458) caption 187,358 92x24 text "<<use>>"
+  Usage: CheckoutService -> PaymentService points (664,549) (664,669) caption 569,597 92x24 text "<<use>>"
+  Usage: PaymentService -> PaymentDAO points (881,727) (972,727) (972,1401) caption 975,1052 92x24 text "<<use>>"
+  Usage: PaymentService -> OrderDAO points (881,715) (1639,715) (1639,1385) (1408,1385) (1408,1401) caption 1214,718 92x24 text "<<use>>"
+  Usage: PaymentService -> InventoryService points (664,753) (664,873) caption 569,801 92x24 text "<<use>>"
+  Usage: PaymentService -> PaymentGateway points (881,739) (993,739) (993,948) (1009,948) caption 996,831 92x24 text "<<use>>"
+  Usage: PaymentService -> AuditDAO points (881,703) (1661,703) (1661,1401) caption 1665,706 92x24 text "<<use>>"
+  Usage: PaymentService -> Database points (881,691) (2153,691) (2153,1421) (2169,1421) caption 1471,664 92x24 text "<<use>>"
+  Usage: InventoryService -> InventoryDAO points (502,1071) (502,1401) caption 407,1224 92x24 text "<<use>>"
+  Realization: PaymentGateway -> SimulatedPaymentProvider points (1317,1005) (1317,1191) caption 1327,1118 20x0 text ""

@@ -1,0 +1,53 @@
+Geometry of 'UC00 General Use Case Diagram' (UseCaseDiagram):
+  Actor: Staff 90,754 40x72 caption 84,826 52x19
+  UseCase: UC02 Login 380,668 200x44 caption 0,0 200x44
+  Actor: Supplier 1200,1274 40x72 caption 1182,1346 77x19
+  Actor: Shipping Provider 1200,1134 40x72 caption 1150,1206 141x19
+  Actor: Payment Provider 1200,394 40x72 caption 1150,466 140x19
+  Actor: Manager 90,1314 40x72 caption 71,1386 78x19
+  Actor: Warehouse Staff 90,1174 40x72 caption 45,1246 131x19
+  Actor: Sales Staff 90,1034 40x72 caption 64,1106 92x19
+  Actor: Administrator 90,894 40x72 caption 54,966 112x19
+  Actor: Customer 90,484 40x72 caption 67,556 86x19
+  System: ABC Online Shop 290,30 770x1392 caption 0,0 770x1392
+    UseCase: UC04 Browse Products 380,68 200x44 caption 0,0 200x44
+    UseCase: UC05 Search Products 380,148 200x44 caption 0,0 200x44
+    UseCase: UC01 Register Account 370,228 220x44 caption 0,0 220x44
+    UseCase: UC07 Manage Shopping Cart 360,328 240x44 caption 0,0 240x44
+    UseCase: UC08 Place Order / Checkout 350,408 260x44 caption 0,0 260x44
+    UseCase: UC11 Track Order 380,488 200x44 caption 0,0 200x44
+    UseCase: UC13 Submit Review 380,568 200x44 caption 0,0 200x44
+    UseCase: UC14 Manage Products 380,868 200x44 caption 0,0 200x44
+    UseCase: UC16 Manage Promotions 370,948 220x44 caption 0,0 220x44
+    UseCase: UC19 Process Orders 380,1048 200x44 caption 0,0 200x44
+    UseCase: UC20 Manage Inventory 370,1148 220x44 caption 0,0 220x44
+    UseCase: UC21 Prepare Shipment 370,1228 220x44 caption 0,0 220x44
+    UseCase: UC25 View Management Dashboard 340,1328 280x44 caption 0,0 280x44
+    UseCase: UC09 Make Payment 780,408 200x44 caption 0,0 200x44
+    UseCase: UC23 Update Shipment Status 750,1148 260x44 caption 0,0 260x44
+    UseCase: UC24 Manage Replenishment 760,1288 240x44 caption 0,0 240x44
+  Actor: Visitor 90,134 40x72 caption 78,206 64x19
+  Association: Customer -> UC02 Login points (129,520) (240,520) (240,690) (381,690) caption 512,663 20x0 text ""
+  Association: Staff -> UC02 Login points (129,790) (480,790) (480,711)
+  Generalization: Staff -> Administrator points (90,790) (60,790) (60,930) (90,930) caption 73,503 20x0 text ""
+  Generalization: Staff -> Sales Staff points (90,790) (60,790) (60,1070) (90,1070) caption 73,572 20x0 text ""
+  Generalization: Staff -> Warehouse Staff points (90,790) (60,790) (60,1210) (90,1210) caption 73,642 20x0 text ""
+  Generalization: Staff -> Manager points (90,790) (60,790) (60,1350) (90,1350)
+  Generalization: Visitor -> Customer points (90,170) (60,170) (60,520) (90,520) caption 115,346 20x0 text ""
+  Include: UC08 Place Order / Checkout -> UC09 Make Payment points (609,430) (781,430) caption 648,409 94x18 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Association: Visitor -> UC04 Browse Products points (129,170) (240,170) (240,90) (381,90) caption 269,110 20x0 text ""
+  Association: Visitor -> UC05 Search Products points (129,170) (381,170) caption 272,190 20x0 text ""
+  Association: Visitor -> UC01 Register Account points (129,170) (240,170) (240,250) (371,250) caption 247,270 20x0 text ""
+  Association: Customer -> UC07 Manage Shopping Cart points (129,520) (240,520) (240,350) (361,350) caption 266,370 20x0 text ""
+  Association: Customer -> UC08 Place Order / Checkout points (129,520) (240,520) (240,430) (351,430) caption 421,451 20x0 text ""
+  Association: Customer -> UC11 Track Order points (129,520) (240,520) (240,510) (381,510) caption 405,476 20x0 text ""
+  Association: Customer -> UC13 Submit Review points (129,520) (240,520) (240,590) (381,590) caption 387,520 20x0 text ""
+  Association: Administrator -> UC14 Manage Products points (129,930) (240,930) (240,890) (381,890) caption 371,824 20x0 text ""
+  Association: Administrator -> UC16 Manage Promotions points (129,930) (240,930) (240,970) (371,970) caption 437,920 20x0 text ""
+  Association: Sales Staff -> UC19 Process Orders points (129,1070) (381,1070) caption 387,1020 20x0 text ""
+  Association: Warehouse Staff -> UC20 Manage Inventory points (129,1210) (240,1210) (240,1170) (371,1170) caption 293,1031 20x0 text ""
+  Association: Warehouse Staff -> UC21 Prepare Shipment points (129,1210) (240,1210) (240,1250) (371,1250) caption 341,1129 20x0 text ""
+  Association: Manager -> UC25 View Management Dashboard points (129,1350) (341,1350) caption 353,1281 20x0 text ""
+  Association: Payment Provider -> UC09 Make Payment points (1200,430) (979,430) caption 429,457 20x0 text ""
+  Association: Shipping Provider -> UC23 Update Shipment Status points (1200,1170) (1009,1170) caption 415,1506 20x0 text ""
+  Association: Supplier -> UC24 Manage Replenishment points (1200,1310) (999,1310) caption 491,1594 20x0 text ""

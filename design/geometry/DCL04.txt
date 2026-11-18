@@ -1,26 +1,9 @@
-Geometry of 'DCL04 Design Classes (service) - Business Services' (ClassDiagram):
-  Class: SimulatedCarrier 1406,618 534x46 caption 0,0 534x19
-  Class: SimulatedPaymentProvider 1027,793 616x46 caption 0,0 616x19
-  Interface: ShippingGateway 2096,310 534x65 caption 0,0 534x38
-  Interface: PaymentGateway 730,618 616x65 caption 0,0 616x38
-  Class: ReportService 2155,949 427x103 caption 0,0 427x19
-  Class: ReviewService 1382,949 713x103 caption 0,0 713x19
-  Class: ShipmentService 1644,40 676x122 caption 0,0 676x19
-  Class: InventoryService 1157,310 879x198 caption 0,0 879x19
-  Class: OrderService 1152,40 432x160 caption 0,0 432x19
-  Class: PaymentService 664,310 433x84 caption 0,0 433x19
-  Class: CheckoutService 349,40 743x103 caption 0,0 743x19
-  Class: CartService 40,310 564x141 caption 0,0 564x19
-  Class: CatalogService 802,949 520x179 caption 0,0 520x19
-  Class: AuthService 87,949 655x103 caption 0,0 655x19
-  Realization: PaymentGateway -> SimulatedPaymentProvider points (1186,683) (1186,793) caption 1196,758 20x0 text ""
-  Realization: ShippingGateway -> SimulatedCarrier points (2116,375) (2116,626) (1940,626) caption 2126,608 20x0 text ""
-  Usage: CheckoutService -> CartService points (349,124) (336,124) (336,310) caption 241,205 92x24 text "<<use>>"
-  Usage: CheckoutService -> InventoryService points (1092,124) (1138,124) (1138,330) (1157,330) caption 1141,215 92x24 text "<<use>>"
-  Usage: CheckoutService -> PaymentService points (878,143) (878,310) caption 783,214 92x24 text "<<use>>"
-  Usage: OrderService -> InventoryService points (1368,200) (1368,310) caption 1371,243 92x24 text "<<use>>"
-  Usage: OrderService -> PaymentService points (1152,180) (1113,180) (1113,320) (1097,320) caption 1018,238 92x24 text "<<use>>"
-  Usage: PaymentService -> InventoryService points (1097,358) (1157,358) caption 1001,408 92x24 text "<<use>>"
-  Usage: PaymentService -> PaymentGateway points (880,394) (880,618) caption 785,494 92x24 text "<<use>>"
-  Usage: ShipmentService -> InventoryService points (1644,139) (1633,139) (1633,310) caption 1636,212 92x24 text "<<use>>"
-  Usage: ShipmentService -> ShippingGateway points (2084,162) (2084,318) (2096,318) caption 1989,228 92x24 text "<<use>>"
+Geometry of 'DCL04 Design Class Diagram (ai)' (ClassDiagram):
+  Class: ReviewInsightService 667,485 351x141 caption 0,0 351x19
+  Class: RecommenderService 201,485 406x84 caption 0,0 406x19
+  Class: SpeechService 903,291 277x84 caption 0,0 277x19
+  Class: ImageService 552,291 291x46 caption 0,0 291x19
+  Class: RankingService 40,291 452x84 caption 0,0 452x19
+  Class: QueryService 599,40 564x141 caption 0,0 564x19
+  Class: SearchService -85,40 143x0 caption 0,0 143x19
+  Usage: SearchService -> RankingService points (156,162) (298,291) caption 61,214 92x24 text "<<use>>"

@@ -1,0 +1,34 @@
+Geometry of 'UC_AI AI-Enabled Use Cases' (UseCaseDiagram):
+  UseCase: UC05 Search Products 460,580 200x60 caption 0,0 200x60
+  UseCase: Search by Keyword 900,583 200x51 caption 0,0 200x52
+  UseCase: Search by Voice 900,823 200x51 caption 0,0 200x52
+  UseCase: Search by Image 900,743 200x51 caption 0,0 200x52
+  UseCase: Search by Text and Image 880,663 240x51 caption 0,0 240x52
+  UseCase: Ask About My Orders 460,63 200x51 caption 0,0 200x52
+  UseCase: UC06 View Product Details 440,303 240x51 caption 0,0 240x52
+  UseCase: UC33 View Review Insights 880,303 240x51 caption 0,0 240x52
+  UseCase: UC34 View Recommendations 880,403 240x51 caption 0,0 240x52
+  UseCase: UC18 Manage Reviews 460,183 200x51 caption 0,0 200x52
+  UseCase: Flag Noisy Review 900,183 200x51 caption 0,0 200x52
+  UseCase: UC25 View Management Dashboard 420,943 280x51 caption 0,0 280x52
+  Actor: Visitor 170,433 40x71 caption 158,505 64x19
+  Actor: Customer 170,53 40x71 caption 146,125 87x19
+  Actor: Administrator 170,173 40x71 caption 135,245 112x19
+  Actor: Manager 170,933 40x71 caption 151,1005 79x19
+  Actor: Speech / Vision Engine 1310,773 40x71 caption 1243,845 175x19
+  NOTE: (NOTE) 870,940 260x70 caption 0,0 245x0
+  Generalization: Visitor -> Customer points (170,469) (120,469) (120,89) (170,89) caption 61,300 20x0 text ""
+  Generalization: UC05 Search Products -> Search by Keyword points (660,610) (900,610) caption 825,580 20x0 text ""
+  Generalization: UC05 Search Products -> Search by Voice points (660,610) (770,610) (770,848) (900,848) caption 780,758 20x0 text ""
+  Generalization: UC05 Search Products -> Search by Image points (660,610) (770,610) (770,768) (900,768) caption 740,795 20x0 text ""
+  Generalization: UC05 Search Products -> Search by Text and Image points (660,610) (770,610) (770,688) (880,688) caption 850,640 20x0 text ""
+  Extend: UC06 View Product Details -> UC33 View Review Insights points (680,328) (880,328) caption 736,306 85x17 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Extend: UC06 View Product Details -> UC34 View Recommendations points (559,354) (559,428) (880,428) caption 676,406 85x17 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Include: UC18 Manage Reviews -> Flag Noisy Review points (660,208) (900,208) caption 731,186 94x17 text "<<include>> <<Include>>" TRUNCATED needs 143x12
+  Association: Visitor -> UC05 Search Products points (210,468) (319,468) (319,608) (460,608) caption 491,515 20x0 text ""
+  Association: Visitor -> UC06 View Product Details points (210,468) (319,468) (319,328) (440,328) caption 366,345 20x0 text ""
+  Association: Customer -> Ask About My Orders points (210,88) (460,88) caption 360,105 20x0 text ""
+  Association: Administrator -> UC18 Manage Reviews points (210,208) (460,208) caption 356,230 20x0 text ""
+  Association: Manager -> UC25 View Management Dashboard points (210,968) (420,968) caption 331,985 20x0 text ""
+  Association: Speech / Vision Engine -> Search by Voice points (1310,808) (1220,808) (1220,848) (1100,848) caption 630,850 20x0 text ""
+  Association: Speech / Vision Engine -> Search by Image points (1310,808) (1220,808) (1220,768) (1100,768) caption 626,841 20x0 text ""

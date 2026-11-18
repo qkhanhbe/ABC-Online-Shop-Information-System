@@ -180,8 +180,8 @@ td.t{font:600 13px var(--mono);white-space:nowrap;color:var(--accent)}
       <p>Phương án bị loại: một bảng Product có mọi cột (nhiều cột rỗng, không đặt được NOT NULL theo loại), lớp trung gian
       ProductDetail (thầy góp ý), bảng EAV thuộc tính–giá trị (mất kiểu dữ liệu và ràng buộc).</p></div>
     <div class="box"><h3>Từ class đến database (không vẽ tay)</h3><ol class="tight">
-      <li>Class phân tích {fig:CL01}, {fig:CL02}: tên thuộc tính, method, chưa có kiểu và khoá.</li>
-      <li>Class «ORM Persistable» {fig:DM01}, {fig:DM02}: thêm kiểu, định danh, tên quan hệ và bản số hai đầu.</li>
+      <li>Pha 2, class phân tích {fig:CL01}: một sơ đồ 22 lớp, chỉ có tên thuộc tính, chưa có kiểu, khoá và method.</li>
+      <li>Pha 4, data model class {fig:DM01}: cùng 22 lớp, cùng vị trí, thêm định danh, kiểu, «ORM Persistable», tên quan hệ và bản số hai đầu.</li>
       <li><b>syncClassesToErd</b> sinh {fig:ERD01}: 22 bảng, 24 khoá ngoại; khoá của bảng không có định danh quyết bằng tool, ghi ở {file:design/v5_tool_log.txt}.</li>
       <li><b>generateSql</b> (SQLite) viết {file:design/create_tables.sql}.</li>
       <li>{file:design/build_db.py}: chạy script, so với schema của ứng dụng (22/22 bảng giống), nạp dữ liệu bằng chính ứng dụng, thử câu lệnh vi phạm.</li></ol>

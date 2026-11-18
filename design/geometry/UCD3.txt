@@ -1,0 +1,15 @@
+Geometry of 'UCD3 Administration' (UseCaseDiagram):
+  System: ABC Online Shop - Administration 400,30 320x556 caption 0,0 320x19
+    UseCase: UC14 Manage Products 460,484 200x52 caption 0,0 200x52
+    UseCase: UC15 Manage Categories 450,284 220x52 caption 0,0 220x52
+    UseCase: UC16 Manage Promotions 450,184 220x52 caption 0,0 220x52
+    UseCase: UC17 Manage Customers 450,84 220x52 caption 0,0 220x52
+    UseCase: UC18 Manage Reviews 460,384 200x52 caption 0,0 200x52
+  Actor: Administrator 200,274 40x72 caption 164,346 112x19
+  Actor: Sales Staff 860,74 40x72 caption 834,146 92x19
+  Association: Administrator -> UC14 Manage Products points (240,310) (350,310) (350,510) (460,510) caption 62,445 26x24 text ""
+  Association: Administrator -> UC15 Manage Categories points (240,310) (450,310) caption 352,316 26x24 text ""
+  Association: Administrator -> UC16 Manage Promotions points (240,310) (350,310) (350,210) (450,210) caption 292,192 26x24 text ""
+  Association: Administrator -> UC17 Manage Customers points (240,310) (350,310) (350,110) (450,110) caption 363,258 26x24 text ""
+  Association: Administrator -> UC18 Manage Reviews points (240,310) (350,310) (350,410) (460,410) caption 376,352 26x24 text ""
+  Association: Sales Staff -> UC17 Manage Customers points (860,110) (670,110) caption 129,123 26x24 text ""

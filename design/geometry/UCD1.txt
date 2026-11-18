@@ -1,0 +1,19 @@
+Geometry of 'UCD1 Account and Catalogue' (UseCaseDiagram):
+  System: ABC Online Shop - Account and Catalogue 390,30 340x686 caption 0,0 340x19
+    UseCase: UC01 Register Account 450,384 220x52 caption 0,0 220x52
+    UseCase: UC02 Login 460,614 200x52 caption 0,0 200x52
+    UseCase: UC03 Manage Profile 460,514 200x52 caption 0,0 200x52
+    UseCase: UC04 Browse Products 460,184 200x52 caption 0,0 200x52
+    UseCase: UC05 Search Products 460,284 200x52 caption 0,0 200x52
+    UseCase: UC06 View Product Details 440,84 240x52 caption 0,0 240x52
+  Actor: Visitor 190,224 40x72 caption 178,296 64x19
+  Actor: Customer 190,554 40x72 caption 167,626 86x19
+  Actor: Staff 870,604 40x72 caption 864,676 52x19
+  Generalization: Visitor -> Customer points (190,260) (160,260) (160,590) (190,590) caption 70,356 20x0 text ""
+  Association: Visitor -> UC01 Register Account points (230,260) (340,260) (340,410) (450,410) caption 271,257 26x24 text ""
+  Association: Visitor -> UC04 Browse Products points (230,260) (340,260) (340,210) (460,210) caption 244,268 26x24 text ""
+  Association: Visitor -> UC05 Search Products points (230,260) (340,260) (340,310) (460,310) caption 305,244 26x24 text ""
+  Association: Visitor -> UC06 View Product Details points (230,260) (340,260) (340,110) (440,110) caption 267,90 26x24 text ""
+  Association: Customer -> UC02 Login points (230,590) (340,590) (340,640) (460,640) caption 379,521 26x24 text ""
+  Association: Customer -> UC03 Manage Profile points (230,590) (340,590) (340,540) (460,540) caption 260,585 26x24 text ""
+  Association: Staff -> UC02 Login points (869,640) (660,640) caption 290,468 26x24 text ""

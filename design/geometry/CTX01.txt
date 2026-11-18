@@ -1,0 +1,26 @@
+Geometry of 'CTX01 System Context Diagram' (DataFlowDiagram):
+  DFProcess: ABC Online Shop E-Commerce Information System 570,20 240x600 caption 0,19 260x19
+  DFExternalEntity: Customer / Visitor 40,40 190x80 caption 0,0 164x19
+  DFExternalEntity: Administrator 40,200 190x80 caption 0,0 124x19
+  DFExternalEntity: Sales Staff 40,360 190x80 caption 0,0 120x19
+  DFExternalEntity: Warehouse Staff 40,520 190x80 caption 0,0 140x19
+  DFExternalEntity: Manager 1150,520 190x80 caption 0,0 120x19
+  DFExternalEntity: Payment Provider 1150,40 190x80 caption 0,0 148x19
+  DFExternalEntity: Shipping Provider 1150,200 190x80 caption 0,0 156x19
+  DFExternalEntity: Supplier 1150,360 190x80 caption 0,0 120x19
+  DFDataFlow 'account, search, cart, order, review': Customer / Visitor -> ABC Online Shop E-Commerce Information System points (230,64) (570,64) caption 250,43 300x18 text "account, search, cart, order, review"
+  DFDataFlow 'products, availability, order status': ABC Online Shop E-Commerce Information System -> Customer / Visitor points (570,94) (230,94) caption 250,73 300x18 text "products, availability, order status"
+  DFDataFlow 'catalogue, promotion, moderation': Administrator -> ABC Online Shop E-Commerce Information System points (230,224) (570,224) caption 266,203 268x18 text "catalogue, promotion, moderation"
+  DFDataFlow 'review queue, audit trail': ABC Online Shop E-Commerce Information System -> Administrator points (570,254) (230,254) caption 294,233 212x18 text "review queue, audit trail"
+  DFDataFlow 'order decisions': Sales Staff -> ABC Online Shop E-Commerce Information System points (230,384) (570,384) caption 334,363 132x18 text "order decisions"
+  DFDataFlow 'processing queue, exceptions': ABC Online Shop E-Commerce Information System -> Sales Staff points (570,414) (230,414) caption 282,393 236x18 text "processing queue, exceptions"
+  DFDataFlow 'stock events, packing': Warehouse Staff -> ABC Online Shop E-Commerce Information System points (230,544) (570,544) caption 310,523 180x18 text "stock events, packing"
+  DFDataFlow 'pick list, low-stock alerts': ABC Online Shop E-Commerce Information System -> Warehouse Staff points (570,574) (230,574) caption 286,553 228x18 text "pick list, low-stock alerts"
+  DFDataFlow 'report request': Manager -> ABC Online Shop E-Commerce Information System points (1150,544) (810,544) caption 918,523 124x18 text "report request"
+  DFDataFlow 'dashboard, reports': ABC Online Shop E-Commerce Information System -> Manager points (810,574) (1150,574) caption 902,553 156x18 text "dashboard, reports"
+  DFDataFlow 'payment request (ref, amount)': ABC Online Shop E-Commerce Information System -> Payment Provider points (810,94) (1150,94) caption 858,73 244x18 text "payment request (ref, amount)"
+  DFDataFlow 'signed payment result': Payment Provider -> ABC Online Shop E-Commerce Information System points (1150,64) (810,64) caption 890,43 180x18 text "signed payment result"
+  DFDataFlow 'delivery request': ABC Online Shop E-Commerce Information System -> Shipping Provider points (810,254) (1150,254) caption 910,233 140x18 text "delivery request"
+  DFDataFlow 'shipment milestones': Shipping Provider -> ABC Online Shop E-Commerce Information System points (1150,224) (810,224) caption 898,203 164x18 text "shipment milestones"
+  DFDataFlow 'replenishment request': ABC Online Shop E-Commerce Information System -> Supplier points (810,414) (1150,414) caption 890,393 180x18 text "replenishment request"
+  DFDataFlow 'supply confirmation': Supplier -> ABC Online Shop E-Commerce Information System points (1150,384) (810,384) caption 898,363 164x18 text "supply confirmation"

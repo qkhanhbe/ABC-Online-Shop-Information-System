@@ -2,6 +2,7 @@
 import http.cookiejar
 import os
 import subprocess
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -18,7 +19,10 @@ def session():
 
 def fetch(opener, path, data=None):
     body = urllib.parse.urlencode(data).encode() if data else None
-    return opener.open(BASE + path, body).read().decode()
+    try:
+        return opener.open(BASE + path, body).read().decode()
+    except urllib.error.HTTPError as e:              # a refused form answers 400 with the page and its message
+        return e.read().decode()
 
 
 def shot(html, name, height=1100):
@@ -63,5 +67,13 @@ def main():
     shot(fetch(manager, "/reports"), "web_10_dashboard", 1250)
 
 
+def added():
+    """V5: register and a refused login (UC01, UC02, the alt fragment of SD07)."""
+    guest = session()
+    shot(fetch(guest, "/register"), "web_11_register", 800)
+    shot(fetch(guest, "/login", {"email": "khanh@example.com", "password": "wrong-password"}), "web_12_login_refused", 650)
+    # card payment and recommendations are shown with demo_output.txt (sections 2, 3 and 7)
+
 if __name__ == "__main__":
-    main()
+    import sys
+    added() if sys.argv[1:] == ["added"] else main()

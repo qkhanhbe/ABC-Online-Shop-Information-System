@@ -1,19 +1,44 @@
-Geometry of 'DCL02 Design Classes (model) - Order History Delivery Stock and Reviews' (ClassDiagram):
-  Class: Review 1344,375 151x202 caption 0,0 151x19
-  Class: ReplenishmentRequest 903,1205 166x122 caption 0,0 166x19
-  Class: InventoryEvent 1441,1205 140x160 caption 0,0 140x19
-  Class: StockLevel 1129,1205 252x164 caption 0,0 252x19
-  Class: Milestone 936,375 122x103 caption 0,0 122x19
-  Class: StatusChange 601,1205 109x103 caption 0,0 109x19
-  Class: Shipment 844,74 306x145 caption 0,0 306x19
-  Class: Product 1311,747 267x297 caption 0,0 267x19
-  Class: Order 60,733 1191x316 caption 0,0 1191x19
-  Class: Customer 1210,173 418x46 caption 0,0 418x19
-  Association 'records': Order -> StatusChange points (656,1049) (656,1205) caption 571,1115 83x24 text "records" mult 639,1049 16x20 mult 621,1185 40x20
-  Association 'tracked by': Shipment -> Milestone points (997,219) (997,375) caption 887,285 110x24 text "tracked by" mult 980,219 16x20 mult 962,355 40x20
-  Association 'has': Product -> StockLevel points (1445,1044) (1445,1107) (1255,1107) (1255,1205) caption 1325,1110 50x24 text "has" mult 1428,1044 16x20 mult 1238,1185 16x20
-  Association 'explained by': Product -> InventoryEvent points (1511,1044) (1511,1205) caption 1511,1112 128x24 text "explained by" mult 1513,1044 16x20 mult 1506,1185 40x20
-  Association 'replenished by': Product -> ReplenishmentRequest points (1378,1044) (1378,1089) (986,1089) (986,1205) caption 1109,1062 146x24 text "replenished by" mult 1361,1044 16x20 mult 951,1185 40x20
-  Association 'about': Review -> Product points (1445,577) (1445,747) caption 1448,650 66x24 text "about" mult 1440,577 40x20 mult 1447,727 16x20
-  Association 'writes': Customer -> Review points (1419,219) (1419,375) caption 1345,285 74x24 text "writes" mult 1402,219 16x20 mult 1384,355 40x20
-  Association 'verified by': Review -> Order points (1394,577) (1394,617) (656,617) (656,733) caption 966,590 119x24 text "verified by" mult 1358,577 40x20 mult 639,713 16x20
+Geometry of 'DCL02 Design Class Diagram (dao)' (ClassDiagram):
+  Class: VectorIndex 1403,599 609x84 caption 0,0 609x19
+  Class: ImageStorage 484,599 381x84 caption 0,0 381x19
+  Class: SqliteAuditDAO 1844,888 612x65 caption 0,0 612x19
+  Class: SqliteReviewDAO 1266,888 518x103 caption 0,0 518x19
+  Class: SqliteShipmentDAO 861,888 345x84 caption 0,0 345x19
+  Class: SqlitePaymentDAO 473,888 328x84 caption 0,0 328x19
+  Class: SqliteOrderDAO 40,888 373x141 caption 0,0 373x19
+  Class: SqlitePromotionDAO 1992,329 306x84 caption 0,0 306x19
+  Class: SqliteCartDAO 1676,329 256x65 caption 0,0 256x19
+  Class: SqliteInventoryDAO 1070,329 546x160 caption 0,0 546x19
+  Class: SqliteProductDAO 508,329 502x141 caption 0,0 502x19
+  Class: SqliteCustomerDAO 198,329 250x103 caption 0,0 250x19
+  Interface: AuditDAO 1844,1139 612x84 caption 0,0 612x38
+  Interface: ReviewDAO 1266,1139 518x122 caption 0,0 518x38
+  Interface: ShipmentDAO 861,1139 345x103 caption 0,0 345x38
+  Interface: PaymentDAO 473,1139 328x103 caption 0,0 328x38
+  Interface: OrderDAO 40,1139 373x160 caption 0,0 373x38
+  Interface: PromotionDAO 1961,40 367x103 caption 0,0 367x38
+  Interface: CartDAO 1645,40 256x84 caption 0,0 256x38
+  Interface: InventoryDAO 1039,40 546x179 caption 0,0 546x38
+  Interface: ProductDAO 477,40 502x160 caption 0,0 502x38
+  Interface: CustomerDAO 167,40 250x122 caption 0,0 250x38
+  Class: Database 925,599 418x179 caption 0,0 418x19
+  Realization: CustomerDAO -> SqliteCustomerDAO points (292,162) (292,329) caption 302,265 20x0 text ""
+  Realization: ProductDAO -> SqliteProductDAO points (728,200) (728,329) caption 738,284 20x0 text ""
+  Realization: InventoryDAO -> SqliteInventoryDAO points (1312,219) (1312,329) caption 1322,294 20x0 text ""
+  Realization: CartDAO -> SqliteCartDAO points (1773,124) (1773,329) caption 1783,246 20x0 text ""
+  Realization: PromotionDAO -> SqlitePromotionDAO points (2144,143) (2144,329) caption 2154,256 20x0 text ""
+  Realization: OrderDAO -> SqliteOrderDAO points (226,1139) (226,1029) caption 236,1104 20x0 text ""
+  Realization: PaymentDAO -> SqlitePaymentDAO points (641,1139) (641,972) caption 651,1076 20x0 text ""
+  Realization: ShipmentDAO -> SqliteShipmentDAO points (1033,1139) (1033,972) caption 1043,1076 20x0 text ""
+  Realization: ReviewDAO -> SqliteReviewDAO points (1530,1139) (1530,991) caption 1540,1085 20x0 text ""
+  Realization: AuditDAO -> SqliteAuditDAO points (2152,1139) (2152,953) caption 2162,1066 20x0 text ""
+  Usage: SqliteCustomerDAO -> Database points (448,413) (494,413) (494,585) (909,585) (909,619) (925,619) caption 655,558 92x24 text "<<use>>"
+  Usage: SqliteProductDAO -> Database points (967,470) (967,599) caption 970,522 92x24 text "<<use>>"
+  Usage: SqliteInventoryDAO -> Database points (1206,489) (1206,599) caption 1111,532 92x24 text "<<use>>"
+  Usage: SqliteCartDAO -> Database points (1676,385) (1630,385) (1630,561) (1359,561) (1359,619) (1343,619) caption 1449,534 92x24 text "<<use>>"
+  Usage: SqlitePromotionDAO -> Database points (1992,399) (1946,399) (1946,573) (1371,573) (1371,631) (1343,631) caption 1643,546 92x24 text "<<use>>"
+  Usage: SqliteOrderDAO -> Database points (413,905) (459,905) (459,739) (925,739) caption 646,712 92x24 text "<<use>>"
+  Usage: SqlitePaymentDAO -> Database points (801,898) (847,898) (847,751) (925,751) caption 752,813 92x24 text "<<use>>"
+  Usage: SqliteShipmentDAO -> Database points (1033,888) (1033,778) caption 1036,821 92x24 text "<<use>>"
+  Usage: SqliteReviewDAO -> Database points (1266,900) (1245,900) (1245,778) caption 1248,827 92x24 text "<<use>>"
+  Usage: SqliteAuditDAO -> Database points (1844,896) (1798,896) (1798,751) (1343,751) caption 1525,754 92x24 text "<<use>>"

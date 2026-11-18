@@ -1,0 +1,14 @@
+Geometry of 'DEP01 Deployment Diagram' (DeploymentDiagram):
+  Node: Customer / Staff device 399,76 234x160 caption 0,8 234x23
+    Artifact: Web browser (HTML, CSS) 421,122 190x75 caption 0,0 166x75
+  Node: Application server 52,316 927x211 caption 0,8 927x23
+    Node: Python 3.11 runtime 282,362 437x143 caption 0,8 437x23
+      Artifact: abc_shop (main.py serve) 304,408 220x75 caption 0,0 196x75
+      Artifact: numpy, Pillow 572,408 125x75 caption 0,0 101x75
+    Artifact: abc_shop.db (SQLite) 767,396 190x75 caption 0,0 166x75
+    Artifact: data/images 74,396 160x75 caption 0,0 136x75
+  Node: Payment Provider (external) 251,607 220x100 caption 0,38 220x23
+  Node: Shipping Provider (external) 560,607 220x100 caption 0,38 220x23
+  Association 'HTTP(S)': Customer / Staff device -> Application server points (515,236) (515,316) caption 421,264 91x24 text "HTTP(S)"
+  Association 'HTTPS, signed callback': Application server -> Payment Provider (external) points (361,527) (361,607) caption 143,555 218x24 text "HTTPS, signed callback"
+  Association 'HTTPS, milestones': Application server -> Shipping Provider (external) points (670,527) (670,607) caption 673,555 176x24 text "HTTPS, milestones"

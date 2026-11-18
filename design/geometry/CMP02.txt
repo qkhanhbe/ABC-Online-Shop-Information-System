@@ -1,0 +1,22 @@
+Geometry of 'CMP02 System Component Diagram' (ComponentDiagram):
+  Package: ABC Online Shop application (Python WSGI) 71,263 742x492 caption 0,20 742x472
+    Component: Web UI (view) 101,489 170x58 caption 0,0 146x58
+    Component: Controllers 141,311 180x58 caption 0,0 156x58
+    Component: Business Services 581,489 190x58 caption 0,0 166x58
+    Component: AI Services 341,489 170x58 caption 0,0 146x58
+    Component: Gateways 633,667 150x58 caption 0,0 126x58
+    Component: Data Access (DAO) 363,667 190x58 caption 0,0 166x58
+  Component: SQLite database abc_shop.db 60,884 270x62 caption 0,0 246x62
+  Component: Payment Provider 400,884 175x62 caption 0,0 151x62
+  Component: Shipping Provider 645,884 175x62 caption 0,0 151x62
+  Component: Web browser 161,78 140x56 caption 0,0 116x56
+  Usage: Web browser -> Controllers points (231,134) (231,311) caption 136,210 92x24 text "<<use>>"
+  Usage: Controllers -> Web UI (view) points (231,369) (231,489) caption 136,417 92x24 text "<<use>>"
+  Usage: Controllers -> Business Services points (321,343) (565,343) (565,497) (581,497) caption 397,316 92x24 text "<<use>>"
+  Usage: Controllers -> AI Services points (321,355) (325,355) (325,497) (341,497) caption 328,414 92x24 text "<<use>>"
+  Usage: Business Services -> Data Access (DAO) points (581,533) (569,533) (569,675) (553,675) caption 572,592 92x24 text "<<use>>"
+  Usage: AI Services -> Data Access (DAO) points (437,547) (437,667) caption 342,595 92x24 text "<<use>>"
+  Usage: Business Services -> Gateways points (702,547) (702,667) caption 705,595 92x24 text "<<use>>"
+  Usage: Gateways -> Payment Provider points (633,711) (591,711) (591,892) (575,892) caption 496,789 92x24 text "<<use>>"
+  Usage: Gateways -> Shipping Provider points (714,725) (714,884) caption 717,792 92x24 text "<<use>>"
+  Usage: Data Access (DAO) -> SQLite database abc_shop.db points (363,711) (346,711) (346,892) (330,892) caption 251,789 92x24 text "<<use>>"

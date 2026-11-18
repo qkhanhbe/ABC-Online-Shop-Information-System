@@ -1,0 +1,30 @@
+Geometry of 'UCD4 Operations and Reporting' (UseCaseDiagram):
+  System: ABC Online Shop - Operations and Reporting 310,30 460x1036 caption 0,0 460x19
+    UseCase: UC19 Process Orders 440,71 200x51 caption 0,0 200x52
+    UseCase: UC20 Manage Inventory 430,301 220x51 caption 0,0 220x52
+    UseCase: UC21 Prepare Shipment 430,391 220x51 caption 0,0 220x52
+    UseCase: UC22 Arrange Delivery 430,481 220x51 caption 0,0 220x52
+    UseCase: UC23 Update Shipment Status 410,571 260x51 caption 0,0 260x52
+    UseCase: UC24 Manage Replenishment 420,181 240x51 caption 0,0 240x52
+    UseCase: UC25 View Management Dashboard 400,691 280x51 caption 0,0 280x52
+    UseCase: UC26 Generate Sales Report 410,781 260x51 caption 0,0 260x52
+    UseCase: UC27 Generate Inventory Report 400,871 280x51 caption 0,0 280x52
+    UseCase: UC28 Generate Order and Exception Report 358,961 358x51 caption 0,0 359x52
+  Actor: Sales Staff 110,61 40x71 caption 84,134 92x19
+  Actor: Warehouse Staff 110,321 40x71 caption 64,394 132x19
+  Actor: Shipping Provider 910,518 40x71 caption 860,590 142x19
+  Actor: Supplier 910,171 40x71 caption 891,244 78x19
+  Actor: Manager 110,818 40x71 caption 91,890 79x19
+  Extend: UC20 Manage Inventory -> UC24 Manage Replenishment points (540,301) (540,232) caption 448,257 86x18 text "<<extend>> <<Extend>>" TRUNCATED needs 136x12
+  Association: Sales Staff -> UC19 Process Orders points (150,95) (439,95) caption 312,62 28x23 text ""
+  Association: Warehouse Staff -> UC20 Manage Inventory points (150,355) (260,355) (260,325) (429,325) caption 71,500 26x26 text ""
+  Association: Warehouse Staff -> UC21 Prepare Shipment points (150,355) (260,355) (260,415) (429,415) caption -10,510 26x23 text ""
+  Association: Warehouse Staff -> UC22 Arrange Delivery points (150,355) (260,355) (260,505) (429,505) caption 455,440 29x26 text ""
+  Association: Warehouse Staff -> UC24 Manage Replenishment points (150,355) (260,355) (260,205) (419,205) caption 275,500 26x25 text ""
+  Association: Shipping Provider -> UC22 Arrange Delivery points (909,551) (819,551) (819,505) (649,505) caption 61,680 26x23 text ""
+  Association: Shipping Provider -> UC23 Update Shipment Status points (909,552) (818,552) (818,595) (669,595) caption -5,722 26x25 text ""
+  Association: Supplier -> UC24 Manage Replenishment points (909,205) (659,205) caption 200,750 26x26 text ""
+  Association: Manager -> UC25 View Management Dashboard points (150,851) (260,851) (260,715) (399,715) caption 225,580 26x25 text ""
+  Association: Manager -> UC26 Generate Sales Report points (150,851) (260,851) (260,805) (409,805) caption 254,522 28x26 text ""
+  Association: Manager -> UC27 Generate Inventory Report points (150,852) (260,852) (260,895) (399,895) caption 321,925 26x26 text ""
+  Association: Manager -> UC28 Generate Order and Exception Report points (150,852) (260,852) (260,985) (358,985) caption 220,1140 26x26 text ""

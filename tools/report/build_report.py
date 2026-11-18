@@ -267,7 +267,11 @@ def render(blocks):
             FIG_LIST.append(caption)
             with Image.open(path) as im:
                 w, h = im.size
-            max_h = (150 - 7 * len(notes)) * mm
+            # the image gets what the caption and the notes leave of the landscape frame (174 mm less its padding)
+            fw = 257 * mm - 12
+            cap = Paragraph(f"Figure {len(FIG_LIST)}. {caption}", CAP)
+            used = sum(p.wrap(fw, 1000)[1] + p.getSpaceBefore() + p.getSpaceAfter() for p in [cap] + note_par)
+            max_h = 174 * mm - 12 - used - 6 * mm
             width = 255 * mm
             height = width * h / w
             if height > max_h:

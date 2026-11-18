@@ -1,0 +1,206 @@
+package essay.gen;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.vp.plugin.diagram.IDiagramElement;
+import com.vp.plugin.diagram.IDiagramUIModel;
+import com.vp.plugin.model.IInteractionLifeLine;
+import com.vp.plugin.model.IModel;
+import com.vp.plugin.model.IModelElement;
+import com.vp.plugin.model.IProject;
+import com.vp.plugin.model.factory.IModelElementFactory;
+
+/**
+ * Organises the project as five sub-projects, one per phase (Model Explorer and Instant Generator show them as the
+ * top level): 1 Requirements, 2 Analysis, 3 AI Search, 4 Data Model, 5 Design. Every diagram goes under the model
+ * of its phase; every top-level model element (package, class, actor, use case, table ...) goes under the model of
+ * the first phase whose diagram shows it, so a phase opens with exactly its own diagrams and elements.
+ */
+public class V5Org {
+    static final String[][] PHASES = {
+        {"1 Requirements", "STK01", "BP01", "PT01", "UC00", "UCD1", "UCD2", "UCD3", "UCD4"},
+        {"2 Analysis", "CL01", "AD01", "AD02", "AD03", "AD05", "AD06", "AD07", "AD08", "CTX01", "DFD0", "DFD1",
+         "SD01", "SD02", "ST01"},
+        {"3 AI Search", "UC_AI", "CMP01", "SD03", "SD04", "AD04"},
+        {"4 Data Model", "DM01", "ERD01"},
+        {"5 Design", "DCL01", "DCL02", "DCL03", "DCL04", "DCL05", "PKG01", "LAY01", "LAY02", "LAY03", "LAY04", "LAY05",
+         "SD05", "SD06", "SD07", "SD08", "SD09", "CMP02", "DEP01"},
+    };
+    /** packages that belong to a phase whatever diagram shows them first */
+    static final String[][] PACKAGES = {
+        {"Analysis", "2 Analysis"}, {"Data Model", "4 Data Model"},
+        {"model", "5 Design"}, {"dao", "5 Design"}, {"service", "5 Design"}, {"ai", "5 Design"}, {"controller", "5 Design"},
+        {"Stakeholders", "1 Requirements"}, {"Analysis Model", "2 Analysis"}, {"Design (added)", "5 Design"},
+        {"shop.py (composition root)", "5 Design"},
+    };
+
+    public void run(IProject project) {
+        run(project, true);
+    }
+
+    public void run(IProject project, boolean organise) {
+        IModelElementFactory f = IModelElementFactory.instance();
+        Map<String, IModel> models = new LinkedHashMap<>();
+        for (String[] phase : organise ? PHASES : new String[0][]) {
+            IModel m = null;
+            for (IModelElement e : project.toModelElementArray("Model")) {
+                if (phase[0].equals(e.getName())) m = (IModel) e;
+            }
+            if (m == null) {
+                m = f.createModel();
+                m.setName(phase[0]);
+            }
+            models.put(phase[0], m);
+        }
+        relink(project);
+        if (!organise) return;
+        ROOTS.clear();
+        for (IModelElement e : project.toModelElementArray()) {
+            if (!(e instanceof IModel)) ROOTS.add(e.getId());
+        }
+        for (String[] p : PACKAGES) {
+            for (IModelElement e : project.toModelElementArray("Package")) {
+                if (p[0].equals(e.getName()) && ROOTS.contains(e.getId())) move(models.get(p[1]), e);
+            }
+        }
+        count(project, "after packages");
+        // addSubDiagram also moves the elements created on the diagram to the model; remember every owner first
+        Map<IModelElement, IModelElement> owner = new LinkedHashMap<>();
+        for (IModelElement e : project.toAllLevelModelElementArray()) {
+            IModelElement p = e.getParent();
+            if (p != null && !(p instanceof IProject)) owner.put(e, p);
+        }
+        int diagrams = 0;
+        for (String[] phase : PHASES) {
+            IModel m = models.get(phase[0]);
+            for (int i = 1; i < phase.length; i++) {
+                for (IDiagramUIModel d : project.toDiagramArray()) {
+                    if (!d.getName().startsWith(phase[i] + " ")) continue;
+                    try {
+                        m.addSubDiagram(d);
+                        diagrams++;
+                    } catch (Throwable t) {
+                        System.out.println("V5ORG cannot move diagram " + d.getName() + ": " + t);
+                    }
+                }
+            }
+        }
+        count(project, "after diagrams");
+        int restored = 0;
+        for (Map.Entry<IModelElement, IModelElement> o : owner.entrySet()) {
+            if (o.getKey().getParent() != o.getValue()) {
+                try {
+                    o.getValue().addChild(o.getKey());
+                    restored++;
+                } catch (Throwable t) {
+                    System.out.println("V5ORG cannot restore " + o.getKey().getName() + ": " + t);
+                }
+            }
+        }
+        System.out.println("V5ORG owners restored " + restored);
+        count(project, "after restore");
+        for (String[] phase : PHASES) {
+            IModel m = models.get(phase[0]);
+            for (int i = 1; i < phase.length; i++) {
+                for (IDiagramUIModel d : project.toDiagramArray()) {
+                    if (!d.getName().startsWith(phase[i] + " ")) continue;
+                    for (IDiagramElement de : d.toDiagramElementArray()) {
+                        IModelElement e = de.getModelElement();
+                        if (e == null) continue;
+                        place(m, e);
+                        if (e instanceof IInteractionLifeLine) {
+                            IModelElement base = base((IInteractionLifeLine) e);
+                            if (base != null) place(m, base);
+                        }
+                    }
+                }
+            }
+        }
+        count(project, "after place");
+        System.out.println("V5ORG diagrams moved " + diagrams);
+        dropOrphans(project);
+        count(project, "after orphans");
+        for (IModelElement e : project.toModelElementArray()) {
+            if (isTop(e)) System.out.println("V5ORG top " + e.getModelType() + " " + e.getName());
+        }
+        for (IModel m : models.values()) {
+            System.out.println("V5ORG " + m.getName() + ": " + m.childCount() + " elements, " + m.subDiagramCount() + " diagrams");
+        }
+    }
+
+    /** ids of the elements at the top level of the project before organising; only these are ever moved */
+    static final java.util.Set<String> ROOTS = new java.util.HashSet<>();
+
+    /** Move the element, or the top-level package that holds it, under the model of the phase. An element inside a
+     *  package stays there (the headless API may not report its parent, so the top-level set decides). */
+    static void place(IModel m, IModelElement e) {
+        IModelElement top = e;
+        while (top.getParent() != null && !(top.getParent() instanceof IProject)) top = top.getParent();
+        if (ROOTS.contains(top.getId())) move(m, top);
+    }
+
+    /** A lifeline drawn by name created a top-level class; point it to the design class of the same name. */
+    static void relink(IProject project) {
+        Map<String, IModelElement> design = new LinkedHashMap<>();
+        for (IModelElement c : project.toAllLevelModelElementArray("Class")) {
+            IModelElement p = c.getParent();
+            if (p != null && "Package".equals(p.getModelType()) && java.util.Arrays.asList("model", "dao", "service", "ai",
+                    "controller").contains(p.getName())) design.put(c.getName(), c);
+        }
+        int n = 0;
+        java.util.Set<IModelElement> dropped = new java.util.HashSet<>();
+        for (IModelElement l : project.toAllLevelModelElementArray("InteractionLifeLine")) {
+            IModelElement base = base((IInteractionLifeLine) l);
+            if (base != null && "Class".equals(base.getModelType()) && isTop(base) && design.containsKey(base.getName())) {
+                ((IInteractionLifeLine) l).setBaseClassifier(design.get(base.getName()));
+                dropped.add(base);
+                n++;
+            }
+        }
+        for (IModelElement c : dropped) c.delete();
+        System.out.println("V5ORG lifelines relinked " + n + ", top-level duplicates deleted " + dropped.size());
+    }
+
+    static IModelElement base(IInteractionLifeLine l) {
+        Object b = l.getBaseClassifier();
+        if (b instanceof IModelElement) return (IModelElement) b;
+        IModelElement e = l.getBaseClassifierAsElement();
+        return e != null ? e : l.getBaseClassifierAsModel();
+    }
+
+    /** Notes, flowchart shapes and pools left at the top level by earlier edits and shown on no diagram. */
+    static void dropOrphans(IProject project) {
+        for (IModelElement e : project.toModelElementArray()) {
+            String t = e.getModelType();
+            if (isTop(e) && ("NOTE".equals(t) || t.startsWith("Flowchart") || t.startsWith("BP"))
+                    && (e.getDiagramElements() == null || e.getDiagramElements().length == 0)) {
+                System.out.println("V5ORG delete orphan " + t + " " + e.getName());
+                e.delete();
+            }
+        }
+    }
+
+    static void count(IProject project, String when) {
+        Map<String, Integer> n = new LinkedHashMap<>();
+        for (IModelElement c : project.toAllLevelModelElementArray("Class")) {
+            IModelElement p = c.getParent();
+            String k = p == null ? "null" : p.getName();
+            n.merge(k, 1, Integer::sum);
+        }
+        System.out.println("V5ORG count " + when + ": " + n);
+    }
+
+    static boolean isTop(IModelElement e) {
+        return e.getParent() == null || e.getParent() instanceof IProject;
+    }
+
+    static void move(IModel m, IModelElement e) {
+        ROOTS.remove(e.getId());
+        try {
+            m.addChild(e);
+        } catch (Throwable t) {
+            System.out.println("V5ORG cannot move " + e.getModelType() + " " + e.getName() + ": " + t);
+        }
+    }
+}

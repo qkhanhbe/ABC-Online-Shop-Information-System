@@ -1,33 +1,47 @@
-Geometry of 'DM01 Data Model Classes - Customers Catalogue and Orders' (ClassDiagram):
-  Class: Shipment 951,1051 473x145 caption 0,0 473x38
-  Class: Payment 60,1051 297x221 caption 0,0 297x38
-  Class: OrderItem 742,1090 149x126 caption 0,0 149x38
-  Class: Order 486,598 551x297 caption 0,0 551x38
-  Class: Promotion 417,1051 265x202 caption 0,0 265x38
-  Class: Watch 707,1845 219x164 caption 0,0 219x38
-  Class: Bag 451,1863 196x145 caption 0,0 196x38
-  Class: Apparel 1453,1863 196x145 caption 0,0 196x38
-  Class: Footwear 1197,1845 196x164 caption 0,0 196x38
-  Class: Product 728,1410 267x297 caption 0,0 267x38
-  Class: Category 986,1863 151x103 caption 0,0 151x38
-  Class: CartItem 1484,1090 149x126 caption 0,0 149x38
-  Class: Cart 1340,655 438x183 caption 0,0 438x38
-  Class: Address 246,598 180x164 caption 0,0 180x38
-  Class: Customer 570,377 382x65 caption 0,0 382x38
-  Class: User 653,74 217x183 caption 0,0 217x38
-  Generalization: User -> Customer points (761,257) (761,377) caption 771,337 20x0 text ""
-  Generalization: Product -> Footwear points (906,1707) (906,1765) (1295,1765) (1295,1845) caption 1121,1785 20x0 text ""
-  Generalization: Product -> Apparel points (950,1707) (950,1747) (1551,1747) (1551,1863) caption 1298,1767 20x0 text ""
-  Generalization: Product -> Bag points (772,1707) (772,1747) (549,1747) (549,1863) caption 633,1767 20x0 text ""
-  Generalization: Product -> Watch points (817,1707) (817,1845) caption 827,1796 20x0 text ""
-  Association 'delivers to': Customer -> Address points (666,442) (666,482) (336,482) (336,598) caption 442,455 119x24 text "delivers to" mult 649,442 16x20 mult 300,578 40x20
-  Association 'owns': Customer -> Cart points (857,442) (857,482) (1559,482) (1559,655) caption 1177,455 63x24 text "owns" mult 859,442 16x20 mult 1523,635 40x20
-  Association 'contains': Cart -> CartItem points (1559,838) (1559,1090) caption 1560,952 92x24 text "contains" mult 1561,838 16x20 mult 1554,1070 40x20
-  Association 'refers to': CartItem -> Product points (1559,1216) (1559,1294) (906,1294) (906,1410) caption 1183,1297 101x24 text "refers to" mult 1524,1216 40x20 mult 908,1390 16x20
-  Association 'belongs to': Product -> Category points (861,1707) (861,1783) (1062,1783) (1062,1863) caption 906,1786 110x24 text "belongs to" mult 856,1707 40x20 mult 1045,1843 16x20
-  Association 'places': Customer -> Order points (761,442) (761,598) caption 764,508 74x24 text "places" mult 763,442 16x20 mult 756,578 40x20
-  Association 'contains': Order -> OrderItem points (817,895) (817,1090) caption 724,980 92x24 text "contains" mult 800,895 16x20 mult 782,1070 40x20
-  Association 'refers to': OrderItem -> Product points (817,1216) (817,1410) caption 720,1301 101x24 text "refers to" mult 782,1216 40x20 mult 800,1390 16x20
-  Association 'paid by': Order -> Payment points (596,895) (596,935) (209,935) (209,1051) caption 362,908 83x24 text "paid by" mult 579,895 16x20 mult 174,1031 40x20
-  Association 'uses': Order -> Promotion points (706,895) (706,953) (550,953) (550,1051) caption 599,956 59x24 text "uses" mult 701,895 40x20 mult 514,1031 40x20
-  Association 'shipped as': Order -> Shipment points (927,895) (927,935) (1188,935) (1188,1051) caption 1002,908 110x24 text "shipped as" mult 929,895 16x20 mult 1152,1031 40x20
+Geometry of 'DM01 Data Model Class Diagram (ORM)' (ClassDiagram):
+  Class: Review 1139,49 149x141 caption 0,0 149x38
+  Class: ReplenishmentRequest 1656,59 206x122 caption 0,0 206x38
+  Class: InventoryEvent 2006,429 152x160 caption 0,0 152x38
+  Class: StockLevel 1708,457 149x103 caption 0,0 149x38
+  Class: Milestone 880,846 149x122 caption 0,0 149x38
+  Class: StatusChange 312,846 149x122 caption 0,0 149x38
+  Class: Shipment 601,856 151x103 caption 0,0 151x38
+  Class: Payment 40,818 150x179 caption 0,0 150x38
+  Class: OrderItem 880,457 149x103 caption 0,0 149x38
+  Class: Order 584,410 186x198 caption 0,0 186x38
+  Class: Promotion 1139,827 149x160 caption 0,0 149x38
+  Class: Watch 2285,846 208x122 caption 0,0 208x38
+  Class: Bag 2000,856 175x103 caption 0,0 175x38
+  Class: Apparel 1708,856 149x103 caption 0,0 149x38
+  Class: Footwear 1398,846 168x122 caption 0,0 168x38
+  Class: Product 1407,410 149x198 caption 0,0 149x38
+  Class: Category 1407,68 149x103 caption 0,0 149x38
+  Class: CartItem 880,68 149x103 caption 0,0 149x38
+  Class: Cart 602,87 149x65 caption 0,0 149x38
+  Class: Address 40,59 149x122 caption 0,0 149x38
+  Class: Customer 40,488 149x42 caption 0,0 149x38
+  Class: User 300,40 174x160 caption 0,0 174x38
+  Generalization: User -> Customer points (320,200) (320,472) (166,472) (166,488) caption 330,441 20x0 text ""
+  Generalization: Product -> Footwear points (1481,608) (1481,846) caption 1491,747 20x0 text ""
+  Generalization: Product -> Apparel points (1497,608) (1497,832) (1726,832) (1726,856) caption 1521,852 20x0 text ""
+  Generalization: Product -> Bag points (1521,608) (2020,608) (2020,856) caption 1904,628 20x0 text ""
+  Generalization: Product -> Watch points (1533,608) (1533,820) (1986,820) (1986,984) (2305,984) (2305,968) caption 1913,840 20x0 text ""
+  Association 'delivers to': Customer -> Address points (114,488) (114,181) caption 0,323 119x24 text "delivers to" mult 97,468 16x20 mult 78,181 40x20
+  Association 'owns': Customer -> Cart points (189,496) (570,496) (570,143) (602,143) caption 348,469 63x24 text "owns" mult 329,476 16x20 mult 566,123 40x20
+  Association 'contains': Cart -> CartItem points (751,116) (880,116) caption 769,119 92x24 text "contains" mult 753,96 16x20 mult 845,96 40x20
+  Association 'refers to': CartItem -> Product points (1029,152) (1125,152) (1125,430) (1407,430) caption 1216,403 101x24 text "refers to" mult 1024,132 40x20 mult 1390,410 16x20
+  Association 'belongs to': Product -> Category points (1481,410) (1481,171) caption 1371,279 110x24 text "belongs to" mult 1446,390 40x20 mult 1464,171 16x20
+  Association 'places': Customer -> Order points (189,509) (584,509) caption 350,512 74x24 text "places" mult 191,509 16x20 mult 549,509 40x20
+  Association 'contains': Order -> OrderItem points (770,505) (880,505) caption 779,478 92x24 text "contains" mult 772,505 16x20 mult 845,505 40x20
+  Association 'refers to': OrderItem -> Product points (1029,505) (1407,505) caption 1168,508 101x24 text "refers to" mult 1024,505 40x20 mult 1390,505 16x20
+  Association 'paid by': Order -> Payment points (584,586) (206,586) (206,838) (190,838) caption 354,589 83x24 text "paid by" mult 567,586 16x20 mult 185,838 40x20
+  Association 'uses': Order -> Promotion points (770,586) (1123,586) (1123,847) (1139,847) caption 917,589 59x24 text "uses" mult 765,586 40x20 mult 1103,847 40x20
+  Association 'shipped as': Order -> Shipment points (676,608) (676,856) caption 678,720 110x24 text "shipped as" mult 678,608 16x20 mult 672,836 40x20
+  Association 'records': Order -> StatusChange points (604,608) (604,830) (438,830) (438,846) caption 519,707 83x24 text "records" mult 587,608 16x20 mult 403,826 40x20
+  Association 'tracked by': Shipment -> Milestone points (752,907) (880,907) caption 761,880 110x24 text "tracked by" mult 754,907 16x20 mult 845,907 40x20
+  Association 'has': Product -> StockLevel points (1556,509) (1708,509) caption 1607,482 50x24 text "has" mult 1558,489 16x20 mult 1691,489 16x20
+  Association 'explained by': Product -> InventoryEvent points (1556,569) (2007,569) caption 1717,572 128x24 text "explained by" mult 1558,549 16x20 mult 1972,549 40x20
+  Association 'replenished by': Product -> ReplenishmentRequest points (1533,410) (1533,197) (1696,197) (1696,181) caption 1532,292 146x24 text "replenished by" mult 1535,390 16x20 mult 1691,181 40x20
+  Association 'about': Review -> Product points (1265,190) (1265,394) (1425,394) (1425,410) caption 1268,280 66x24 text "about" mult 1260,190 40x20 mult 1427,390 16x20
+  Association 'writes': Customer -> Review points (154,488) (154,214) (1169,214) (1169,190) caption 624,217 74x24 text "writes" mult 137,468 16x20 mult 1164,190 40x20
+  Association 'verified by': Review -> Order points (1157,190) (1157,442) (770,442) caption 905,415 119x24 text "verified by" mult 1152,220 40x20 mult 772,442 16x20

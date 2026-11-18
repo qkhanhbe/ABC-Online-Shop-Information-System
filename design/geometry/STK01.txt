@@ -1,0 +1,20 @@
+Geometry of 'STK01 Stakeholder Map' (ClassDiagram):
+  Package: External stakeholders 1000,40 380x500 caption 0,20 380x480
+    Class: Customer 1020,90 321x65 caption 0,0 321x38
+    Class: Supplier 1020,200 273x65 caption 0,0 273x38
+    Class: Payment Provider 1020,310 300x65 caption 0,0 300x38
+    Class: Shipping Provider 1020,420 321x65 caption 0,0 321x38
+  Package: Internal stakeholders 40,40 380x500 caption 0,20 380x480
+    Class: Administrator 60,90 315x65 caption 0,0 315x38
+    Class: Sales Staff 60,200 268x65 caption 0,0 268x38
+    Class: Warehouse Staff 60,310 274x65 caption 0,0 274x38
+    Class: Manager 60,420 263x65 caption 0,0 263x38
+  Class: ABC Online Shop 640,270 127x42 caption 0,0 127x38
+  Association: Administrator -> ABC Online Shop points (375,146) (612,146) (612,290) (640,290) caption 586,154 26x24 text ""
+  Association: Sales Staff -> ABC Online Shop points (328,256) (624,256) (624,278) (640,278) caption 502,264 26x24 text ""
+  Association: Warehouse Staff -> ABC Online Shop points (334,318) (624,318) (624,302) (640,302) caption 502,326 26x24 text ""
+  Association: Manager -> ABC Online Shop points (323,428) (655,428) (655,312) caption 554,436 26x24 text ""
+  Association: Customer -> ABC Online Shop points (1020,146) (795,146) (795,290) (767,290) caption 829,154 26x24 text ""
+  Association: Supplier -> ABC Online Shop points (1020,256) (783,256) (783,278) (767,278) caption 890,264 26x24 text ""
+  Association: Payment Provider -> ABC Online Shop points (1020,318) (783,318) (783,302) (767,302) caption 893,326 26x24 text ""
+  Association: Shipping Provider -> ABC Online Shop points (1020,428) (751,428) (751,312) caption 835,436 26x24 text ""

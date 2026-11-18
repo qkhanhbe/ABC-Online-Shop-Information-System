@@ -1,0 +1,30 @@
+Geometry of 'DFD1 Level 1 - 4.0 Place Order and Pay' (DataFlowDiagram):
+  DFExternalEntity: Customer 88,262 120x116 caption 0,0 120x19
+  DFExternalEntity: Payment Provider 60,628 148x84 caption 0,0 148x19
+  DFProcess: Validate Cart 514,126 150x116 caption 0,19 150x19
+  DFProcess: Calculate Total 970,260 150x90 caption 0,19 150x19
+  DFProcess: Reserve Stock and Create Order 1426,375 170x148 caption 0,19 170x19
+  DFProcess: Request Payment 1902,827 150x90 caption 0,19 150x19
+  DFProcess: Record Payment Result 1431,593 160x90 caption 0,19 160x19
+  DFDataStore: Products 1902,166 150x36 caption 32,0 118x19
+  DFDataStore: Carts 1902,60 150x36 caption 32,0 118x19
+  DFDataStore: Promotions 1902,272 150x36 caption 32,0 118x19
+  DFDataStore: Orders 1902,567 150x84 caption 32,0 118x19
+  DFDataStore: Inventory 1902,378 150x84 caption 32,0 118x19
+  DFDataStore: Payments 1902,721 150x36 caption 32,0 118x19
+  DFDataFlow 'checkout request': Customer -> Validate Cart points (208,276) (498,276) (498,224) (514,224) caption 274,249 158x24 text "checkout request"
+  DFDataFlow 'cart lines': Carts -> Validate Cart points (1902,80) (680,80) (680,140) (664,140) caption 1245,53 93x24 text "cart lines"
+  DFDataFlow 'price, status': Products -> Validate Cart points (1902,184) (664,184) caption 1224,157 118x24 text "price, status"
+  DFDataFlow 'valid cart': Validate Cart -> Calculate Total points (664,224) (954,224) (954,271) (970,271) caption 763,227 93x24 text "valid cart"
+  DFDataFlow 'promotion rule': Promotions -> Calculate Total points (1902,296) (1120,296) caption 1443,269 136x24 text "promotion rule"
+  DFDataFlow 'quote': Calculate Total -> Customer points (970,306) (208,306) caption 556,309 66x24 text "quote"
+  DFDataFlow 'confirmed total': Calculate Total -> Reserve Stock and Create Order points (1120,331) (1410,331) (1410,393) (1426,393) caption 1196,334 139x24 text "confirmed total"
+  DFDataFlow 'available qty': Inventory -> Reserve Stock and Create Order points (1902,424) (1612,424) (1612,449) (1596,449) caption 1697,427 121x24 text "available qty"
+  DFDataFlow 'RESERVE events': Reserve Stock and Create Order -> Inventory points (1596,393) (1886,393) (1886,399) (1902,399) caption 1659,366 165x24 text "RESERVE events"
+  DFDataFlow 'Payment Pending order': Reserve Stock and Create Order -> Orders points (1596,501) (1886,501) (1886,577) (1902,577) caption 1636,504 210x24 text "Payment Pending order"
+  DFDataFlow 'order ref, amount': Reserve Stock and Create Order -> Request Payment points (1596,465) (1856,465) (1856,838) (1902,838) caption 1694,651 159x24 text "order ref, amount"
+  DFDataFlow 'payment request': Request Payment -> Payment Provider points (1902,872) (224,872) (224,698) (208,698) caption 986,875 155x24 text "payment request"
+  DFDataFlow 'signed result': Payment Provider -> Record Payment Result points (208,655) (1431,655) caption 758,628 123x24 text "signed result"
+  DFDataFlow 'payment status': Record Payment Result -> Payments points (1591,664) (1607,664) (1607,729) (1902,729) caption 1683,732 143x24 text "payment status"
+  DFDataFlow 'order status': Record Payment Result -> Orders points (1591,638) (1902,638) caption 1688,611 116x24 text "order status"
+  DFDataFlow 'confirmation': Record Payment Result -> Customer points (1431,604) (224,604) (224,360) (208,360) caption 769,577 119x24 text "confirmation"

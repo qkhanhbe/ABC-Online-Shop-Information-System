@@ -28,7 +28,9 @@ public class V5Show {
         for (IDiagramUIModel d : project.toDiagramArray()) {
             String n = d.getName();
             try { ApplicationManager.instance().getDiagramManager().openDiagram(d); } catch (Throwable ignored) { }
-            if (n.startsWith("LAY01 ") || n.startsWith("LAY02 ")) System.out.println("V5SHOW collapsed " + collapseModel(d) + " on " + n);
+            if (n.startsWith("LAY0")) System.out.println("V5SHOW collapsed " + collapseModel(d) + " on " + n);
+            if (n.startsWith("CL01 ") || n.startsWith("DM01 ") || n.startsWith("DCL0") || n.startsWith("LAY0"))
+                System.out.println("V5SHOW widened " + widen(d) + " on " + n);
         }
     }
 
@@ -48,6 +50,22 @@ public class V5Show {
             u.setShowFromRoleName(true);
             u.setShowToRoleName(true);
             n++;
+        }
+        return n;
+    }
+
+    /** Visual Paradigm fits a class to its members, but the bold name can be wider: keep the centre, widen. */
+    int widen(IDiagramUIModel d) {
+        int n = 0;
+        for (IDiagramElement e : d.toDiagramElementArray()) {
+            if (!(e instanceof IClassUIModel) || e.getModelElement() == null) continue;
+            IClassUIModel u = (IClassUIModel) e;
+            int need = 9 * e.getModelElement().getName().length() + 26;
+            if (u.getWidth() < need) {
+                u.setBounds(u.getX() - (need - u.getWidth()) / 2, u.getY(), need, u.getHeight());
+                u.resetCaption();
+                n++;
+            }
         }
         return n;
     }

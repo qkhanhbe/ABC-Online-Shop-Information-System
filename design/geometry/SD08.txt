@@ -1,0 +1,34 @@
+Geometry of 'SD08 Pay Order by Card (Design)' (InteractionDiagram):
+  Activation: Activation 1785,621 8x12
+  Activation: Activation 1613,529 8x68
+  Activation: Activation 1307,420 8x303
+  Activation: Activation 994,172 8x48
+  Activation: Activation 825,136 8x551
+  Activation: Activation 552,100 8x659
+  Activation: Activation 118,100 8x659
+  Lifeline: InventoryService 1702,30 174x757 caption 1728,65 123x19
+  Lifeline: Order 1552,30 130x749 caption 1593,65 48x19
+  Lifeline: OrderDAO 1246,30 130x749 caption 1272,65 79x19
+  Lifeline: PaymentGateway 920,30 156x749 caption 935,65 126x19
+  Lifeline: PaymentDAO 764,30 130x749 caption 780,65 99x19
+  Lifeline: PaymentService 478,30 156x749 caption 497,65 118x19
+  Lifeline: CheckoutService 40,30 165x749 caption 60,65 124x19
+  CombinedFragment: CombinedFragment2 454,476 1446x166 caption 0,0 27x22
+    InteractionOperand: Operand3 454,498 1446x56
+    InteractionOperand: Operand4 454,554 1446x88
+  Message 'request_payment(order, card_token)': CheckoutService -> PaymentService points (126,100) (552,100) caption 173,71 333x24 text "request_payment(order, card_token)"
+  Message 'save_payment(payment Pending)': PaymentService -> PaymentDAO points (560,136) (825,136) caption 537,107 310x24 text "save_payment(payment Pending)"
+  Message 'authorize(attempt_ref, amount, currency, token)': PaymentService -> PaymentGateway points (560,172) (994,172) caption 567,143 421x24 text "authorize(attempt_ref, amount, currency, token)"
+  Message 'signed result': PaymentGateway -> PaymentService points (994,208) (560,208) caption 706,179 143x24 text "signed result"
+  Message 'handle_result(result)': PaymentService -> PaymentService points (560,244) (592,244) (592,260) (560,260) caption 598,240 205x24 text "handle_result(result)"
+  Message 'get_by_attempt(attempt_ref)': PaymentService -> PaymentDAO points (560,296) (825,296) caption 558,267 268x24 text "get_by_attempt(attempt_ref)"
+  Message 'payment': PaymentDAO -> PaymentService points (825,332) (560,332) caption 637,303 110x24 text "payment"
+  Message 'check signature, amount, currency': PaymentService -> PaymentService points (560,368) (592,368) (592,384) (560,384) caption 598,364 316x24 text "check signature, amount, currency"
+  Message 'get_order(order_id)': PaymentService -> OrderDAO points (560,420) (1307,420) caption 835,391 196x24 text "get_order(order_id)"
+  Message 'order': OrderDAO -> PaymentService points (1307,456) (560,456) caption 887,427 93x24 text "order"
+  Message 'change_status(Paid)': PaymentService -> Order points (560,529) (1613,529) caption 978,500 216x24 text "change_status(Paid)"
+  Message 'change_status(Payment Failed)': PaymentService -> Order points (560,585) (1613,585) caption 934,556 305x24 text "change_status(Payment Failed)"
+  Message 'release_order(order)': PaymentService -> InventoryService points (560,621) (1785,621) caption 1064,592 216x24 text "release_order(order)"
+  Message 'save_payment(payment)': PaymentService -> PaymentDAO points (560,675) (825,675) caption 568,646 249x24 text "save_payment(payment)"
+  Message 'save_order(order)': PaymentService -> OrderDAO points (560,711) (1307,711) caption 836,682 195x24 text "save_order(order)"
+  Message 'payment status': PaymentService -> CheckoutService points (552,747) (126,747) caption 253,718 173x24 text "payment status"

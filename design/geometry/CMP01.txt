@@ -1,0 +1,33 @@
+Geometry of 'CMP01 AI Search Three-Layer Architecture' (ComponentDiagram):
+  NOTE: (NOTE) 144,289 520x40 caption 0,0 505x0
+  Package: Presentation Layer (controller, view) 734,78 392x452 caption 0,20 392x432
+    Component: ShopController 839,284 180x58 caption 0,0 156x58
+    Component: SearchForm (text, voice, image) 779,126 300x58 caption 0,0 276x58
+    Component: SearchResultsView 806,442 220x58 caption 0,0 196x58
+  Package: Application - Intelligence Layer (ai.search, service) 257,648 920x345 caption 0,20 920x325
+    Component: QueryService 757,696 160x58 caption 0,0 136x58
+    Component: SpeechService 287,696 160x58 caption 0,0 136x58
+    Component: SearchService 517,696 170x58 caption 0,0 146x58
+    Component: ImageService 987,696 160x58 caption 0,0 136x58
+    Component: RankingService 568,854 170x58 caption 0,0 146x58
+  Package: Data Layer (dao) 60,1111 1150x153 caption 0,20 1150x133
+    Component: ProductDAO 320,1159 160x58 caption 0,0 136x58
+    Component: InventoryDAO 550,1159 160x58 caption 0,0 136x58
+    Component: OrderDAO 90,1159 160x58 caption 0,0 136x58
+    Component: VectorIndex 780,1159 160x58 caption 0,0 136x58
+    Component: ImageStorage 1010,1159 170x58 caption 0,0 146x58
+  Usage: SearchForm (text, voice, image) -> ShopController points (935,184) (935,284) caption 945,254 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> SearchResultsView points (929,342) (929,442) caption 939,412 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> QueryService points (839,328) (789,328) (789,696) caption 799,507 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> SpeechService points (839,316) (823,316) (823,428) (463,428) (463,704) (447,704) caption 571,448 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> ImageService points (1019,328) (1043,328) (1043,696) caption 1053,520 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> SearchService points (839,304) (703,304) (703,704) (687,704) caption 713,464 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: SearchService -> RankingService points (602,754) (602,854) caption 612,824 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: SearchService -> ProductDAO points (537,754) (537,770) (460,770) (460,1159) caption 470,938 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: SearchService -> InventoryDAO points (549,754) (549,1143) (570,1143) (570,1159) caption 559,987 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: SearchService -> OrderDAO points (537,696) (537,680) (230,680) (230,1159) caption 240,778 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: SearchService -> VectorIndex points (657,754) (657,840) (800,840) (800,1159) caption 810,905 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ShopController -> ImageStorage points (991,342) (991,428) (1177,428) (1177,1143) (1150,1143) (1150,1159) caption 1187,691 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Usage: ImageService -> ImageStorage points (1067,754) (1067,1159) caption 1077,976 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Dependency: Presentation Layer (controller, view) -> Application - Intelligence Layer (ai.search, service) points (930,530) (930,668) caption 940,619 20x0 text "<<use>>" TRUNCATED needs 53x12
+  Dependency: Application - Intelligence Layer (ai.search, service) -> Data Layer (dao) points (717,993) (717,1131) caption 727,1082 20x0 text "<<use>>" TRUNCATED needs 53x12
