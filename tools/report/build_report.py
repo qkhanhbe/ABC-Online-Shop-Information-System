@@ -67,6 +67,7 @@ class Doc(BaseDocTemplate):
         lw, lh = landscape(A4)
         frame_l = Frame(20 * mm, 18 * mm, lw - 40 * mm, lh - 36 * mm, id="fl")
         self.addPageTemplates([PageTemplate("cover", [frame], onPage=draw_cover),
+                               PageTemplate("plain", [frame], onPage=lambda c, d: None),
                                PageTemplate("normal", [frame], onPage=self.decorate),
                                PageTemplate("landscape", [frame_l], onPage=self.decorate_l, pagesize=landscape(A4))])
 
@@ -329,7 +330,9 @@ def draw_cover(canvas, doc):
 
 def cover():
     c1 = ParagraphStyle("c1", fontName="TNR-B", fontSize=14, leading=18, alignment=TA_CENTER)
-    s = [Spacer(1, 1), PageBreak()]                       # the cover itself is drawn by draw_cover
+    from reportlab.platypus import NextPageTemplate
+    # the cover itself is drawn by draw_cover; the instructor's page that follows is a plain page
+    s = [Spacer(1, 1), NextPageTemplate("plain"), PageBreak()]
     dots = ParagraphStyle("dots", fontName="TNR", fontSize=12, leading=24)
     s += [Paragraph("INSTRUCTOR'S COMMENTS", ParagraphStyle("ic", parent=c1, fontSize=15)), Spacer(1, 8 * mm)]
     s += [Paragraph("." * 150, dots) for _ in range(16)]
